@@ -1,0 +1,3 @@
+[submodule "Recruit/guile"]
+	path = Recruit/guile
+	url = https://github.com/gilt/guile.git

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
+		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
+		D2A68073194C07530091B768 /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68072194C07530091B768 /* CandidateEntry.m */; };
+		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
 		D2F8185B19465FE5006E88FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185A19465FE5006E88FD /* Foundation.framework */; };
 		D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185C19465FE5006E88FD /* CoreGraphics.framework */; };
 		D2F8185F19465FE5006E88FD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185E19465FE5006E88FD /* UIKit.framework */; };
@@ -14,13 +18,22 @@
 		D2F8186719465FE5006E88FD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8186619465FE5006E88FD /* main.m */; };
 		D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8186A19465FE5006E88FD /* YRAppDelegate.m */; };
 		D2F8186E19465FE5006E88FD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D2F8186C19465FE5006E88FD /* Main.storyboard */; };
-		D2F8187119465FE5006E88FD /* YRViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8187019465FE5006E88FD /* YRViewController.m */; };
+		D2F8187119465FE5006E88FD /* YRMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8187019465FE5006E88FD /* YRMainViewController.m */; };
 		D2F8187319465FE5006E88FD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2F8187219465FE5006E88FD /* Images.xcassets */; };
 		D2F8187A19465FE5006E88FD /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8187919465FE5006E88FD /* XCTest.framework */; };
 		D2F8187B19465FE5006E88FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185A19465FE5006E88FD /* Foundation.framework */; };
 		D2F8187C19465FE5006E88FD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185E19465FE5006E88FD /* UIKit.framework */; };
 		D2F8188419465FE5006E88FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D2F8188219465FE5006E88FD /* InfoPlist.strings */; };
 		D2F8188619465FE5006E88FD /* RecruitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8188519465FE5006E88FD /* RecruitTests.m */; };
+		D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8189019466940006E88FD /* YRHostMainViewController.m */; };
+		D2F818941946696D006E88FD /* YRClientConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F818931946696D006E88FD /* YRClientConnectionViewController.m */; };
+		D2F8189719469FC1006E88FD /* YRMCManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8189619469FC1006E88FD /* YRMCManager.m */; };
+		D2F8189A1946B3E4006E88FD /* YRFormViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F818991946B3E4006E88FD /* YRFormViewController.m */; };
+		D2F8189D19474712006E88FD /* YRDataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8189C19474712006E88FD /* YRDataViewController.m */; };
+		D2F818A019476113006E88FD /* YRinfoDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8189F19476113006E88FD /* YRinfoDataCell.m */; };
+		D2F818A519489B5E006E88FD /* Recruit.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */; };
+		D2F818A719489FF8006E88FD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F818A619489FF8006E88FD /* CoreData.framework */; };
+		D2F818B31948E691006E88FD /* YRDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F818B21948E691006E88FD /* YRDataManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +47,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostSettingViewController.h; path = Recruit/YRHostSettingViewController.h; sourceTree = SOURCE_ROOT; };
+		D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostSettingViewController.m; path = Recruit/YRHostSettingViewController.m; sourceTree = SOURCE_ROOT; };
+		D2A6806F194BA00F0091B768 /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
+		D2A68071194C07530091B768 /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
+		D2A68072194C07530091B768 /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
+		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
+		D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostDetailViewController.m; path = Recruit/YRHostDetailViewController.m; sourceTree = SOURCE_ROOT; };
 		D2F8185719465FE5006E88FD /* Recruit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recruit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F8185A19465FE5006E88FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2F8185C19465FE5006E88FD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -45,14 +65,30 @@
 		D2F8186919465FE5006E88FD /* YRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YRAppDelegate.h; sourceTree = "<group>"; };
 		D2F8186A19465FE5006E88FD /* YRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YRAppDelegate.m; sourceTree = "<group>"; };
 		D2F8186D19465FE5006E88FD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		D2F8186F19465FE5006E88FD /* YRViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YRViewController.h; sourceTree = "<group>"; };
-		D2F8187019465FE5006E88FD /* YRViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YRViewController.m; sourceTree = "<group>"; };
+		D2F8186F19465FE5006E88FD /* YRMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YRMainViewController.h; sourceTree = "<group>"; };
+		D2F8187019465FE5006E88FD /* YRMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YRMainViewController.m; sourceTree = "<group>"; };
 		D2F8187219465FE5006E88FD /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		D2F8187819465FE5006E88FD /* RecruitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RecruitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F8187919465FE5006E88FD /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		D2F8188119465FE5006E88FD /* RecruitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RecruitTests-Info.plist"; sourceTree = "<group>"; };
 		D2F8188319465FE5006E88FD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D2F8188519465FE5006E88FD /* RecruitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RecruitTests.m; sourceTree = "<group>"; };
+		D2F8188F19466940006E88FD /* YRHostMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostMainViewController.h; path = Recruit/YRHostMainViewController.h; sourceTree = SOURCE_ROOT; };
+		D2F8189019466940006E88FD /* YRHostMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostMainViewController.m; path = Recruit/YRHostMainViewController.m; sourceTree = SOURCE_ROOT; };
+		D2F818921946696D006E88FD /* YRClientConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRClientConnectionViewController.h; path = Recruit/YRClientConnectionViewController.h; sourceTree = SOURCE_ROOT; };
+		D2F818931946696D006E88FD /* YRClientConnectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRClientConnectionViewController.m; path = Recruit/YRClientConnectionViewController.m; sourceTree = SOURCE_ROOT; };
+		D2F8189519469FC1006E88FD /* YRMCManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRMCManager.h; sourceTree = "<group>"; };
+		D2F8189619469FC1006E88FD /* YRMCManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRMCManager.m; sourceTree = "<group>"; };
+		D2F818981946B3E4006E88FD /* YRFormViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRFormViewController.h; path = ../YRFormViewController.h; sourceTree = "<group>"; };
+		D2F818991946B3E4006E88FD /* YRFormViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRFormViewController.m; path = ../YRFormViewController.m; sourceTree = "<group>"; };
+		D2F8189B19474712006E88FD /* YRDataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRDataViewController.h; path = ../YRDataViewController.h; sourceTree = "<group>"; };
+		D2F8189C19474712006E88FD /* YRDataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRDataViewController.m; path = ../YRDataViewController.m; sourceTree = "<group>"; };
+		D2F8189E19476113006E88FD /* YRinfoDataCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRinfoDataCell.h; path = ../YRinfoDataCell.h; sourceTree = "<group>"; };
+		D2F8189F19476113006E88FD /* YRinfoDataCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRinfoDataCell.m; path = ../YRinfoDataCell.m; sourceTree = "<group>"; };
+		D2F818A419489B5E006E88FD /* Recruit.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Recruit.xcdatamodel; sourceTree = "<group>"; };
+		D2F818A619489FF8006E88FD /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		D2F818B11948E691006E88FD /* YRDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRDataManager.h; path = Recruit/YRDataManager.h; sourceTree = SOURCE_ROOT; };
+		D2F818B21948E691006E88FD /* YRDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRDataManager.m; path = Recruit/YRDataManager.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,9 +96,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2F818A719489FF8006E88FD /* CoreData.framework in Frameworks */,
 				D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */,
 				D2F8185F19465FE5006E88FD /* UIKit.framework in Frameworks */,
 				D2F8185B19465FE5006E88FD /* Foundation.framework in Frameworks */,
+				D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +139,8 @@
 		D2F8185919465FE5006E88FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D2A6806F194BA00F0091B768 /* Guile.framework */,
+				D2F818A619489FF8006E88FD /* CoreData.framework */,
 				D2F8185A19465FE5006E88FD /* Foundation.framework */,
 				D2F8185C19465FE5006E88FD /* CoreGraphics.framework */,
 				D2F8185E19465FE5006E88FD /* UIKit.framework */,
@@ -112,11 +152,20 @@
 		D2F8186019465FE5006E88FD /* Recruit */ = {
 			isa = PBXGroup;
 			children = (
+				D2F818A119478777006E88FD /* YRClient */,
+				D2F818A219478777006E88FD /* YRHost */,
 				D2F8186919465FE5006E88FD /* YRAppDelegate.h */,
 				D2F8186A19465FE5006E88FD /* YRAppDelegate.m */,
+				D2A68071194C07530091B768 /* CandidateEntry.h */,
+				D2A68072194C07530091B768 /* CandidateEntry.m */,
+				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
+				D2F818B11948E691006E88FD /* YRDataManager.h */,
+				D2F818B21948E691006E88FD /* YRDataManager.m */,
 				D2F8186C19465FE5006E88FD /* Main.storyboard */,
-				D2F8186F19465FE5006E88FD /* YRViewController.h */,
-				D2F8187019465FE5006E88FD /* YRViewController.m */,
+				D2F8186F19465FE5006E88FD /* YRMainViewController.h */,
+				D2F8187019465FE5006E88FD /* YRMainViewController.m */,
+				D2F8189519469FC1006E88FD /* YRMCManager.h */,
+				D2F8189619469FC1006E88FD /* YRMCManager.m */,
 				D2F8187219465FE5006E88FD /* Images.xcassets */,
 				D2F8186119465FE5006E88FD /* Supporting Files */,
 			);
@@ -150,6 +199,34 @@
 				D2F8188219465FE5006E88FD /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D2F818A119478777006E88FD /* YRClient */ = {
+			isa = PBXGroup;
+			children = (
+				D2F818921946696D006E88FD /* YRClientConnectionViewController.h */,
+				D2F818931946696D006E88FD /* YRClientConnectionViewController.m */,
+				D2F818981946B3E4006E88FD /* YRFormViewController.h */,
+				D2F818991946B3E4006E88FD /* YRFormViewController.m */,
+			);
+			path = YRClient;
+			sourceTree = "<group>";
+		};
+		D2F818A219478777006E88FD /* YRHost */ = {
+			isa = PBXGroup;
+			children = (
+				D2F8188F19466940006E88FD /* YRHostMainViewController.h */,
+				D2F8189019466940006E88FD /* YRHostMainViewController.m */,
+				D2F8189B19474712006E88FD /* YRDataViewController.h */,
+				D2F8189C19474712006E88FD /* YRDataViewController.m */,
+				D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */,
+				D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */,
+				D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */,
+				D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */,
+				D2F8189E19476113006E88FD /* YRinfoDataCell.h */,
+				D2F8189F19476113006E88FD /* YRinfoDataCell.m */,
+			);
+			path = YRHost;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -250,9 +327,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D2F8187119465FE5006E88FD /* YRViewController.m in Sources */,
+				D2F818A519489B5E006E88FD /* Recruit.xcdatamodeld in Sources */,
+				D2F818A019476113006E88FD /* YRinfoDataCell.m in Sources */,
+				D2F8187119465FE5006E88FD /* YRMainViewController.m in Sources */,
+				D2F818941946696D006E88FD /* YRClientConnectionViewController.m in Sources */,
+				D2F8189719469FC1006E88FD /* YRMCManager.m in Sources */,
+				D2A68073194C07530091B768 /* CandidateEntry.m in Sources */,
+				D2F818B31948E691006E88FD /* YRDataManager.m in Sources */,
 				D2F8186719465FE5006E88FD /* main.m in Sources */,
+				D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */,
+				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
+				D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */,
+				D2F8189D19474712006E88FD /* YRDataViewController.m in Sources */,
 				D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */,
+				D2F8189A1946B3E4006E88FD /* YRFormViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,9 +467,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
 				INFOPLIST_FILE = "Recruit/Recruit-Info.plist";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -392,9 +485,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
 				INFOPLIST_FILE = "Recruit/Recruit-Info.plist";
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -461,6 +559,7 @@
 				D2F8188B19465FE5006E88FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D2F8188C19465FE5006E88FD /* Build configuration list for PBXNativeTarget "RecruitTests" */ = {
 			isa = XCConfigurationList;
@@ -469,8 +568,22 @@
 				D2F8188E19465FE5006E88FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D2F818A419489B5E006E88FD /* Recruit.xcdatamodel */,
+			);
+			currentVersion = D2F818A419489B5E006E88FD /* Recruit.xcdatamodel */;
+			path = Recruit.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = D2F8184F19465FE4006E88FD /* Project object */;
 }
