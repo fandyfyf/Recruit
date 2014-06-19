@@ -87,6 +87,7 @@
 }
 
 - (IBAction)signOut:(id)sender {
+    NSLog(@"sign out");
     for (NSDictionary *peerSession in [self.appDelegate mcManager].activeSessions) {
         [[peerSession valueForKey:@"session"] disconnect];
     }
@@ -130,39 +131,35 @@
 }
 
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
-        NSString *peerDisplayName = peerID.displayName;
-        MCSessionState state = [[[notification userInfo] objectForKey:@"state"] intValue];
-        
-        if (state != MCSessionStateConnecting) {
-            if (state == MCSessionStateConnected) {
-                [self.yrarrayConnectedDevices addObject:peerDisplayName];
-                //send ACK back
-                [[self.appDelegate dataManager] sendACKBack:peerID];
-            }
-            else if (state == MCSessionStateNotConnected){
-                if ([self.yrarrayConnectedDevices count] > 0) {
-                    unsigned long indexOfPeer = [self.yrarrayConnectedDevices indexOfObject:peerDisplayName];
-                    [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
-                    
-                    [[self.appDelegate mcManager].activeSessions removeObjectAtIndex:indexOfPeer];
-                    
-                }
-            }
+    MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
+    NSString *peerDisplayName = peerID.displayName;
+    MCSessionState state = [[[notification userInfo] objectForKey:@"state"] intValue];
+    
+    if (state != MCSessionStateConnecting) {
+        if (state == MCSessionStateConnected) {
+            [self.yrarrayConnectedDevices addObject:peerDisplayName];
+            //send ACK back
+            [[self.appDelegate dataManager] sendACKBack:peerID];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.yrtableView reloadData];
+            [[self.appDelegate dataManager] sendNameList:peerID];
+        }
+        else if (state == MCSessionStateNotConnected){
+            if ([self.yrarrayConnectedDevices count] > 0) {
+                unsigned long indexOfPeer = [self.yrarrayConnectedDevices indexOfObject:peerDisplayName];
+                [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
                 
-                BOOL peersNotExist = ([[self.appDelegate mcManager].activeSessions count] == 0);
-                [self.yrdisconnectButton setEnabled:!peersNotExist];
-            });
+                [[self.appDelegate mcManager].activeSessions removeObjectAtIndex:indexOfPeer];
+                
+            }
         }
-        else
-        {
-            NSLog(@"Peer %@ is connecting",peerID);
-        }
-    });
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.yrtableView reloadData];
+            
+            BOOL peersNotExist = ([[self.appDelegate mcManager].activeSessions count] == 0);
+            [self.yrdisconnectButton setEnabled:!peersNotExist];
+        });
+    }
 }
 
 -(void)needUpdateTableNotification:(NSNotification *)notification

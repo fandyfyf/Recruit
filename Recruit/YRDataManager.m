@@ -44,47 +44,62 @@
 
 -(void)didReceiveDataWithNotification:(NSNotification *)notification
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
-        NSString *peerDisplayName = peerID.displayName;
-        
-        NSData* yrinfoData = [[notification userInfo] objectForKey:@"data"];
-        
-        NSKeyedUnarchiver* yrunarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:yrinfoData];
-        
-        NSMutableDictionary *dic = [[yrunarchiver decodeObjectForKey:@"infoDataKey"] mutableCopy];
-        
-        [yrunarchiver finishDecoding];
+    MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
+    //NSString *peerDisplayName = peerID.displayName;
     
-        if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
-        {
-            [self sendACKBack:peerID];
-            
-            NSMutableDictionary *infoData = [dic[@"data"] mutableCopy];
-            [infoData setValue:peerDisplayName forKey:@"interviewer"];
-            
-            CandidateEntry* curr = [self saveCandidate:infoData];
-            NSDictionary *dict = @{@"entry" : curr};
-            
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
-                                                                object:nil
-                                                              userInfo:dict];
+    NSData* yrinfoData = [[notification userInfo] objectForKey:@"data"];
+    
+    NSKeyedUnarchiver* yrunarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:yrinfoData];
+    
+    NSMutableDictionary *dic = [[yrunarchiver decodeObjectForKey:@"infoDataKey"] mutableCopy];
+    
+    [yrunarchiver finishDecoding];
+    
+    NSLog(@"receiving msg is %@", dic[@"msg"]);
+    
+    if ([dic[@"msg"] isEqualToString:@"backup"] && self.isHost)
+    {
+        CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+        NSDictionary *dict = @{@"entry" : curr};
+        
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+                                                            object:nil
+                                                          userInfo:dict];
+    }
+    else if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
+    {
+        [self sendACKBack:peerID];
+        
+        CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+        NSDictionary *dict = @{@"entry" : curr};
+        
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+                                                            object:nil
+                                                          userInfo:dict];
+    }
+    else if([dic[@"msg"] isEqualToString:@"ack"])
+    {
+        [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
+        NSDictionary *dict = @{@"recruitID": dic[@"code"]};
+        
+        if (self.localBackUp != nil) {
+            [self sendBackUp:self.localBackUp];
         }
-        else if([dic[@"msg"] isEqualToString:@"ack"])
-        {
-            [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
-            NSDictionary *dict = @{@"recruitID": dic[@"code"]};
-            //NSLog(@"receciving %@",dic[@"code"]);
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateCodeNotification"
-                                                                object:nil
-                                                              userInfo:dict];
-        }
-        else
-        {
-            NSLog(@"trash");
-        }
-    });
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateCodeNotification"
+                                                            object:nil
+                                                          userInfo:dict];
+    }
+    else if([dic[@"msg"] isEqualToString:@"nameList"])
+    {
+        NSLog(@"The receiving list is %@",dic[@"data"]);
+        self.nameList = dic[@"data"];
+    }
+    else
+    {
+        NSLog(@"trash");
+    }
 
 }
 
@@ -98,8 +113,20 @@
     [item setCode:infoData[@"code"]];
     [item setRecommand:infoData[@"recommand"]];
     [item setStatus:infoData[@"status"]];
+    [item setPdf:infoData[@"pdf"]];
+    [item setGender:infoData[@"gender"]];
+    [item setPosition:infoData[@"position"]];
+    [item setPreference:infoData[@"preference"]];
+    [item setDate:infoData[@"date"]];
+    [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]]]];
+    [item setRank:[NSNumber numberWithFloat:[(NSString*)infoData[@"rank"] floatValue]]];
+    NSLog(@"saving rank %@",infoData[@"rank"]);
     
-    NSError *error;
+    [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
+    [item setMaxgpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"maxgpa"] floatValue]]];
+    [item setRatio:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]/[(NSString*)infoData[@"maxgpa"] floatValue]]];
+    
+    NSError *error = nil;
     if (![self.managedObjectContext save:&error]) {
         NSLog(@"ERROR -- saving coredata");
     }
@@ -125,6 +152,70 @@
     
     if(error){
         NSLog(@"%@", [error localizedDescription]);
+        
+        self.localBackUp = @{@"msg" : @"backup" , @"data" : data[@"data"]};
+    }
+}
+
+-(void)sendNameList:(MCPeerID*)peerID
+{
+    NSMutableArray* currentList = [NSMutableArray new];
+    for (NSDictionary* dic in [[NSUserDefaults standardUserDefaults] objectForKey:@"interviewerList"])
+    {
+        if ([dic[@"code"] isEqualToString:self.yrPrefix]) {
+            [currentList addObject:dic];
+        }
+    }
+    
+    NSDictionary* dic = @{@"msg" : @"nameList", @"data" : currentList};
+    
+    NSLog(@"sending name list");
+    
+    NSMutableData* dataToSend = [NSMutableData new];
+    
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:dataToSend];
+    
+    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    NSError *error;
+    
+    MCSession * selectedSession;
+    
+    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+        if ([[dic[@"peer"] displayName] isEqualToString:peerID.displayName]) {
+            selectedSession = dic[@"session"];
+        }
+    }
+    
+    [selectedSession sendData:dataToSend toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
+    if(error){
+        NSLog(@"%@", [error localizedDescription]);
+    }
+}
+
+-(void)sendBackUp:(NSDictionary *)localBackUp
+{
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    
+    [yrarchiver encodeObject:localBackUp forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    NSArray * allPeers = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session.connectedPeers;
+    
+    NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+    
+    NSError *error;
+    
+    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+    
+    if(error){
+        NSLog(@"%@", [error localizedDescription]);
+    }
+    else
+    {
+        self.localBackUp = nil;
     }
 }
 

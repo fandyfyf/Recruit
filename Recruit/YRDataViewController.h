@@ -12,6 +12,7 @@
 @interface YRDataViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 @property (weak, nonatomic) IBOutlet UITableView *infoDataList;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrSortingSegmentControl;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionFilter;
 
 @property (strong, nonatomic) NSString * yrPrefix;
 @property (strong, nonatomic) NSMutableArray *yrdataEntry;

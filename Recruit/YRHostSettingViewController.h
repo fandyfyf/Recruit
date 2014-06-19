@@ -19,6 +19,8 @@
 @property (strong, nonatomic) AutoSuggestTextField* interviewerEmail;
 @property (strong, nonatomic) UITextField* interviewerName;
 
+@property (strong,nonatomic) UITextField* interviewerCode;
+
 @property (strong, nonatomic) NSMutableArray* interviewerArray;
 
 - (IBAction)addInterviewer:(id)sender;

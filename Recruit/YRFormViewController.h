@@ -7,22 +7,28 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <Guile/AutoSuggestDelegate.h>
 #import "YRAppDelegate.h"
-@class AutoSuggestTextField;
 
-@interface YRFormViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate, AutoSuggestTextFieldDelegate>
+@interface YRFormViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate, UITextViewDelegate>
 
 @property (strong, nonatomic) NSKeyedArchiver* yrarchiver;
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
 @property (weak, nonatomic) IBOutlet UILabel *yrcodeLabel;
-@property (weak, nonatomic) IBOutlet UITextField *yrfirstnameLabel;
-@property (weak, nonatomic) IBOutlet UITextField *yrlastnameLabel;
-@property (weak, nonatomic) IBOutlet AutoSuggestTextField *yremailLabel;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *yrgenderSegmentControl;
+
+@property (weak, nonatomic) IBOutlet UITextField *yrGPATextField;
+@property (weak, nonatomic) IBOutlet UITextField *yrMaxGPATextField;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionSegmentControl;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *yrPreferenceSegmentControl;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *yrRankingSegmentControl;
+@property (weak, nonatomic) IBOutlet UITextView *yrNoteTextView;
+
+
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
+
+
+
 - (IBAction)refreshInformation:(id)sender;
 
 - (IBAction)sendInformation:(id)sender;

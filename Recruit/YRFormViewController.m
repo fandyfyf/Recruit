@@ -9,8 +9,6 @@
 #import "YRFormViewController.h"
 #import "YRMCManager.h"
 #import "YRDataManager.h"
-#import <Guile/UITextField+AutoSuggestAdditions.h>
-#import <Guile/Guile.h>
 
 @interface YRFormViewController ()
 
@@ -23,15 +21,6 @@
 @end
 
 @implementation YRFormViewController
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
 
 - (void)viewDidLoad
 {
@@ -49,11 +38,13 @@
     if ([[self.tabBarController.viewControllers[0] valueForKey:@"yrIDCode"] length] != 0) {
         [self.yrcodeLabel setText:[self.tabBarController.viewControllers[0] valueForKey:@"yrIDCode"]];
     }
+    self.yrGPATextField.delegate = self;
+    self.yrMaxGPATextField.delegate = self;
     
-    self.yremailLabel.delegate = self;
-    self.yrfirstnameLabel.delegate = self;
-    self.yrlastnameLabel.delegate = self;
-    self.yremailLabel.suggestionDelegate = self;
+    self.yrNoteTextView.delegate = self;
+    [[self.yrNoteTextView layer] setCornerRadius:10];
+    
+    [self.yrNoteTextView setText:[NSString stringWithFormat:@"#%@#\n\n",[[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]]];
 }
 
 - (void)didReceiveMemoryWarning
@@ -73,7 +64,7 @@
 
 -(void)checkReady
 {
-    if ([self.yrfirstnameLabel.text length] != 0 && [self.yrlastnameLabel.text length] != 0 && [self.yremailLabel.text length] != 0) {
+    if ([self.yrGPATextField.text length] != 0 && [self.yrMaxGPATextField.text length] != 0) {
         [self.sendButton setEnabled:YES];
     }
     else
@@ -104,16 +95,29 @@
 
 -(void)refresh
 {
-    self.yrfirstnameLabel.text = @"";
-    self.yrlastnameLabel.text = @"";
-    self.yremailLabel.text = @"";
+    [self.yrMaxGPATextField setText:@""];
+    [self.yrGPATextField setText:@""];
     [self.sendButton setEnabled:NO];
 }
 
 - (IBAction)backgroundTapped:(id)sender {
-    [self.yrfirstnameLabel resignFirstResponder];
-    [self.yrlastnameLabel resignFirstResponder];
-    [self.yremailLabel resignFirstResponder];
+    
+    [self.yrGPATextField resignFirstResponder];
+    [self.yrMaxGPATextField resignFirstResponder];
+    
+    [UIView beginAnimations:@"move" context:nil];
+    [UIView setAnimationDuration:0.5];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.yrNoteTextView.frame = CGRectMake(70, 531, 627, 280);
+    }
+    else{
+        self.yrNoteTextView.frame = CGRectMake(20, 298, 280, 150);
+    }
+    
+    [UIView commitAnimations];
+    [self.yrNoteTextView resignFirstResponder];
+    
     [self checkReady];
 }
 
@@ -121,9 +125,9 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    [self.yrfirstnameLabel resignFirstResponder];
-    [self.yrlastnameLabel resignFirstResponder];
-    [self.yremailLabel resignFirstResponder];
+    [self.yrGPATextField resignFirstResponder];
+    [self.yrMaxGPATextField resignFirstResponder];
+    
     [self checkReady];
     
     return YES;
@@ -134,7 +138,7 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (![[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Cancel"]) {
-        NSDictionary *dataDic = @{@"firstName" : self.yrfirstnameLabel.text, @"lastName" : self.yrlastnameLabel.text, @"email" : self.yremailLabel.text, @"gender" : [self.yrgenderSegmentControl titleForSegmentAtIndex:self.yrgenderSegmentControl.selectedSegmentIndex], @"code" : self.yrcodeLabel.text, @"recommand" : [NSNumber numberWithBool:NO], @"status" : @"pending"};
+        NSDictionary *dataDic = @{@"firstName" : @"", @"lastName" : @"", @"email" : @"", @"gender" : @"", @"code" : self.yrcodeLabel.text, @"recommand" : [NSNumber numberWithBool:NO], @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : [self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex], @"position" : [self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex], @"date" : [NSDate date], @"note" : [self.yrNoteTextView text], @"gpa" : self.yrGPATextField.text, @"maxgpa" : self.yrMaxGPATextField.text, @"rank" : [self.yrRankingSegmentControl titleForSegmentAtIndex:self.yrRankingSegmentControl.selectedSegmentIndex], @"interviewer" : [[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]};
         
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];
@@ -148,51 +152,30 @@
         [self.appDelegate.dataManager sendData:dic];
         
         [self refresh];
-        [self.yrcodeLabel setText:@"- - -"];
+        [self.yrcodeLabel setText:@"No Connection!"];
     }
 }
 
-#pragma mark - AutoSuggestDelegate
+#pragma mark - UITextViewDelegate
 
-- (NSString *)suggestedStringForInputString:(NSString *)input
+-(void)textViewDidBeginEditing:(UITextView *)textView
 {
-    static NSArray *domains;
-    if (!domains) {
-        domains = @[@"gmail.com",
-                    @"gmail.co.uk",
-                    @"yahoo.com",
-                    @"yahoo.cn",
-                    @"hotmail.com",
-                    @"yahoo-inc.com"];
+    [UIView beginAnimations:@"move" context:nil];
+    [UIView setAnimationDuration:0.5];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.yrNoteTextView.frame = CGRectMake(30, 350, 708, 385);
+    }
+    else{
+        self.yrNoteTextView.frame = CGRectMake(20, 180, 280, 150);
     }
     
-    NSArray *parts = [input componentsSeparatedByString:@"@"];
-    NSString *suggestion = nil;
-    if (parts.count == 2) {
-        NSString *domain = [parts lastObject];
-        
-        if (domain.length == 0) {
-            suggestion = nil;
-        }
-        else {
-            for (NSString *current in domains) {
-                if ([current isEqualToString:domain]) {
-                    suggestion = nil;
-                    break;
-                }
-                else if ([current hasPrefix:domain]) {
-                    suggestion = [current substringFromIndex:domain.length];
-                    break;
-                }
-            }
-        }
-    }
-    return suggestion;
+    [UIView commitAnimations];
 }
 
--(UIColor *)suggestedTextColor
+-(void)textViewDidEndEditing:(UITextView *)textView
 {
-    return [UIColor grayColor];
+    [self.yrNoteTextView resignFirstResponder];
 }
 
 

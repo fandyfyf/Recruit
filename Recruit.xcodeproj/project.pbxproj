@@ -7,17 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D25268A7194F3E6100EBE43E /* MessageUI.framework */; };
+		D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */; };
+		D25268B019507D7700EBE43E /* document.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268AF19507D7700EBE43E /* document.png */; };
+		D25268B219507D8D00EBE43E /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268B119507D8D00EBE43E /* folder.png */; };
+		D25268B419507DE400EBE43E /* wifi.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268B319507DE400EBE43E /* wifi.png */; };
+		D25268B619507E5300EBE43E /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268B519507E5300EBE43E /* gear.png */; };
+		D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D25268B81950826800EBE43E /* YRViewerDataCell.m */; };
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
-		D2A68073194C07530091B768 /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68072194C07530091B768 /* CandidateEntry.m */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
+		D2CB59A919534FDF00CAB252 /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2CB59A819534FDF00CAB252 /* CandidateEntry.m */; };
 		D2F8185B19465FE5006E88FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185A19465FE5006E88FD /* Foundation.framework */; };
 		D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185C19465FE5006E88FD /* CoreGraphics.framework */; };
 		D2F8185F19465FE5006E88FD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185E19465FE5006E88FD /* UIKit.framework */; };
 		D2F8186519465FE5006E88FD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D2F8186319465FE5006E88FD /* InfoPlist.strings */; };
 		D2F8186719465FE5006E88FD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8186619465FE5006E88FD /* main.m */; };
 		D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8186A19465FE5006E88FD /* YRAppDelegate.m */; };
-		D2F8186E19465FE5006E88FD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D2F8186C19465FE5006E88FD /* Main.storyboard */; };
+		D2F8186E19465FE5006E88FD /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D2F8186C19465FE5006E88FD /* Main_iPhone.storyboard */; };
 		D2F8187119465FE5006E88FD /* YRMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2F8187019465FE5006E88FD /* YRMainViewController.m */; };
 		D2F8187319465FE5006E88FD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2F8187219465FE5006E88FD /* Images.xcassets */; };
 		D2F8187A19465FE5006E88FD /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8187919465FE5006E88FD /* XCTest.framework */; };
@@ -47,13 +54,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D25268A7194F3E6100EBE43E /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main_iPad.storyboard; sourceTree = "<group>"; };
+		D25268AF19507D7700EBE43E /* document.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = document.png; sourceTree = "<group>"; };
+		D25268B119507D8D00EBE43E /* folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder.png; sourceTree = "<group>"; };
+		D25268B319507DE400EBE43E /* wifi.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wifi.png; sourceTree = "<group>"; };
+		D25268B519507E5300EBE43E /* gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gear.png; sourceTree = "<group>"; };
+		D25268B71950826800EBE43E /* YRViewerDataCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRViewerDataCell.h; sourceTree = "<group>"; };
+		D25268B81950826800EBE43E /* YRViewerDataCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRViewerDataCell.m; sourceTree = "<group>"; };
 		D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostSettingViewController.h; path = Recruit/YRHostSettingViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostSettingViewController.m; path = Recruit/YRHostSettingViewController.m; sourceTree = SOURCE_ROOT; };
 		D2A6806F194BA00F0091B768 /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
-		D2A68071194C07530091B768 /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
-		D2A68072194C07530091B768 /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostDetailViewController.m; path = Recruit/YRHostDetailViewController.m; sourceTree = SOURCE_ROOT; };
+		D2CB59A719534FDF00CAB252 /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
+		D2CB59A819534FDF00CAB252 /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
 		D2F8185719465FE5006E88FD /* Recruit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recruit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F8185A19465FE5006E88FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2F8185C19465FE5006E88FD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -64,7 +79,7 @@
 		D2F8186819465FE5006E88FD /* Recruit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Recruit-Prefix.pch"; sourceTree = "<group>"; };
 		D2F8186919465FE5006E88FD /* YRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YRAppDelegate.h; sourceTree = "<group>"; };
 		D2F8186A19465FE5006E88FD /* YRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YRAppDelegate.m; sourceTree = "<group>"; };
-		D2F8186D19465FE5006E88FD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D2F8186D19465FE5006E88FD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		D2F8186F19465FE5006E88FD /* YRMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YRMainViewController.h; sourceTree = "<group>"; };
 		D2F8187019465FE5006E88FD /* YRMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YRMainViewController.m; sourceTree = "<group>"; };
 		D2F8187219465FE5006E88FD /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -96,6 +111,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */,
 				D2F818A719489FF8006E88FD /* CoreData.framework in Frameworks */,
 				D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */,
 				D2F8185F19465FE5006E88FD /* UIKit.framework in Frameworks */,
@@ -117,6 +133,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D25268A9194F4B4B00EBE43E /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
 		D2F8184E19465FE4006E88FD = {
 			isa = PBXGroup;
 			children = (
@@ -139,6 +163,7 @@
 		D2F8185919465FE5006E88FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D25268A7194F3E6100EBE43E /* MessageUI.framework */,
 				D2A6806F194BA00F0091B768 /* Guile.framework */,
 				D2F818A619489FF8006E88FD /* CoreData.framework */,
 				D2F8185A19465FE5006E88FD /* Foundation.framework */,
@@ -152,16 +177,21 @@
 		D2F8186019465FE5006E88FD /* Recruit */ = {
 			isa = PBXGroup;
 			children = (
+				D25268B519507E5300EBE43E /* gear.png */,
+				D25268B319507DE400EBE43E /* wifi.png */,
+				D25268B119507D8D00EBE43E /* folder.png */,
+				D25268AF19507D7700EBE43E /* document.png */,
+				D25268A9194F4B4B00EBE43E /* iPad */,
 				D2F818A119478777006E88FD /* YRClient */,
 				D2F818A219478777006E88FD /* YRHost */,
 				D2F8186919465FE5006E88FD /* YRAppDelegate.h */,
 				D2F8186A19465FE5006E88FD /* YRAppDelegate.m */,
-				D2A68071194C07530091B768 /* CandidateEntry.h */,
-				D2A68072194C07530091B768 /* CandidateEntry.m */,
 				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
+				D2CB59A719534FDF00CAB252 /* CandidateEntry.h */,
+				D2CB59A819534FDF00CAB252 /* CandidateEntry.m */,
 				D2F818B11948E691006E88FD /* YRDataManager.h */,
 				D2F818B21948E691006E88FD /* YRDataManager.m */,
-				D2F8186C19465FE5006E88FD /* Main.storyboard */,
+				D2F8186C19465FE5006E88FD /* Main_iPhone.storyboard */,
 				D2F8186F19465FE5006E88FD /* YRMainViewController.h */,
 				D2F8187019465FE5006E88FD /* YRMainViewController.m */,
 				D2F8189519469FC1006E88FD /* YRMCManager.h */,
@@ -225,6 +255,8 @@
 				D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */,
 				D2F8189E19476113006E88FD /* YRinfoDataCell.h */,
 				D2F8189F19476113006E88FD /* YRinfoDataCell.m */,
+				D25268B71950826800EBE43E /* YRViewerDataCell.h */,
+				D25268B81950826800EBE43E /* YRViewerDataCell.m */,
 			);
 			path = YRHost;
 			sourceTree = "<group>";
@@ -274,9 +306,12 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = YR;
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Yahoo-inc";
 				TargetAttributes = {
+					D2F8185619465FE5006E88FD = {
+						DevelopmentTeam = 2ARNJY38FW;
+					};
 					D2F8187719465FE5006E88FD = {
 						TestTargetID = D2F8185619465FE5006E88FD;
 					};
@@ -306,9 +341,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D25268B019507D7700EBE43E /* document.png in Resources */,
 				D2F8187319465FE5006E88FD /* Images.xcassets in Resources */,
+				D25268B619507E5300EBE43E /* gear.png in Resources */,
+				D25268B419507DE400EBE43E /* wifi.png in Resources */,
+				D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */,
 				D2F8186519465FE5006E88FD /* InfoPlist.strings in Resources */,
-				D2F8186E19465FE5006E88FD /* Main.storyboard in Resources */,
+				D2F8186E19465FE5006E88FD /* Main_iPhone.storyboard in Resources */,
+				D25268B219507D8D00EBE43E /* folder.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,11 +372,12 @@
 				D2F8187119465FE5006E88FD /* YRMainViewController.m in Sources */,
 				D2F818941946696D006E88FD /* YRClientConnectionViewController.m in Sources */,
 				D2F8189719469FC1006E88FD /* YRMCManager.m in Sources */,
-				D2A68073194C07530091B768 /* CandidateEntry.m in Sources */,
 				D2F818B31948E691006E88FD /* YRDataManager.m in Sources */,
+				D2CB59A919534FDF00CAB252 /* CandidateEntry.m in Sources */,
 				D2F8186719465FE5006E88FD /* main.m in Sources */,
 				D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */,
 				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
+				D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */,
 				D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */,
 				D2F8189D19474712006E88FD /* YRDataViewController.m in Sources */,
 				D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */,
@@ -371,12 +412,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		D2F8186C19465FE5006E88FD /* Main.storyboard */ = {
+		D2F8186C19465FE5006E88FD /* Main_iPhone.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				D2F8186D19465FE5006E88FD /* Base */,
 			);
-			name = Main.storyboard;
+			name = Main_iPhone.storyboard;
 			sourceTree = "<group>";
 		};
 		D2F8188219465FE5006E88FD /* InfoPlist.strings */ = {
@@ -394,7 +435,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -433,7 +473,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -467,6 +506,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
@@ -474,8 +515,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
 				INFOPLIST_FILE = "Recruit/Recruit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -485,6 +529,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
@@ -492,8 +538,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
 				INFOPLIST_FILE = "Recruit/Recruit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -501,7 +550,6 @@
 		D2F8188D19465FE5006E88FD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Recruit.app/Recruit";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -524,7 +572,6 @@
 		D2F8188E19465FE5006E88FD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Recruit.app/Recruit";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",

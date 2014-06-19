@@ -13,15 +13,25 @@
 
 @interface YRDataViewController ()
 
+@property (strong, nonatomic) CandidateEntry* currentEntry;
+
 -(void)needUpdateTableNotification:(NSNotification *)notification;
 
 -(void)fetchCandidates;
 
 -(void)sortMethodSelected:(UISegmentedControl *)mySegmentedControl;
 
+
 @end
 
 @implementation YRDataViewController
+
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"ListToDetail"]) {
+        [segue.destinationViewController setValue:self.currentEntry forKey:@"dataSource"];
+    }
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -48,9 +58,19 @@
     
     self.managedObjectContext = [self.appDelegate managedObjectContext];
     
-    [self fetchCandidates];
+    //[self fetchCandidates];
     
     [self.yrSortingSegmentControl addTarget:self action:@selector(sortMethodSelected:) forControlEvents:UIControlEventValueChanged];
+    [self.yrPositionFilter addTarget:self action:@selector(sortMethodSelected:) forControlEvents:UIControlEventValueChanged];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [self fetchCandidates]; //updatedata before each time the view appear
+    
+    [self.infoDataList reloadData];
 }
 
 - (void)didReceiveMemoryWarning
@@ -88,6 +108,20 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
     
+    if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
+    {
+        [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"ratio" ascending:NO]]];
+    }
+    else if(self.yrSortingSegmentControl.selectedSegmentIndex == 2)
+    {
+        //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
+        [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
+    }
+    
+    if (self.yrPositionFilter.selectedSegmentIndex != 0) {
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"position = %@",[self.yrPositionFilter titleForSegmentAtIndex:self.yrPositionFilter.selectedSegmentIndex]]];
+    }
+    
     NSError* error = nil;
     NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
     [self setYrdataEntry:mutableFetchResults];
@@ -97,16 +131,22 @@
 {
     //guarantee the insert only happen in main thread
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.yrdataEntry removeAllObjects];
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
         
         if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
         {
-            [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"lastName" ascending:YES]]];
+            [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"ratio" ascending:NO]]];
         }
-        else if(self.yrSortingSegmentControl.selectedSegmentIndex == 4)
+        else if(self.yrSortingSegmentControl.selectedSegmentIndex == 2)
         {
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
+            //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
+            [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
+        }
+        
+        if (self.yrPositionFilter.selectedSegmentIndex != 0) {
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"position = %@",[self.yrPositionFilter titleForSegmentAtIndex:self.yrPositionFilter.selectedSegmentIndex]]];
         }
         
         NSError* error = nil;
@@ -169,8 +209,37 @@
     {
         //
     }
+    cell.yrGPALabel.text = [NSString stringWithFormat:@"%@/%@",current.gpa,current.maxgpa];
+    
+    if ([current.rank floatValue] == 3.5) {
+        cell.yrRankLabel.text = @"3";
+        cell.yrHalfRankLabel.hidden = NO;
+    }
+    else
+    {
+        cell.yrRankLabel.text = [current.rank stringValue];
+        cell.yrHalfRankLabel.hidden = YES;
+    }
+    
+    NSLog(@"rank is %@",current.rank);
+    
+    if ([current.pdf boolValue]) {
+        cell.yrPDFIconView.image = [UIImage imageNamed:@"document.png"];
+    }
+    else
+    {
+        cell.yrPDFIconView.image = nil;
+    }
     
     return cell;
+}
+
+#pragma mark - UITableViewDelegate
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    self.currentEntry = (CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row];
+    [self performSegueWithIdentifier:@"ListToDetail" sender:self];
 }
 
 @end

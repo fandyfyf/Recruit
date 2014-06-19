@@ -21,6 +21,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *yrbrowseButton;
 @property (strong, nonatomic) NSMutableString *yrIDCode;
 
+@property (strong, nonatomic) UIView * yrNameListView;
+@property (strong, nonatomic) UITableView *yrNameList;
+
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 //@property (strong, nonatomic) YRDataManager *yrDataManager;
 

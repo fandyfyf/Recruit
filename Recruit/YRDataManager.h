@@ -19,6 +19,9 @@
 @property (assign) int counter;
 @property (assign, getter = isHost) BOOL host;
 
+@property (strong,nonatomic) NSDictionary* localBackUp;
+@property (strong,nonatomic) NSMutableArray* nameList;
+
 -(id) init;
 
 -(id) initWithPrefix:(NSString*)prefix;
@@ -30,6 +33,10 @@
 -(void)sendACKBack:(MCPeerID*)peerID;
 
 -(void)sendData:(NSDictionary*)data;
+
+-(void)sendNameList:(MCPeerID*)peerID;
+
+-(void)sendBackUp:(NSDictionary* )localBackUp;
 
 -(int) nextCode;
 
