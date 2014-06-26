@@ -22,6 +22,9 @@
 @property (strong,nonatomic) UITextField* interviewerCode;
 
 @property (strong, nonatomic) NSMutableArray* interviewerArray;
+@property (weak, nonatomic) IBOutlet UITextField *interviewStartTime;
+@property (weak, nonatomic) IBOutlet UITextField *interviewDuration;
+@property (weak, nonatomic) IBOutlet UITextField *interviewLocations;
 
 - (IBAction)addInterviewer:(id)sender;
 - (IBAction)removeAll:(id)sender;

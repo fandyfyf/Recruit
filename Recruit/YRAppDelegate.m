@@ -19,6 +19,13 @@
 {
     // Override point for customization after application launch.
     self.mcManager = [YRMCManager new];
+    if([[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"] == nil)
+    {
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:3] forKey:@"scheduleColums"];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:8] forKey:@"scheduleStartTime"];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:45] forKey:@"scheduleDuration"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     return YES;
 }
 							

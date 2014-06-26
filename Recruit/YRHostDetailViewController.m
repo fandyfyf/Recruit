@@ -19,15 +19,6 @@
 
 @implementation YRHostDetailViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -35,13 +26,7 @@
     self.appDelegate = (YRAppDelegate* )[[UIApplication sharedApplication] delegate];
     
     self.yrCodeLabel.text = self.dataSource.code;
-    if ([self.dataSource.gender isEqualToString:@"M"]) {
-        self.yrGenderLabel.text = @"Male";
-    }
-    else
-    {
-        self.yrGenderLabel.text = @"Female";
-    }
+    
     if ([self.dataSource.preference isEqualToString:@"FE"]) {
         self.yrPreferenceLabel.text = @"Back End";
     }
@@ -58,6 +43,8 @@
     self.yrLastNameTextField.delegate = self;
     self.yrEmailTextField.delegate = self;
     self.yrEmailTextField.suggestionDelegate = self;
+    self.yrBusinessUnit1.delegate = self;
+    self.yrBusinessUnit2.delegate = self;
     
     self.yrFirstNameTextField.text = self.dataSource.firstName;
     self.yrLastNameTextField.text = self.dataSource.lastName;
@@ -111,10 +98,11 @@
     else
     {
         self.yrRankLabel.text = [self.dataSource.rank stringValue];
+        self.yrHalfRankLabel.hidden = YES;
     }
     
     
-    self.yrGPALabel.text = [NSString stringWithFormat:@"GPA: %@/%@",self.dataSource.gpa,self.dataSource.maxgpa];
+    self.yrGPALabel.text = [NSString stringWithFormat:@"GPA: %@",self.dataSource.gpa];
 }
 
 - (void)didReceiveMemoryWarning
@@ -214,10 +202,10 @@
     [UIView setAnimationDuration:0.5];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrCommentTextView.frame = CGRectMake(84, 530, 600, 385);
+        self.yrCommentTextView.frame = CGRectMake(84, 590, 600, 325);
     }
     else{
-        self.yrCommentTextView.frame = CGRectMake(10, 363, 300, 150);
+        self.yrCommentTextView.frame = CGRectMake(10, 393, 300, 120);
     }
     [UIView commitAnimations];
     [self.yrCommentTextView resignFirstResponder];
@@ -225,6 +213,8 @@
     [self.yrLastNameTextField resignFirstResponder];
     [self.yrEmailTextField resignFirstResponder];
     [self.yrEmailTextField acceptSuggestion];
+    [self.yrBusinessUnit1 resignFirstResponder];
+    [self.yrBusinessUnit2 resignFirstResponder];
 }
 
 - (IBAction)emailCandidate:(id)sender {
@@ -422,6 +412,8 @@
     [self.yrLastNameTextField resignFirstResponder];
     [self.yrEmailTextField resignFirstResponder];
     [self.yrEmailTextField acceptSuggestion];
+    [self.yrBusinessUnit1 resignFirstResponder];
+    [self.yrBusinessUnit2 resignFirstResponder];
 }
 
 #pragma mark - AutoSuggestDelegate

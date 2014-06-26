@@ -19,6 +19,8 @@ FOUNDATION_EXPORT NSString* const kYRMCManagerDidReceiveDataNotification;
 @property (strong, nonatomic) MCSession *session;
 @property (strong, nonatomic) NSMutableArray *activeSessions;
 @property (strong, nonatomic) MCBrowserViewController *browser;
+@property (strong, nonatomic) MCNearbyServiceBrowser *autoBrowser;
+
 //@property (strong, nonatomic) MCAdvertiserAssistant *advertiser;
 @property (strong, nonatomic) MCNearbyServiceAdvertiser *Nadvertiser;
 @property (assign, getter = isHost) BOOL host;

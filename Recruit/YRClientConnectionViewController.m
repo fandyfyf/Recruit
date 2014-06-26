@@ -17,6 +17,8 @@
 
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
 -(void)needUpdateCodeNotification:(NSNotification *)notification;
+-(void)popUpNameListNotification:(NSNotification*)notification;
+-(void)reconnectNotification:(NSNotification *)notification;
 -(void)removeListView;
 
 @end
@@ -48,16 +50,36 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:@"NeedUpdateCodeNotification" object:nil];
-    
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:@"NameListReadyNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
     [self.yrtableView setDelegate:self];
     [self.yrtableView setDataSource:self];
     self.yrIDCode = [NSMutableString new];
     
-    //advertise
-    //[[self.appDelegate mcManager] advertiseSelf:YES];  //client doesn't need to be posted
+    [self.yrbrowseButton setHidden:YES];//this button is no longer needed
+    
+    [self.appDelegate.mcManager.session disconnect];
+    self.appDelegate.mcManager.session = nil;
+    self.appDelegate.mcManager.autoBrowser = nil;
+    self.appDelegate.mcManager.peerID = nil;
+    [self.yrarrayConnectedDevices removeAllObjects];
+    [self.appDelegate.dataManager stopListeningForData];
+    [self.yrtableView reloadData];
+    
+    if ([self.appDelegate dataManager] == nil) {
+        [self.appDelegate setDataManager:[YRDataManager new]];
+    }
+    [[self.appDelegate dataManager] setHost:NO];
+    [[self.appDelegate dataManager] startListeningForData];
+    
+    [self.appDelegate.mcManager setHost:NO];//set host identity first, in order to initialize the session
+    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:self.clientUserName];
+    [self.appDelegate.mcManager setupMCBrowser];
+    
+    self.appDelegate.mcManager.autoBrowser.delegate = self;
+    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -76,23 +98,24 @@
     
     [[self.appDelegate mcManager].session disconnect];
     [self.appDelegate mcManager].session = nil;
+    [self.appDelegate mcManager].peerID = nil;
     [self.yrarrayConnectedDevices removeAllObjects];
-    
     [self.appDelegate.dataManager stopListeningForData];
-    
     [self.yrtableView reloadData];
 
+    
+    [[self.appDelegate mcManager] setHost:NO];//set host identity first, in order to initialize the session
+    [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:self.clientUserName];
+    [[self.appDelegate mcManager] setupMCBrowser];
+    
+    [[[self.appDelegate mcManager] browser] setDelegate:self];
+    [self presentViewController:[[self.appDelegate mcManager] browser] animated:YES completion:nil];
+    
     if ([self.appDelegate dataManager] == nil) {
         [self.appDelegate setDataManager:[YRDataManager new]];
     }
     [[self.appDelegate dataManager] setHost:NO];
     [[self.appDelegate dataManager] startListeningForData];
-    
-    [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:self.clientUserName];
-    [[self.appDelegate mcManager] setHost:NO];
-    [[self.appDelegate mcManager] setupMCBrowser];
-    [[[self.appDelegate mcManager] browser] setDelegate:self];
-    [self presentViewController:[[self.appDelegate mcManager] browser] animated:YES completion:nil];
     
 }
 
@@ -120,6 +143,7 @@
     
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
 
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification{
     MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
@@ -150,6 +174,75 @@
 {
     NSMutableString *code = [[notification userInfo] objectForKey:@"recruitID"];
     self.yrIDCode = code;
+}
+
+-(void)popUpNameListNotification:(NSNotification*)notification
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UILabel* titleLabel;
+        UIButton* cancelButton;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+            self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(50, 100, 220, 300)];
+            self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(0, 50, 220, 250) style:UITableViewStylePlain];
+            titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 180, 30)];
+            titleLabel.font = [UIFont boldSystemFontOfSize:20];
+            cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(self.yrNameListView.frame.size.width-30, 0, 30, 30)];
+            
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        {
+            self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(150, 250, 468, 600)];
+            self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(0, 100, 468, 500) style:UITableViewStylePlain];
+            titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 428, 70)];
+            titleLabel.font = [UIFont boldSystemFontOfSize:30];
+            cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(self.yrNameListView.frame.size.width-50, 0, 50, 50)];
+        }
+        
+        [cancelButton addTarget:self action:@selector(removeListView) forControlEvents:UIControlEventTouchUpInside];
+        [cancelButton setTitle:@"X" forState:UIControlStateNormal];
+        cancelButton.titleLabel.textColor = [UIColor redColor];
+        
+        [self.yrNameList setContentInset:UIEdgeInsetsMake(1.0, 0, 0, 0)];
+        titleLabel.textAlignment = NSTextAlignmentCenter;
+        titleLabel.text = @"Register";
+        self.yrNameList.delegate = self;
+        self.yrNameList.dataSource = self;
+        
+        [self.yrNameList setSeparatorInset:UIEdgeInsetsZero];
+        [self.yrNameListView addSubview:self.yrNameList];
+        [self.yrNameListView addSubview:titleLabel];
+        [self.yrNameListView addSubview:cancelButton];
+        [[self.yrNameListView layer] setCornerRadius:20];
+        [[self.yrNameListView layer] setBorderColor:[[UIColor grayColor] CGColor]];
+        [[self.yrNameListView layer] setBorderWidth:2];
+        self.yrNameListView.backgroundColor = [UIColor whiteColor];
+        
+        [self.view addSubview:self.yrNameListView];
+    });
+}
+
+-(void)reconnectNotification:(NSNotification *)notification
+{
+    [self.appDelegate.mcManager.session disconnect];
+    self.appDelegate.mcManager.session = nil;
+    self.appDelegate.mcManager.autoBrowser = nil;
+    self.appDelegate.mcManager.peerID = nil;
+    [self.yrarrayConnectedDevices removeAllObjects];
+    [self.appDelegate.dataManager stopListeningForData];
+    [self.yrtableView reloadData];
+    
+    if ([self.appDelegate dataManager] == nil) {
+        [self.appDelegate setDataManager:[YRDataManager new]];
+    }
+    [[self.appDelegate dataManager] setHost:NO];
+    [[self.appDelegate dataManager] startListeningForData];
+    
+    [self.appDelegate.mcManager setHost:NO];//set host identity first, in order to initialize the session
+    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:self.clientUserName];
+    [self.appDelegate.mcManager setupMCBrowser];
+    
+    self.appDelegate.mcManager.autoBrowser.delegate = self;
+    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
 }
 
 -(void)removeListView
@@ -205,9 +298,31 @@
     [self.view addSubview:self.yrNameListView];
 }
 
-
 -(void)browserViewControllerWasCancelled:(MCBrowserViewController *)browserViewController{
     [[self.appDelegate mcManager].browser dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - MCNearByServiceBrowserDelegate
+
+-(void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary *)info
+{
+    NSString *remotePeerName = peerID.displayName;
+    
+    NSLog(@"Browser found %@", remotePeerName);
+    
+    //MCPeerID *myPeerID = self.appDelegate.mcManager.session.myPeerID;
+    
+    //BOOL shouldInvite = ([myPeerID.displayName compare:remotePeerName] == NSOrderedDescending);
+    
+    NSLog(@"Inviting %@", remotePeerName);
+    [browser invitePeer:peerID toSession:self.appDelegate.mcManager.session withContext:nil timeout:30.0];
+    
+    [browser stopBrowsingForPeers];
+}
+
+- (void)browser:(MCNearbyServiceBrowser *)browser lostPeer:(MCPeerID *)peerID
+{
+    //
 }
 
 #pragma mark - UITableViewDataSource

@@ -10,7 +10,7 @@
 #import "MultipeerConnectivity/MultipeerConnectivity.h"
 #import "YRAppDelegate.h"
 
-@interface YRClientConnectionViewController : UIViewController <MCBrowserViewControllerDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface YRClientConnectionViewController : UIViewController <MCBrowserViewControllerDelegate, UITableViewDataSource, UITableViewDelegate,MCNearbyServiceBrowserDelegate>
 
 @property (strong, nonatomic) UIViewController* source;
 @property (strong, nonatomic) NSString* clientUserName;

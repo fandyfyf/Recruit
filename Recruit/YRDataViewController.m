@@ -33,15 +33,6 @@
     }
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -110,10 +101,6 @@
     
     if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
     {
-        [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"ratio" ascending:NO]]];
-    }
-    else if(self.yrSortingSegmentControl.selectedSegmentIndex == 2)
-    {
         //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
         [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
     }
@@ -136,10 +123,6 @@
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
         
         if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
-        {
-            [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"ratio" ascending:NO]]];
-        }
-        else if(self.yrSortingSegmentControl.selectedSegmentIndex == 2)
         {
             //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
             [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
@@ -201,7 +184,7 @@
     {
         cell.yrstatusLabel.textColor = [UIColor redColor];
     }
-    else if([current.status isEqualToString:@"approved"])
+    else if([current.status isEqualToString:@"scheduled"])
     {
         cell.yrstatusLabel.textColor = [UIColor greenColor];
     }
@@ -209,7 +192,7 @@
     {
         //
     }
-    cell.yrGPALabel.text = [NSString stringWithFormat:@"%@/%@",current.gpa,current.maxgpa];
+    cell.yrGPALabel.text = [NSString stringWithFormat:@"%@",current.gpa];
     
     if ([current.rank floatValue] == 3.5) {
         cell.yrRankLabel.text = @"3";
@@ -220,8 +203,6 @@
         cell.yrRankLabel.text = [current.rank stringValue];
         cell.yrHalfRankLabel.hidden = YES;
     }
-    
-    NSLog(@"rank is %@",current.rank);
     
     if ([current.pdf boolValue]) {
         cell.yrPDFIconView.image = [UIImage imageNamed:@"document.png"];

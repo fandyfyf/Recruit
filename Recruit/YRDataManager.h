@@ -28,6 +28,8 @@
 
 -(void)didReceiveDataWithNotification:(NSNotification *)notification;
 
+- (BOOL)isNotDuplicateData:(NSDictionary*)infoData;
+
 -(CandidateEntry*)saveCandidate:(NSDictionary *)infoData;
 
 -(void)sendACKBack:(MCPeerID*)peerID;
@@ -43,5 +45,7 @@
 - (void)startListeningForData;
 
 - (void)stopListeningForData;
+
+
 
 @end

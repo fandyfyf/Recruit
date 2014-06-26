@@ -59,7 +59,7 @@
     [self.yrPrefixTextField setDelegate:self];
     
     //advertise
-    [[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
+    //[[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
     //disable brower button
     [self.yrbrowseButton setEnabled:NO];
 }

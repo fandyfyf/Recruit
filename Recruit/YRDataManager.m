@@ -55,29 +55,41 @@
     
     [yrunarchiver finishDecoding];
     
-    NSLog(@"receiving msg is %@", dic[@"msg"]);
+    NSLog(@"message is %@",dic[@"msg"]);
     
     if ([dic[@"msg"] isEqualToString:@"backup"] && self.isHost)
     {
-        CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
-        NSDictionary *dict = @{@"entry" : curr};
-        
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
-                                                            object:nil
-                                                          userInfo:dict];
+        if ([self isNotDuplicateData:dic[@"data"]]) {
+            CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+            NSDictionary *dict = @{@"entry" : curr};
+            
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+                                                                object:nil
+                                                              userInfo:dict];
+        }
+        else
+        {
+            NSLog(@"duplicate code and firstName found");
+        }
     }
     else if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
     {
-        [self sendACKBack:peerID];
+        if ([self isNotDuplicateData:dic[@"data"]]){
+            [self sendACKBack:peerID];
         
-        CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
-        NSDictionary *dict = @{@"entry" : curr};
+            CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+            NSDictionary *dict = @{@"entry" : curr};
         
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
                                                             object:nil
                                                           userInfo:dict];
+        }
+        else
+        {
+            NSLog(@"duplicate code and firstName found");
+        }
     }
     else if([dic[@"msg"] isEqualToString:@"ack"])
     {
@@ -95,12 +107,35 @@
     {
         NSLog(@"The receiving list is %@",dic[@"data"]);
         self.nameList = dic[@"data"];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NameListReadyNotification"
+                                                            object:nil
+                                                          userInfo:nil];
     }
     else
     {
         NSLog(@"trash");
     }
 
+}
+
+- (BOOL)isNotDuplicateData:(NSDictionary*)infoData
+{
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+    
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@",infoData[@"code"],infoData[@"firstName"]]];
+    
+    NSError* error = nil;
+    NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
+    
+    if ([mutableFetchResults count] == 0) {
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 -(CandidateEntry*)saveCandidate:(NSDictionary *)infoData
@@ -114,17 +149,14 @@
     [item setRecommand:infoData[@"recommand"]];
     [item setStatus:infoData[@"status"]];
     [item setPdf:infoData[@"pdf"]];
-    [item setGender:infoData[@"gender"]];
     [item setPosition:infoData[@"position"]];
     [item setPreference:infoData[@"preference"]];
     [item setDate:infoData[@"date"]];
     [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]]]];
     [item setRank:[NSNumber numberWithFloat:[(NSString*)infoData[@"rank"] floatValue]]];
-    NSLog(@"saving rank %@",infoData[@"rank"]);
-    
     [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
-    [item setMaxgpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"maxgpa"] floatValue]]];
-    [item setRatio:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]/[(NSString*)infoData[@"maxgpa"] floatValue]]];
+    
+    [item setInterviews:[NSMutableArray new]];
     
     NSError *error = nil;
     if (![self.managedObjectContext save:&error]) {

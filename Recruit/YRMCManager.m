@@ -20,11 +20,13 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
         _peerID = nil;
         _session = nil;
         _browser = nil;
+        _autoBrowser = nil;
         _activeSessions = nil;
         _Nadvertiser = nil;
     }
     return self;
 }
+
 
 -(void)setupPeerAndSessionWithDisplayName:(NSString *)displayName
 {
@@ -40,6 +42,8 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 {
     //the service type should be limited to 1 to 15 characters long
     self.browser = [[MCBrowserViewController alloc] initWithServiceType:@"files" session:self.session];
+    
+    self.autoBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.peerID serviceType:@"files"];
 }
 
 -(void)advertiseSelf:(BOOL)shouldAdvertise
@@ -47,6 +51,7 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     self.activeSessions = [NSMutableArray new];
     if (shouldAdvertise) {
         //self.advertiser = [[MCAdvertiserAssistant alloc] initWithServiceType:@"files" discoveryInfo:nil session:self.session];
+        
         
         self.Nadvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.peerID discoveryInfo:nil serviceType:@"files"];
         

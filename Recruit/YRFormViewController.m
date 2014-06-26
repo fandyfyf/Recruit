@@ -9,14 +9,17 @@
 #import "YRFormViewController.h"
 #import "YRMCManager.h"
 #import "YRDataManager.h"
+#import "YRClientSignInViewController.h"
 
 @interface YRFormViewController ()
 
--(void)checkReady;
+//-(void)checkReadySend;
+//-(void)checkReadySave;
 -(void)needUpdateCodeNotification:(NSNotification *)notification;
 -(void)reconnectNotification:(NSNotification *)notification;
 -(void)needEndSessionNotification:(NSNotification *)notification;
 -(void)refresh;
+-(void)showPlatformSeg;
 
 @end
 
@@ -26,6 +29,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     self.managedObjectContext = [self.appDelegate managedObjectContext];
     
@@ -35,16 +39,27 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needEndSessionNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
-    if ([[self.tabBarController.viewControllers[0] valueForKey:@"yrIDCode"] length] != 0) {
-        [self.yrcodeLabel setText:[self.tabBarController.viewControllers[0] valueForKey:@"yrIDCode"]];
-    }
+    self.yrcodeLabel.text = [(YRClientSignInViewController*)self.source yrcodeLabel].text;
+    
     self.yrGPATextField.delegate = self;
-    self.yrMaxGPATextField.delegate = self;
     
     self.yrNoteTextView.delegate = self;
     [[self.yrNoteTextView layer] setCornerRadius:10];
     
     [self.yrNoteTextView setText:[NSString stringWithFormat:@"#%@#\n\n",[[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]]];
+    
+    
+    NSDate * now = [NSDate date];
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"yyy"];
+    int year = [[format stringFromDate:now] intValue];
+    
+    for (int i=0; i<4; i++) {
+        [self.yrGraduationSegCtrl setTitle:[NSString stringWithFormat:@"%d",year+i] forSegmentAtIndex:i];
+    }
+    
+    [self.yrPreferenceSegmentControl addTarget:self action:@selector(showPlatformSeg) forControlEvents:UIControlEventValueChanged];
+    //[self.yrRankingSegmentControl addTarget:self action:@selector(checkReadySend) forControlEvents:UIControlEventValueChanged];
 }
 
 - (void)didReceiveMemoryWarning
@@ -62,9 +77,31 @@
     [alert show];
 }
 
+//-(void)checkReadySend
+//{
+//    if ([self.yrGPATextField.text length] != 0 && (self.yrRankingSegmentControl.selectedSegmentIndex == 3 || self.yrRankingSegmentControl.selectedSegmentIndex == 4)) {
+//        [self.sendButton setEnabled:YES];
+//    }
+//    else
+//    {
+//        [self.sendButton setEnabled:NO];
+//    }
+//}
+//
+//-(void)checkReadySave
+//{
+//    if ([self.yrGPATextField.text length] != 0) {
+//        [self.saveButton setEnabled:YES];
+//    }
+//    else
+//    {
+//        [self.saveButton setEnabled:NO];
+//    }
+//}
+
 -(void)checkReady
 {
-    if ([self.yrGPATextField.text length] != 0 && [self.yrMaxGPATextField.text length] != 0) {
+    if ([self.yrGPATextField.text length] != 0) {
         [self.sendButton setEnabled:YES];
     }
     else
@@ -95,15 +132,24 @@
 
 -(void)refresh
 {
-    [self.yrMaxGPATextField setText:@""];
     [self.yrGPATextField setText:@""];
     [self.sendButton setEnabled:NO];
+}
+
+-(void)showPlatformSeg
+{
+    if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 3) {
+        self.yrPlatformSegCtrl.enabled = YES;
+    }
+    else
+    {
+        self.yrPlatformSegCtrl.enabled = NO;
+    }
 }
 
 - (IBAction)backgroundTapped:(id)sender {
     
     [self.yrGPATextField resignFirstResponder];
-    [self.yrMaxGPATextField resignFirstResponder];
     
     [UIView beginAnimations:@"move" context:nil];
     [UIView setAnimationDuration:0.5];
@@ -118,7 +164,13 @@
     [UIView commitAnimations];
     [self.yrNoteTextView resignFirstResponder];
     
+//    [self checkReadySave];
+//    [self checkReadySend];
     [self checkReady];
+}
+
+- (IBAction)cancelTapped:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - UITextFieldDelegate
@@ -126,8 +178,9 @@
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [self.yrGPATextField resignFirstResponder];
-    [self.yrMaxGPATextField resignFirstResponder];
     
+//    [self checkReadySave];
+//    [self checkReadySend];
     [self checkReady];
     
     return YES;
@@ -138,7 +191,15 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (![[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Cancel"]) {
-        NSDictionary *dataDic = @{@"firstName" : @"", @"lastName" : @"", @"email" : @"", @"gender" : @"", @"code" : self.yrcodeLabel.text, @"recommand" : [NSNumber numberWithBool:NO], @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : [self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex], @"position" : [self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex], @"date" : [NSDate date], @"note" : [self.yrNoteTextView text], @"gpa" : self.yrGPATextField.text, @"maxgpa" : self.yrMaxGPATextField.text, @"rank" : [self.yrRankingSegmentControl titleForSegmentAtIndex:self.yrRankingSegmentControl.selectedSegmentIndex], @"interviewer" : [[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]};
+        NSString* preference;
+        if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 3) {
+            preference = [NSString stringWithFormat:@"%@ - %@",[self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex],[self.yrPlatformSegCtrl titleForSegmentAtIndex:self.yrPlatformSegCtrl.selectedSegmentIndex]];
+        }
+        else
+        {
+            preference = [self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex];
+        }
+        NSDictionary *dataDic = @{@"firstName" : [[(YRClientSignInViewController*)self.source yrFirstNameTextField] text], @"lastName" : [[(YRClientSignInViewController*)self.source yrLastNameTextField] text], @"email" : [[(YRClientSignInViewController*)self.source yrEmailTextField] text], @"code" : self.yrcodeLabel.text, @"recommand" : [NSNumber numberWithBool:NO], @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : preference, @"position" : [self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex], @"date" : [NSDate date], @"note" : [self.yrNoteTextView text], @"gpa" : self.yrGPATextField.text, @"rank" : [self.yrRankingSegmentControl titleForSegmentAtIndex:self.yrRankingSegmentControl.selectedSegmentIndex], @"interviewer" : [[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]};
         
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];
@@ -149,10 +210,12 @@
         //change NSDictionary to NSMutableDictionary
         NSDictionary *dic = @{@"msg" : @"data", @"data" : newDic};
         
+        [(YRClientSignInViewController*)self.source setCodeLabel:@"No Connection!"];
         [self.appDelegate.dataManager sendData:dic];
         
         [self refresh];
-        [self.yrcodeLabel setText:@"No Connection!"];
+        
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
 

@@ -22,8 +22,11 @@
 
 @property (weak, nonatomic) IBOutlet UITextField *yrFirstNameTextField;
 @property (weak, nonatomic) IBOutlet UITextField *yrLastNameTextField;
-@property (weak, nonatomic) IBOutlet UILabel *yrGenderLabel;
+
 @property (weak, nonatomic) IBOutlet AutoSuggestTextField *yrEmailTextField;
+@property (weak, nonatomic) IBOutlet UITextField *yrBusinessUnit1;
+@property (weak, nonatomic) IBOutlet UITextField *yrBusinessUnit2;
+
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionSegmentControl;
 @property (weak, nonatomic) IBOutlet UILabel *yrGPALabel;
 @property (weak, nonatomic) IBOutlet UILabel *yrRankLabel;

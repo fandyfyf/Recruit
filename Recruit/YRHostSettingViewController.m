@@ -20,6 +20,7 @@
 -(void)yrCardViewCancel;
 -(void)yrCardViewSave;
 -(void)removeAllInterviewerInfo;
+-(void)saveScheduleInfo;
 
 @end
 
@@ -52,6 +53,14 @@
     
     self.interviewerList.delegate = self;
     self.interviewerList.dataSource = self;
+    
+    self.interviewStartTime.delegate = self;
+    self.interviewDuration.delegate = self;
+    self.interviewLocations.delegate = self;
+    
+    self.interviewStartTime.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleStartTime"]];
+    self.interviewDuration.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleDuration"]];
+    self.interviewLocations.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"]];
     
     [self fetchInterviewerInfo];
 }
@@ -97,6 +106,7 @@
         [self.interviewerEmail setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerEmail.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.interviewerEmail.autocorrectionType = UITextAutocorrectionTypeNo;
+        self.interviewerEmail.keyboardType = UIKeyboardTypeEmailAddress;
         
         self.interviewerCode = [[UITextField alloc] initWithFrame:CGRectMake(180, 190, 200, 30)];
         self.interviewerCode.borderStyle = UITextBorderStyleRoundedRect;
@@ -136,7 +146,7 @@
     }
     else
     {
-        self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(20, 120, 280, 250)];
+        self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(20, 120, 280, 230)];
         
         [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
         [[self.yrCardView layer] setCornerRadius:10];
@@ -160,6 +170,7 @@
         [self.interviewerEmail setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerEmail.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.interviewerEmail.autocorrectionType = UITextAutocorrectionTypeNo;
+        self.interviewerEmail.keyboardType = UIKeyboardTypeEmailAddress;
         
         self.interviewerCode = [[UITextField alloc] initWithFrame:CGRectMake(80, 150, 160, 30)];
         self.interviewerCode.borderStyle = UITextBorderStyleRoundedRect;
@@ -185,12 +196,12 @@
         [codeLabel setTextAlignment:NSTextAlignmentRight];
         
         cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        cancelButton.frame = CGRectMake(40, 210, 60, 30);
+        cancelButton.frame = CGRectMake(40, 190, 60, 30);
         [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
         [cancelButton addTarget:self action:@selector(yrCardViewCancel) forControlEvents:UIControlEventTouchUpInside];
         
         saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        saveButton.frame = CGRectMake(180, 210, 60, 30);
+        saveButton.frame = CGRectMake(180, 190, 60, 30);
         [saveButton setTitle:@"Save" forState:UIControlStateNormal];
         [saveButton addTarget:self action:@selector(yrCardViewSave) forControlEvents:UIControlEventTouchUpInside];
     }
@@ -215,8 +226,12 @@
 - (IBAction)backgroundTapped:(id)sender {
     [self.emailTextField resignFirstResponder];
     [self.userNameTextField resignFirstResponder];
+    [self.interviewLocations resignFirstResponder];
+    [self.interviewDuration resignFirstResponder];
+    [self.interviewStartTime resignFirstResponder];
     
     [self.emailTextField acceptSuggestion];
+    [self saveScheduleInfo];
 }
 
 -(void)yrCardViewCancel
@@ -249,7 +264,7 @@
 
 -(void)fetchInterviewerInfo
 {
-    self.interviewerArray = [[NSUserDefaults standardUserDefaults] objectForKey:@"interviewerList"];
+    self.interviewerArray = [[[NSUserDefaults standardUserDefaults] objectForKey:@"interviewerList"] mutableCopy];
     if (self.interviewerArray == nil) {
         self.interviewerArray = [NSMutableArray new];
     }
@@ -260,6 +275,14 @@
     [self.interviewerArray removeAllObjects];
     [self.interviewerList reloadData];
     [[NSUserDefaults standardUserDefaults] setObject:self.interviewerArray forKey:@"interviewerList"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+-(void)saveScheduleInfo
+{
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewStartTime.text intValue]] forKey:@"scheduleStartTime"];
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewDuration.text intValue]] forKey:@"scheduleDuration"];
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewLocations.text intValue]] forKey:@"scheduleColums"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -315,10 +338,14 @@
     [self.interviewerEmail resignFirstResponder];
     [self.interviewerName resignFirstResponder];
     [self.interviewerCode resignFirstResponder];
+    [self.interviewStartTime resignFirstResponder];
+    [self.interviewDuration resignFirstResponder];
+    [self.interviewLocations resignFirstResponder];
     
     [self.emailTextField acceptSuggestion];
     [self.interviewerEmail acceptSuggestion];
     
+    [self saveScheduleInfo];
     return YES;
 }
 

@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D2281521195B21590097E45C /* YRInterviewAppointmentInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D2281520195B21590097E45C /* YRInterviewAppointmentInfo.m */; };
+		D2281524195B76FC0097E45C /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2281523195B76FC0097E45C /* CandidateEntry.m */; };
+		D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */; };
+		D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */; };
+		D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414D1959D838004A31E1 /* YRTimeCardView.m */; };
 		D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D25268A7194F3E6100EBE43E /* MessageUI.framework */; };
 		D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */; };
 		D25268B019507D7700EBE43E /* document.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268AF19507D7700EBE43E /* document.png */; };
@@ -17,7 +22,7 @@
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
-		D2CB59A919534FDF00CAB252 /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2CB59A819534FDF00CAB252 /* CandidateEntry.m */; };
+		D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */; };
 		D2F8185B19465FE5006E88FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185A19465FE5006E88FD /* Foundation.framework */; };
 		D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185C19465FE5006E88FD /* CoreGraphics.framework */; };
 		D2F8185F19465FE5006E88FD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185E19465FE5006E88FD /* UIKit.framework */; };
@@ -54,6 +59,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D228151F195B21590097E45C /* YRInterviewAppointmentInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRInterviewAppointmentInfo.h; sourceTree = "<group>"; };
+		D2281520195B21590097E45C /* YRInterviewAppointmentInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRInterviewAppointmentInfo.m; sourceTree = "<group>"; };
+		D2281522195B76FC0097E45C /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
+		D2281523195B76FC0097E45C /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
+		D24341461954FFE4004A31E1 /* YRHostTimeCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRHostTimeCardViewController.h; sourceTree = "<group>"; };
+		D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRHostTimeCardViewController.m; sourceTree = "<group>"; };
+		D24341491959C23C004A31E1 /* YRSchedulingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRSchedulingViewController.h; sourceTree = "<group>"; };
+		D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRSchedulingViewController.m; sourceTree = "<group>"; };
+		D243414C1959D838004A31E1 /* YRTimeCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRTimeCardView.h; sourceTree = "<group>"; };
+		D243414D1959D838004A31E1 /* YRTimeCardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRTimeCardView.m; sourceTree = "<group>"; };
 		D25268A7194F3E6100EBE43E /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main_iPad.storyboard; sourceTree = "<group>"; };
 		D25268AF19507D7700EBE43E /* document.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = document.png; sourceTree = "<group>"; };
@@ -67,8 +82,8 @@
 		D2A6806F194BA00F0091B768 /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostDetailViewController.m; path = Recruit/YRHostDetailViewController.m; sourceTree = SOURCE_ROOT; };
-		D2CB59A719534FDF00CAB252 /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
-		D2CB59A819534FDF00CAB252 /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
+		D2CB59AD195393D900CAB252 /* YRClientSignInViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRClientSignInViewController.h; sourceTree = "<group>"; };
+		D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRClientSignInViewController.m; sourceTree = "<group>"; };
 		D2F8185719465FE5006E88FD /* Recruit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recruit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F8185A19465FE5006E88FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2F8185C19465FE5006E88FD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -187,8 +202,8 @@
 				D2F8186919465FE5006E88FD /* YRAppDelegate.h */,
 				D2F8186A19465FE5006E88FD /* YRAppDelegate.m */,
 				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
-				D2CB59A719534FDF00CAB252 /* CandidateEntry.h */,
-				D2CB59A819534FDF00CAB252 /* CandidateEntry.m */,
+				D2281522195B76FC0097E45C /* CandidateEntry.h */,
+				D2281523195B76FC0097E45C /* CandidateEntry.m */,
 				D2F818B11948E691006E88FD /* YRDataManager.h */,
 				D2F818B21948E691006E88FD /* YRDataManager.m */,
 				D2F8186C19465FE5006E88FD /* Main_iPhone.storyboard */,
@@ -236,6 +251,8 @@
 			children = (
 				D2F818921946696D006E88FD /* YRClientConnectionViewController.h */,
 				D2F818931946696D006E88FD /* YRClientConnectionViewController.m */,
+				D2CB59AD195393D900CAB252 /* YRClientSignInViewController.h */,
+				D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */,
 				D2F818981946B3E4006E88FD /* YRFormViewController.h */,
 				D2F818991946B3E4006E88FD /* YRFormViewController.m */,
 			);
@@ -251,6 +268,14 @@
 				D2F8189C19474712006E88FD /* YRDataViewController.m */,
 				D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */,
 				D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */,
+				D24341461954FFE4004A31E1 /* YRHostTimeCardViewController.h */,
+				D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */,
+				D228151F195B21590097E45C /* YRInterviewAppointmentInfo.h */,
+				D2281520195B21590097E45C /* YRInterviewAppointmentInfo.m */,
+				D24341491959C23C004A31E1 /* YRSchedulingViewController.h */,
+				D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */,
+				D243414C1959D838004A31E1 /* YRTimeCardView.h */,
+				D243414D1959D838004A31E1 /* YRTimeCardView.m */,
 				D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */,
 				D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */,
 				D2F8189E19476113006E88FD /* YRinfoDataCell.h */,
@@ -373,14 +398,19 @@
 				D2F818941946696D006E88FD /* YRClientConnectionViewController.m in Sources */,
 				D2F8189719469FC1006E88FD /* YRMCManager.m in Sources */,
 				D2F818B31948E691006E88FD /* YRDataManager.m in Sources */,
-				D2CB59A919534FDF00CAB252 /* CandidateEntry.m in Sources */,
+				D2281524195B76FC0097E45C /* CandidateEntry.m in Sources */,
 				D2F8186719465FE5006E88FD /* main.m in Sources */,
 				D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */,
 				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
+				D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */,
+				D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */,
+				D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */,
 				D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */,
 				D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */,
 				D2F8189D19474712006E88FD /* YRDataViewController.m in Sources */,
+				D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */,
 				D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */,
+				D2281521195B21590097E45C /* YRInterviewAppointmentInfo.m in Sources */,
 				D2F8189A1946B3E4006E88FD /* YRFormViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
