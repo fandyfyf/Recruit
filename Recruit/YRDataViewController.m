@@ -17,6 +17,8 @@
 
 -(void)needUpdateTableNotification:(NSNotification *)notification;
 
+-(void)setUpInterviewNotification:(NSNotification *)notification;
+
 -(void)fetchCandidates;
 
 -(void)sortMethodSelected:(UISegmentedControl *)mySegmentedControl;
@@ -45,6 +47,8 @@
     
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:@"NeedUpdateTableNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setUpInterviewNotification:) name:@"SetUpInterview" object:nil];
+    
     self.yrPrefix = [(YRHostMainViewController*)self.tabBarController.viewControllers[0] yrPrefix];
     
     self.managedObjectContext = [self.appDelegate managedObjectContext];
@@ -91,6 +95,11 @@
         
         [self.infoDataList performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
     });
+}
+
+-(void)setUpInterviewNotification:(NSNotification *)notification
+{
+    [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:3]];
 }
 
 -(void)fetchCandidates

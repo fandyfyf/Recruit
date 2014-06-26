@@ -20,10 +20,11 @@ FOUNDATION_EXPORT NSString* const kYRMCManagerDidReceiveDataNotification;
 @property (strong, nonatomic) NSMutableArray *activeSessions;
 @property (strong, nonatomic) MCBrowserViewController *browser;
 @property (strong, nonatomic) MCNearbyServiceBrowser *autoBrowser;
-
-//@property (strong, nonatomic) MCAdvertiserAssistant *advertiser;
 @property (strong, nonatomic) MCNearbyServiceAdvertiser *Nadvertiser;
 @property (assign, getter = isHost) BOOL host;
+
+@property (nonatomic, copy) NSString* userName;
+@property (nonatomic, copy) NSString* userEmail;
 
 -(void)setupPeerAndSessionWithDisplayName:(NSString *)displayName;
 -(void)setupMCBrowser;

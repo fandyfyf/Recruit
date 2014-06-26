@@ -10,6 +10,8 @@
 #import "YRViewerDataCell.h"
 #import <Guile/UITextField+AutoSuggestAdditions.h>
 #import <Guile/Guile.h>
+#import "YRAppDelegate.h"
+#import "Interviewer.h"
 
 
 @interface YRHostSettingViewController ()
@@ -26,15 +28,6 @@
 
 @implementation YRHostSettingViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 -(void)awakeFromNib
 {
     self.interviewerArray = [[NSMutableArray alloc] init];
@@ -44,8 +37,11 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    [self.userNameTextField setText:[[NSUserDefaults standardUserDefaults] valueForKey: @"userName"]];
-    [self.emailTextField setText:[[NSUserDefaults standardUserDefaults] valueForKey: @"userEmail"]];
+    
+    self.managedObjectContext = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] managedObjectContext];
+    
+    [self.userNameTextField setText:[[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] userName]];
+    [self.emailTextField setText:[[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] userEmail]];
     
     self.emailTextField.suggestionDelegate = self;
     self.emailTextField.delegate = self;
@@ -250,12 +246,17 @@
     }
     else
     {
-        NSDictionary* curr = @{@"name" : self.interviewerName.text, @"email" : self.interviewerEmail.text, @"code" : self.interviewerCode.text};
+        Interviewer* item = (Interviewer*)[NSEntityDescription insertNewObjectForEntityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext];
+        item.name = self.interviewerName.text;
+        item.email = self.interviewerEmail.text;
+        item.code = self.interviewerCode.text;
         
-        [self.interviewerArray addObject:curr];
+        NSError *error = nil;
+        if (![self.managedObjectContext save:&error]) {
+            NSLog(@"ERROR -- saving coredata");
+        }
         
-        [[NSUserDefaults standardUserDefaults] setObject:self.interviewerArray forKey:@"interviewerList"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.interviewerArray addObject:item];
         
         [self.interviewerList reloadData];
         [self.yrCardView removeFromSuperview];
@@ -264,18 +265,44 @@
 
 -(void)fetchInterviewerInfo
 {
-    self.interviewerArray = [[[NSUserDefaults standardUserDefaults] objectForKey:@"interviewerList"] mutableCopy];
     if (self.interviewerArray == nil) {
         self.interviewerArray = [NSMutableArray new];
     }
+    
+    
+    [self.interviewerArray removeAllObjects];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+    
+    NSError* error = nil;
+    
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    self.interviewerArray = [FetchResults mutableCopy];
 }
 
 -(void)removeAllInterviewerInfo
 {
     [self.interviewerArray removeAllObjects];
     [self.interviewerList reloadData];
-    [[NSUserDefaults standardUserDefaults] setObject:self.interviewerArray forKey:@"interviewerList"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    
+    //delete core data
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+    
+    NSError* error = nil;
+    
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    for (NSManagedObject* obj in FetchResults) {
+        [self.managedObjectContext deleteObject:obj];
+    }
+    
+    if (![self.managedObjectContext save:&error]) {
+        NSLog(@"ERROR -- saving coredata");
+    }
 }
 
 -(void)saveScheduleInfo
@@ -353,7 +380,6 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    //NSLog(@"%lu",(unsigned long)self.interviewerArray.count);
     return [self.interviewerArray count];
 }
 
@@ -365,9 +391,10 @@
     if (cell == nil) {
         cell = [YRViewerDataCell new];
     }
-    cell.yrNameLabel.text = [self.interviewerArray objectAtIndex:indexPath.row][@"name"];
-    cell.yrEmailLabel.text = [self.interviewerArray objectAtIndex:indexPath.row][@"email"];
-    cell.yrCodeLabel.text = [self.interviewerArray objectAtIndex:indexPath.row][@"code"];
+    Interviewer* current = [self.interviewerArray objectAtIndex:indexPath.row];
+    cell.yrNameLabel.text = current.name;
+    cell.yrEmailLabel.text = current.email;
+    cell.yrCodeLabel.text = current.code;
     return cell;
 }
 

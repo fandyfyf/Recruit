@@ -14,8 +14,10 @@
 @interface YRHostTimeCardViewController ()
 
 -(void)buildSchedule;
-//-(void)showList;
+
 -(void)cardOnClick:(id)sender;
+
+-(void)setUpInterviewNotification:(NSNotification *)notification;
 
 -(void)reloadSchedule;
 
@@ -23,17 +25,20 @@
 
 @implementation YRHostTimeCardViewController
 {
-    BOOL viewPoped;
     BOOL firstLoad;
+    BOOL dataIsReady;
+}
+
+- (void)awakeFromNib
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setUpInterviewNotification:) name:@"SetUpInterview" object:nil];
+    dataIsReady = NO;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    //[self buildSchedule];
-    self.view.backgroundColor = [UIColor purpleColor];
-    viewPoped = NO;
     self.yrdataEntry = [NSMutableArray new];
     self.yrinterviewerEntry = [NSMutableArray new];
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
@@ -72,6 +77,7 @@
     self.yrTimeCardScrollView = nil;
     self.yrTimeLabelScrollView = nil;
     self.yrPlaceOrNameScrollView = nil;
+    dataIsReady = NO;
 }
 
 - (void)didReceiveMemoryWarning
@@ -82,14 +88,6 @@
 
 -(void)buildSchedule
 {
-//    UIButton *scheduleButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//    scheduleButton.frame = CGRectMake(0, 20, 50, 50);
-//    [scheduleButton setTitle:@"Set" forState:UIControlStateNormal];
-//    scheduleButton.tintColor = [UIColor whiteColor];
-//    [scheduleButton addTarget:self action:@selector(showList) forControlEvents:UIControlEventTouchUpInside];
-//    
-//    [self.view addSubview:scheduleButton];
-    
     self.cardWidth = [NSNumber numberWithInt:130];
     self.cardHeight = [NSNumber numberWithInt:100];
     self.toTop = [NSNumber numberWithInt:70];
@@ -229,121 +227,75 @@
     [self.view addSubview:self.yrPlaceOrNameScrollView];
 }
 
-//-(void)showList
-//{
-//    self.cardDetailView = [[UIView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/4,self.view.frame.size.height/4,self.view.frame.size.width/2, self.view.frame.size.height/2)];
-//    
-//    self.cardDetailView.backgroundColor = [UIColor whiteColor];
-//    
-//    self.recommandListTable = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.cardDetailView.frame.size.width, self.cardDetailView.frame.size.height) style:UITableViewStylePlain];
-//    
-//    [self.cardDetailView addSubview:self.recommandListTable];
-//    self.recommandListTable.delegate = self;
-//    self.recommandListTable.dataSource = self;
-//    
-//    
-//    [[self.cardDetailView layer] setBorderColor:[[UIColor purpleColor] CGColor]];
-//    [[self.cardDetailView layer] setBorderWidth:2];
-//    [self.view addSubview:self.cardDetailView];
-//}
-
 -(void)cardOnClick:(id)sender
 {
-//    if (!viewPoped) {
-//        NSLog(@"hello world");
-//        
-//        self.yrTriggeringView = (UIControl*)sender;
-//        
-//        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-//            self.cardDetailView = [[UIView alloc] initWithFrame:CGRectMake(self.view.frame.size.width/4,self.view.frame.size.height/4,self.view.frame.size.width/2, self.view.frame.size.height/2)];
-//            
-//            self.cardDetailView.backgroundColor = [UIColor whiteColor];
-//            self.cardDetailView.hidden = YES;
-//            
-//            UIButton* cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//            [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-//            
-//            
-//            
-//            [[self.cardDetailView layer] setBorderColor:[[UIColor purpleColor] CGColor]];
-//            [[self.cardDetailView layer] setBorderWidth:2];
-//            [self.view addSubview:self.cardDetailView];
-//            
-//            [UIView beginAnimations:@"pop" context:Nil];
-//            
-//            [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.cardDetailView cache:NO];
-//            [UIView setAnimationDuration:1];
-//            
-//            [self.cardDetailView setHidden:NO];
-//            
-//            
-//            [UIView commitAnimations];
-//        }
-//        else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-//        {
-//            self.cardDetailView = [[UIView alloc] initWithFrame:self.view.frame];
-//            self.cardDetailView.backgroundColor = [UIColor whiteColor];
-//            
-//            UILabel* candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 40, 150, 20)];
-//            [candidateTitleLabel setText:@"Candidates: "];
-//            candidateTitleLabel.font = [UIFont boldSystemFontOfSize:15];
-//            [self.cardDetailView addSubview:candidateTitleLabel];
-//            
-//            UILabel* interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 250, 150, 20)];
-//            [interviewerTitleLabel setText:@"Interviewers: "];
-//            interviewerTitleLabel.font = [UIFont boldSystemFontOfSize:15];
-//            [self.cardDetailView addSubview:interviewerTitleLabel];
-//            
-//            self.candidatesPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 50, self.view.frame.size.width, 300)];
-//            self.interviewerPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 250, self.view.frame.size.width, 300)];
-//            self.candidatesPickerView.delegate = self;
-//            self.candidatesPickerView.dataSource = self;
-//            self.interviewerPickerView.delegate = self;
-//            self.interviewerPickerView.dataSource = self;
-//            
-//            [self fetch];
-//            
-//            [self.cardDetailView addSubview:self.candidatesPickerView];
-//            [self.cardDetailView addSubview:self.interviewerPickerView];
-//            
-//            UIButton* cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//            [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-//            [cancelButton setFrame:CGRectMake(20, 480, 50, 30)];
-//            [cancelButton setTintColor:[UIColor purpleColor]];
-//            [cancelButton addTarget:self action:@selector(cancelDetail) forControlEvents:UIControlEventTouchUpInside];
-//            
-//            [self.cardDetailView addSubview:cancelButton];
-//            
-//            UIButton* doneButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-//            [doneButton setTitle:@"Done" forState:UIControlStateNormal];
-//            [doneButton setFrame:CGRectMake(250, 480, 50, 30)];
-//            [doneButton setTintColor:[UIColor purpleColor]];
-//            [doneButton addTarget:self action:@selector(cancelDetail) forControlEvents:UIControlEventTouchUpInside];
-//            
-//            [self.cardDetailView addSubview:doneButton];
-//            
-//            [UIView beginAnimations:@"pop" context:Nil];
-//            
-//            [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
-//            [UIView setAnimationDuration:1];
-//            
-//            [self.view addSubview:self.cardDetailView];
-//        
-//            [UIView commitAnimations];
-//        }
-//        
-//        viewPoped = YES;
-//    }
-    self.yrSchedulingController.yrTriggeringView = (UIControl*)sender;
-    
-    [UIView beginAnimations:@"pop" context:Nil];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
-    [UIView setAnimationDuration:0.5];
-    
-    [self.view addSubview:self.yrSchedulingController.view];
-    
-    [UIView commitAnimations];
+    if (!dataIsReady) {
+        self.yrSchedulingController.yrTriggeringView = (UIControl*)sender;
+        
+        [UIView beginAnimations:@"pop" context:Nil];
+        
+        [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
+        [UIView setAnimationDuration:0.5];
+        
+        [self.view addSubview:self.yrSchedulingController.view];
+        
+        [UIView commitAnimations];
+    }
+    else
+    {
+        //after one click
+        NSMutableArray* infoArray = [[[NSUserDefaults standardUserDefaults] objectForKey:kYRAppointmentInfoKey] mutableCopy];
+        YRInterviewAppointmentInfo* selected = [NSKeyedUnarchiver unarchiveObjectWithData:[infoArray objectAtIndex:[(YRTimeCardView*)sender index]]];
+        
+        if (selected.isTaken) {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"The slot is taken." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+        else
+        {
+            NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+            [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"code = '%@'",self.passedInRid]]];
+            NSError* error = nil;
+            //NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
+            NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+            
+            //highlighted
+            if ([FetchResults count] != 0) {
+                CandidateEntry* fetched = (CandidateEntry*)[FetchResults objectAtIndex:0];
+                
+                [fetched.interviews addObject:@{@"time" : [(YRTimeCardView*)sender interviewStartTime], @"interviewer" : @""}];
+                [fetched setStatus:@"scheduled"];
+            }
+            
+            if (![[self managedObjectContext] save:&error]) {
+                NSLog(@"ERROR -- saving coredata");
+            }
+            
+            selected.candidateRid = [self.passedInRid mutableCopy];
+            selected.candidateName = [[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[FetchResults objectAtIndex:0] firstName],[(CandidateEntry*)[FetchResults objectAtIndex:0] lastName]] mutableCopy];
+            selected.interviewerName = [@"" mutableCopy];
+            [selected setTaken:YES];
+            
+            [[(YRTimeCardView*)sender codeLabel] setText:self.passedInRid];
+            
+            [[(YRTimeCardView*)sender candidateNameLabel] setText:selected.candidateName];
+            
+            [[(YRTimeCardView*)sender interviewerNameLabel] setText:@""];
+            
+            [infoArray setObject:[NSKeyedArchiver archivedDataWithRootObject:selected] atIndexedSubscript:[(YRTimeCardView*)sender index]];
+            
+            [[NSUserDefaults standardUserDefaults] setObject:infoArray forKey:kYRAppointmentInfoKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            dataIsReady = NO;
+        }
+    }
+}
+
+-(void)setUpInterviewNotification:(NSNotification *)notification
+{
+    dataIsReady = YES;
+    self.passedInRid = notification.object[@"code"];
 }
 
 -(void)reloadSchedule

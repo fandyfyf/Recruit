@@ -9,6 +9,7 @@
 #import "YRDataManager.h"
 #import "YRAppDelegate.h"
 #import "YRMCManager.h"
+#import "Interviewer.h"
 
 
 @implementation YRDataManager
@@ -45,7 +46,6 @@
 -(void)didReceiveDataWithNotification:(NSNotification *)notification
 {
     MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
-    //NSString *peerDisplayName = peerID.displayName;
     
     NSData* yrinfoData = [[notification userInfo] objectForKey:@"data"];
     
@@ -152,7 +152,7 @@
     [item setPosition:infoData[@"position"]];
     [item setPreference:infoData[@"preference"]];
     [item setDate:infoData[@"date"]];
-    [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[[NSUserDefaults standardUserDefaults] valueForKey:@"userName"]]]];
+    [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName]]];
     [item setRank:[NSNumber numberWithFloat:[(NSString*)infoData[@"rank"] floatValue]]];
     [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
     
@@ -191,12 +191,21 @@
 
 -(void)sendNameList:(MCPeerID*)peerID
 {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+    
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.yrPrefix]];
+    
+    NSError* error = nil;
+    
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+
+    //NSMutableArray* currentList = [FetchResults mutableCopy];
     NSMutableArray* currentList = [NSMutableArray new];
-    for (NSDictionary* dic in [[NSUserDefaults standardUserDefaults] objectForKey:@"interviewerList"])
-    {
-        if ([dic[@"code"] isEqualToString:self.yrPrefix]) {
-            [currentList addObject:dic];
-        }
+    
+    for (Interviewer* curr in FetchResults) {
+        NSDictionary * dic = @{@"name" : curr.name, @"email" : curr.email};
+        [currentList addObject:dic];
     }
     
     NSDictionary* dic = @{@"msg" : @"nameList", @"data" : currentList};
@@ -209,8 +218,6 @@
     
     [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
     [yrarchiver finishEncoding];
-    
-    NSError *error;
     
     MCSession * selectedSession;
     

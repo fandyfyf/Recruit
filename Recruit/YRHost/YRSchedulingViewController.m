@@ -8,6 +8,7 @@
 
 #import "YRSchedulingViewController.h"
 #import "CandidateEntry.h"
+#import "Interviewer.h"
 #import "YRTimeCardView.h"
 #import "YRInterviewAppointmentInfo.h"
 
@@ -93,6 +94,54 @@ NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
     [self fetch];
     [self.candidatesPickerView reloadAllComponents];
     [self.interviewerPickerView reloadAllComponents];
+    
+    //setting default appearance of picker view
+    
+    if ([(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text != nil) {
+        if (![[(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text isEqualToString:@""]) {
+            //setting default at the beginning
+            self.selectedCandidate = [(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text;
+            self.selectedCode = [(YRTimeCardView*)self.yrTriggeringView codeLabel].text;
+            int index = 0;
+            for (int i = 0; i<[self.yrdataEntry count];i++) {
+                if ([[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] lastName]] isEqualToString:[(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text]  ) {
+                    index = i;
+                }
+            }
+            [self.candidatesPickerView selectRow:index+1 inComponent:0 animated:YES];
+        }
+        else
+        {
+            [self.candidatesPickerView selectRow:0 inComponent:0 animated:YES];
+        }
+    }
+    else
+    {
+        [self.candidatesPickerView selectRow:0 inComponent:0 animated:YES];
+    }
+    
+    
+    if ([(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text != nil) {
+        if (![[(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text isEqualToString:@""]) {
+            //setting default at the beginning
+            self.selectedInterviewer = [(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text;
+            int index = 0;
+            for (int i = 0; i<[self.yrinterviewerEntry count];i++) {
+                if ([[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:i] name] isEqualToString:[(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text]) {
+                    index = i;
+                }
+            }
+            [self.interviewerPickerView selectRow:index+1 inComponent:0 animated:YES];
+        }
+        else
+        {
+            [self.interviewerPickerView selectRow:0 inComponent:0 animated:YES];
+        }
+    }
+    else
+    {
+        [self.interviewerPickerView selectRow:0 inComponent:0 animated:YES];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -141,15 +190,12 @@ NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
     NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
     [self setYrdataEntry:mutableFetchResults];
     
-    self.yrinterviewerEntry = [[[NSUserDefaults standardUserDefaults] objectForKey:@"interviewerList"] mutableCopy];
+    fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
     
-//    if (self.yrinterviewerEntry == nil) {
-//        NSLog(@"empty");
-//    }
-//    else
-//    {
-//        NSLog(@"%d",[self.yrinterviewerEntry count]);
-//    }
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    self.yrinterviewerEntry = [FetchResults mutableCopy];
 }
 
 -(void)addContent:(UIControl*)owner
@@ -328,7 +374,7 @@ NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
         }
         else if (pickerView == self.interviewerPickerView)
         {
-            return [NSString stringWithFormat:@"%@",[self.yrinterviewerEntry objectAtIndex:row-1][@"name"]];
+            return [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
         }
         else
         {
@@ -357,7 +403,7 @@ NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
         }
         else
         {
-            self.selectedInterviewer = [NSString stringWithFormat:@"%@",[self.yrinterviewerEntry objectAtIndex:row-1][@"name"]];
+            self.selectedInterviewer = [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
         }
     }
 }

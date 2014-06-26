@@ -83,6 +83,15 @@
     [self.yrEmailTextField acceptSuggestion];
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [self.yrFirstNameTextField resignFirstResponder];
+    [self.yrLastNameTextField resignFirstResponder];
+    [self.yrEmailTextField resignFirstResponder];
+    [self.yrEmailTextField acceptSuggestion];
+    return YES;
+}
+
 #pragma mark - AutoSuggestDelegate
 
 - (NSString *)suggestedStringForInputString:(NSString *)input

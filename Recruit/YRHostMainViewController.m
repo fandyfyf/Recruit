@@ -36,15 +36,15 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     //self.hostUserName = [self.source valueForKey:@"userName"];
+    self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
+    self.managedObjectContext = [self.appDelegate managedObjectContext];
     
-    self.hostUserName = [[NSUserDefaults standardUserDefaults] valueForKey:@"userName"];
+    self.hostUserName = self.appDelegate.mcManager.userName;
     NSLog(@"Hello: %@ as a Host",self.hostUserName);
     
     [self.yrnameLabel setText:self.hostUserName];
     //self.yrnameLabel.textAlignment = NSTextAlignmentCenter;
     
-    self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
-    self.managedObjectContext = [self.appDelegate managedObjectContext];
     
     self.yrPrefix = [NSString new];
     //set up session with host username

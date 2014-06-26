@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		D2281521195B21590097E45C /* YRInterviewAppointmentInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D2281520195B21590097E45C /* YRInterviewAppointmentInfo.m */; };
-		D2281524195B76FC0097E45C /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2281523195B76FC0097E45C /* CandidateEntry.m */; };
 		D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */; };
 		D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */; };
 		D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414D1959D838004A31E1 /* YRTimeCardView.m */; };
@@ -22,6 +21,9 @@
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
+		D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */; };
+		D2BB4200195CBF90002ECCC9 /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2BB41FF195CBF90002ECCC9 /* CandidateEntry.m */; };
+		D2BB4203195CBF90002ECCC9 /* Interviewer.m in Sources */ = {isa = PBXBuildFile; fileRef = D2BB4202195CBF90002ECCC9 /* Interviewer.m */; };
 		D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */; };
 		D2F8185B19465FE5006E88FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185A19465FE5006E88FD /* Foundation.framework */; };
 		D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185C19465FE5006E88FD /* CoreGraphics.framework */; };
@@ -61,8 +63,6 @@
 /* Begin PBXFileReference section */
 		D228151F195B21590097E45C /* YRInterviewAppointmentInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRInterviewAppointmentInfo.h; sourceTree = "<group>"; };
 		D2281520195B21590097E45C /* YRInterviewAppointmentInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRInterviewAppointmentInfo.m; sourceTree = "<group>"; };
-		D2281522195B76FC0097E45C /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
-		D2281523195B76FC0097E45C /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
 		D24341461954FFE4004A31E1 /* YRHostTimeCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRHostTimeCardViewController.h; sourceTree = "<group>"; };
 		D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRHostTimeCardViewController.m; sourceTree = "<group>"; };
 		D24341491959C23C004A31E1 /* YRSchedulingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRSchedulingViewController.h; sourceTree = "<group>"; };
@@ -82,6 +82,11 @@
 		D2A6806F194BA00F0091B768 /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostDetailViewController.m; path = Recruit/YRHostDetailViewController.m; sourceTree = SOURCE_ROOT; };
+		D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yahoo-icon.png"; sourceTree = "<group>"; };
+		D2BB41FE195CBF90002ECCC9 /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
+		D2BB41FF195CBF90002ECCC9 /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
+		D2BB4201195CBF90002ECCC9 /* Interviewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interviewer.h; sourceTree = "<group>"; };
+		D2BB4202195CBF90002ECCC9 /* Interviewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Interviewer.m; sourceTree = "<group>"; };
 		D2CB59AD195393D900CAB252 /* YRClientSignInViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRClientSignInViewController.h; sourceTree = "<group>"; };
 		D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRClientSignInViewController.m; sourceTree = "<group>"; };
 		D2F8185719465FE5006E88FD /* Recruit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recruit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -192,6 +197,7 @@
 		D2F8186019465FE5006E88FD /* Recruit */ = {
 			isa = PBXGroup;
 			children = (
+				D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */,
 				D25268B519507E5300EBE43E /* gear.png */,
 				D25268B319507DE400EBE43E /* wifi.png */,
 				D25268B119507D8D00EBE43E /* folder.png */,
@@ -201,9 +207,11 @@
 				D2F818A219478777006E88FD /* YRHost */,
 				D2F8186919465FE5006E88FD /* YRAppDelegate.h */,
 				D2F8186A19465FE5006E88FD /* YRAppDelegate.m */,
+				D2BB41FE195CBF90002ECCC9 /* CandidateEntry.h */,
+				D2BB41FF195CBF90002ECCC9 /* CandidateEntry.m */,
+				D2BB4201195CBF90002ECCC9 /* Interviewer.h */,
+				D2BB4202195CBF90002ECCC9 /* Interviewer.m */,
 				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
-				D2281522195B76FC0097E45C /* CandidateEntry.h */,
-				D2281523195B76FC0097E45C /* CandidateEntry.m */,
 				D2F818B11948E691006E88FD /* YRDataManager.h */,
 				D2F818B21948E691006E88FD /* YRDataManager.m */,
 				D2F8186C19465FE5006E88FD /* Main_iPhone.storyboard */,
@@ -367,6 +375,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D25268B019507D7700EBE43E /* document.png in Resources */,
+				D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */,
 				D2F8187319465FE5006E88FD /* Images.xcassets in Resources */,
 				D25268B619507E5300EBE43E /* gear.png in Resources */,
 				D25268B419507DE400EBE43E /* wifi.png in Resources */,
@@ -398,7 +407,7 @@
 				D2F818941946696D006E88FD /* YRClientConnectionViewController.m in Sources */,
 				D2F8189719469FC1006E88FD /* YRMCManager.m in Sources */,
 				D2F818B31948E691006E88FD /* YRDataManager.m in Sources */,
-				D2281524195B76FC0097E45C /* CandidateEntry.m in Sources */,
+				D2BB4200195CBF90002ECCC9 /* CandidateEntry.m in Sources */,
 				D2F8186719465FE5006E88FD /* main.m in Sources */,
 				D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */,
 				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
@@ -408,6 +417,7 @@
 				D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */,
 				D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */,
 				D2F8189D19474712006E88FD /* YRDataViewController.m in Sources */,
+				D2BB4203195CBF90002ECCC9 /* Interviewer.m in Sources */,
 				D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */,
 				D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */,
 				D2281521195B21590097E45C /* YRInterviewAppointmentInfo.m in Sources */,

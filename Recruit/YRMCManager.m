@@ -23,6 +23,8 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
         _autoBrowser = nil;
         _activeSessions = nil;
         _Nadvertiser = nil;
+        _userEmail = nil;
+        _userName = nil;
     }
     return self;
 }

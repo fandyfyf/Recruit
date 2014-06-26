@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3400" systemVersion="13D65" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Appointment" syncable="YES">
+        <attribute name="appointmentId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="candidateName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="candidateRid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="interviewer" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="startTime" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="CandidateEntry" representedClassName="CandidateEntry" syncable="YES">
         <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
@@ -17,7 +24,15 @@
         <attribute name="recommand" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
+    <entity name="Interviewer" representedClassName="Interviewer" syncable="YES">
+        <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="interviewerId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <elements>
         <element name="CandidateEntry" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="Interviewer" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="Appointment" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>

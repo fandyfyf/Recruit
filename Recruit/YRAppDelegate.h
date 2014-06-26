@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-//#import "YRMCManager.h"
-//#import "YRDataManager.h"
-@class YRDataManager;
-@class YRMCManager;
+#import "YRMCManager.h"
+#import "YRDataManager.h"
+//@class YRDataManager;
+//@class YRMCManager;
 
 @interface YRAppDelegate : UIResponder <UIApplicationDelegate>
 

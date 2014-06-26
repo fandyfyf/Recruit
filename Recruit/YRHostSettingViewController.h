@@ -25,6 +25,8 @@
 @property (weak, nonatomic) IBOutlet UITextField *interviewStartTime;
 @property (weak, nonatomic) IBOutlet UITextField *interviewDuration;
 @property (weak, nonatomic) IBOutlet UITextField *interviewLocations;
+@property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+
 
 - (IBAction)addInterviewer:(id)sender;
 - (IBAction)removeAll:(id)sender;

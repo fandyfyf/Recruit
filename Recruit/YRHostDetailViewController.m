@@ -103,6 +103,18 @@
     
     
     self.yrGPALabel.text = [NSString stringWithFormat:@"GPA: %@",self.dataSource.gpa];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[self.yrScheduleButton layer] setCornerRadius:35];
+        [[self.yrGoBackButton layer] setCornerRadius:35];
+        [[self.yrEmailButton layer] setCornerRadius:35];
+        [[self.checkInterviewButton layer] setCornerRadius:35];
+    }
+    else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [[self.yrGoBackButton layer] setCornerRadius:25];
+        [[self.yrEmailButton layer] setCornerRadius:25];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -202,10 +214,10 @@
     [UIView setAnimationDuration:0.5];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrCommentTextView.frame = CGRectMake(84, 590, 600, 325);
+        self.yrCommentTextView.frame = CGRectMake(84, 610, 600, 325);
     }
     else{
-        self.yrCommentTextView.frame = CGRectMake(10, 393, 300, 120);
+        self.yrCommentTextView.frame = CGRectMake(10, 417, 300, 120);
     }
     [UIView commitAnimations];
     [self.yrCommentTextView resignFirstResponder];
@@ -257,6 +269,13 @@
         NSLog(@"Fail");
     }
     
+}
+
+- (IBAction)scheduleInterview:(id)sender {
+    NSDictionary* dic = @{@"code" : self.yrCodeLabel.text};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SetUpInterview" object:dic];
+    
+    [self dismissViewControllerAnimated:YES completion:Nil];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {

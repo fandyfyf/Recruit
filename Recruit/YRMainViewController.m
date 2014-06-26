@@ -7,26 +7,13 @@
 //
 
 #import "YRMainViewController.h"
+#import "YRAppDelegate.h"
 
 @interface YRMainViewController ()
 
 @end
 
 @implementation YRMainViewController
-
-//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-//{
-//    if ([segue.identifier isEqualToString:@"MainToHost"]) {
-//        UIViewController* destination = [[(UITabBarController*)segue.destinationViewController viewControllers] objectAtIndex:0];
-//        [destination setValue:self.userName forKey:@"hostUserName"];
-//    }
-//    else if ([segue.identifier isEqualToString:@"MainToClient"])
-//    {
-//        UIViewController* destination = [[(UITabBarController*)segue.destinationViewController viewControllers] objectAtIndex:0];
-//        [destination setValue:self.userName forKey:@"clientUserName"];
-//    }
-//}
-
 
 - (void)viewDidLoad
 {
@@ -56,9 +43,9 @@
     {
         [self setUserName:self.yrtextField.text];
         
-        [[NSUserDefaults standardUserDefaults] setValue:self.userName forKey:@"userName"];
-        [[NSUserDefaults standardUserDefaults] setValue:[self.userName stringByAppendingString:@"@yahoo-inc.com"] forKey:@"userEmail"];
-        [[NSUserDefaults  standardUserDefaults] synchronize];
+        
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setUserName:self.userName];
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setUserEmail:[self.userName stringByAppendingString:@"@yahoo-inc.com"]];
         
         if (self.yrsegmentedControl.selectedSegmentIndex == 0) {
             [self performSegueWithIdentifier:@"MainToHost" sender:self];

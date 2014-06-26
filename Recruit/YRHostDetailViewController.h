@@ -41,6 +41,10 @@
 @property (weak, nonatomic) IBOutlet UIButton *yrEmailCandidateButton;
 @property (strong, nonatomic) UIScrollView* yrScrollView;
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
+@property (weak, nonatomic) IBOutlet UIButton *yrScheduleButton;
+@property (weak, nonatomic) IBOutlet UIButton *yrEmailButton;
+@property (weak, nonatomic) IBOutlet UIButton *checkInterviewButton;
+
 @property (weak, nonatomic) IBOutlet UITextView *yrCommentTextView;
 @property (strong, nonatomic) MFMailComposeViewController* yrMailViewController;
 
@@ -49,5 +53,6 @@
 - (IBAction)retakeImage:(id)sender;
 - (IBAction)backgroundTapped:(id)sender;
 - (IBAction)emailCandidate:(id)sender;
+- (IBAction)scheduleInterview:(id)sender;
 
 @end

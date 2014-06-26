@@ -10,6 +10,7 @@
 #import "YRFormViewController.h"
 #import "YRDataManager.h"
 #import "YRMCManager.h"
+#import "Interviewer.h"
 
 @interface YRClientConnectionViewController ()
 
@@ -38,13 +39,14 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     
-    self.clientUserName = [[NSUserDefaults standardUserDefaults] valueForKey:@"userName"];
+    
+    self.clientUserName = [self.appDelegate.mcManager userName];
     
     NSLog(@"Hello: %@ as a client",self.clientUserName);
     [self.yrnameLabel setText:self.clientUserName];
     
-    self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     
     //set up session with host username
     
@@ -84,7 +86,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    self.clientUserName = [[NSUserDefaults standardUserDefaults] valueForKey:@"userName"];
+    self.clientUserName = [self.appDelegate.mcManager userName];
     [self.yrnameLabel setText:self.clientUserName];
 }
 
@@ -366,9 +368,14 @@
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"nameListCell"];
         }
         
-        cell.textLabel.text = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row][@"name"];
-        cell.detailTextLabel.text = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row][@"email"];
+//        Interviewer* current = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row];
+//
+//        cell.textLabel.text = current.name;
+//        cell.detailTextLabel.text = current.email;
+        NSDictionary* current = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row];
         
+        cell.textLabel.text = current[@"name"];
+        cell.detailTextLabel.text = current[@"email"];
         return cell;
     }
 }
@@ -382,12 +389,16 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tableView == self.yrNameList) {
-        [[NSUserDefaults standardUserDefaults] setValue:self.appDelegate.dataManager.nameList[indexPath.row][@"name"] forKey:@"userName"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        //Interviewer* current = self.appDelegate.dataManager.nameList[indexPath.row];
+        NSDictionary* current = self.appDelegate.dataManager.nameList[indexPath.row];
+        
+        //[self.appDelegate.mcManager setUserName:current.name];
+        [self.appDelegate.mcManager setUserName:current[@"name"]];
         
         [self.yrNameListView removeFromSuperview];
         
-        [self.yrnameLabel setText:self.appDelegate.dataManager.nameList[indexPath.row][@"name"]];
+        [self.yrnameLabel setText:self.appDelegate.mcManager.userName];
     }
 }
 
