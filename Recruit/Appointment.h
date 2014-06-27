@@ -14,9 +14,6 @@
 @interface Appointment : NSManagedObject
 
 @property (nonatomic, retain) NSString * startTime;
-@property (nonatomic, retain) NSString * candidateRid;
-@property (nonatomic, retain) NSString * candidateName;
-@property (nonatomic, retain) NSString * interviewer;
 @property (nonatomic, retain) NSNumber * apIndex_x;
 @property (nonatomic, retain) NSNumber * apIndex_y;
 @property (nonatomic, retain) CandidateEntry *candidate;

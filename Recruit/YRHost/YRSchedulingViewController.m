@@ -9,8 +9,8 @@
 #import "YRSchedulingViewController.h"
 #import "CandidateEntry.h"
 #import "Interviewer.h"
+#import "Appointment.h"
 #import "YRTimeCardView.h"
-#import "YRInterviewAppointmentInfo.h"
 
 @interface YRSchedulingViewController ()
 
@@ -21,8 +21,6 @@
 
 @end
 
-NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
-
 @implementation YRSchedulingViewController
 
 - (void)viewDidLoad
@@ -30,6 +28,8 @@ NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
+    
+    //=================set up UI===================//
     self.view = [[UIView alloc] initWithFrame:self.view.frame];
     self.view.backgroundColor = [UIColor whiteColor];
     
@@ -200,124 +200,172 @@ NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
 
 -(void)addContent:(UIControl*)owner
 {
-    NSString* previous = [(YRTimeCardView*)owner codeLabel].text;
+    NSString* previousCode = [(YRTimeCardView*)owner codeLabel].text;
+    //NSString* previousCandidate = [(YRTimeCardView*)owner candidateNameLabel].text;
+    NSString* previousViewer = [(YRTimeCardView*)owner interviewerNameLabel].text;
     
-    NSMutableArray* infoArray = [[[NSUserDefaults standardUserDefaults] objectForKey:kYRAppointmentInfoKey] mutableCopy];
-    YRInterviewAppointmentInfo* selected = [NSKeyedUnarchiver unarchiveObjectWithData:[infoArray objectAtIndex:[(YRTimeCardView*)owner index]]];
-    
-    if ([self.selectedCode isEqualToString:@""]) {
-        [selected setTaken:NO];
-        [selected setCandidateRid:[@"" mutableCopy]];
-        [selected setCandidateName:[@"" mutableCopy]];
-        [selected setInterviewerName:[@"" mutableCopy]];
-    }
-    else
-    {
-        [selected setTaken:YES];
-        [selected setCandidateRid:[self.selectedCode mutableCopy]];
-        [selected setCandidateName:[self.selectedCandidate mutableCopy]];
-        [selected setInterviewerName:[self.selectedInterviewer mutableCopy]];
-    }
-    
-    [infoArray setObject:[NSKeyedArchiver archivedDataWithRootObject:selected] atIndexedSubscript:[(YRTimeCardView*)owner index]];
-    
-    [[NSUserDefaults standardUserDefaults] setObject:infoArray forKey:kYRAppointmentInfoKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
-    
-    if ([self.selectedCode isEqualToString:@""]) {
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"code = '%@'",previous]]];
-    }
-    else
-    {
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"code = '%@'",self.selectedCode]]];
-    }
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d",[(YRTimeCardView*)owner roomIndex],[(YRTimeCardView*)owner slotIndex]]];
     
     NSError* error = nil;
-    NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
-    if ([mutableFetchResults count] != 0) {
-        
-        NSMutableArray* interviews = [(CandidateEntry*)[mutableFetchResults objectAtIndex:0] interviews];
-        
+    if ([FetchResults count] == 0) {
+        //the appointment doesn't exist
         if (![self.selectedCode isEqualToString:@""]) {
+            //when the candidate is set, save the data
+            Appointment* item = (Appointment*)[NSEntityDescription insertNewObjectForEntityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext];
+            item.startTime = [(YRTimeCardView*)owner interviewStartTime];
+            item.apIndex_x = [NSNumber numberWithInt:[(YRTimeCardView*)owner roomIndex]];
+            item.apIndex_y = [NSNumber numberWithInt:[(YRTimeCardView*)owner slotIndex]];
             
-            //same code, remove duplicate first
-            if ([self.selectedCode isEqualToString:[(YRTimeCardView*)owner codeLabel].text]) {
-                int index = -1;
-                for (int i=0;i<[interviews count];i++)
-                {
-                    NSDictionary* dic = [interviews objectAtIndex:i];
-                    if ([dic isEqualToDictionary:@{@"time" : [(YRTimeCardView*)owner interviewStartTime], @"interviewer" : [(YRTimeCardView*)owner interviewerNameLabel].text}]) {
-                        index = i;
-                    }
+            NSFetchRequest *fetchRequestC = [[NSFetchRequest alloc] init];
+            [fetchRequestC setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+            [fetchRequestC setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.selectedCode]];
+            
+            NSArray* candidate = [self.managedObjectContext executeFetchRequest:fetchRequestC error:&error];
+            
+            NSFetchRequest *fetchRequestI = [[NSFetchRequest alloc] init];
+            [fetchRequestI setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+            [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@",self.selectedInterviewer]];
+            
+            NSArray* interviewer = [self.managedObjectContext executeFetchRequest:fetchRequestI error:&error];
+            
+            
+            if ([candidate count] != 0) {
+                item.candidate = (CandidateEntry*)[candidate objectAtIndex:0];
+                
+                if ([interviewer count] != 0) {
+                    item.interviewers = (Interviewer*)[interviewer objectAtIndex:0];
                 }
-                //renew the entry
-                [interviews setObject:@{@"time" : [(YRTimeCardView*)owner interviewStartTime], @"interviewer" : self.selectedInterviewer} atIndexedSubscript:index];
+                [item.candidate setStatus:@"scheduled"];
             }
             else
             {
-                //add new entry to new guy
-                [interviews addObject:@{@"time" : [(YRTimeCardView*)owner interviewStartTime], @"interviewer" : self.selectedInterviewer}];
-                
-                //delete old entry from previous guy
-            }
-            
-            [(CandidateEntry*)[mutableFetchResults objectAtIndex:0] setStatus:@"scheduled"];
-        }
-        else
-        {
-            int index = -1;
-            for (int i=0;i<[interviews count];i++)
-            {
-                NSDictionary* dic = [interviews objectAtIndex:i];
-                if ([dic isEqualToDictionary:@{@"time" : [(YRTimeCardView*)owner interviewStartTime], @"interviewer" : [(YRTimeCardView*)owner interviewerNameLabel].text}]) {
-                    index = i;
-                }
-            }
-            if (index >=0) {
-                [interviews removeObjectAtIndex:index];
-            }
-            if ([interviews count] == 0) {
-                [(CandidateEntry*)[mutableFetchResults objectAtIndex:0] setStatus:@"pending"];
-            }
-        }
-
-    }
-    if (![[self managedObjectContext] save:&error]) {
-        NSLog(@"ERROR -- saving coredata");
-    }
-    
-    if (![self.selectedCode isEqualToString:@""]) {
-        if (![self.selectedCode isEqualToString:[(YRTimeCardView*)owner codeLabel].text]) {
-            NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-            [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"code = '%@'",previous]]];
-            NSError* error = nil;
-            NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
-            if ([mutableFetchResults count] != 0) {
-                NSMutableArray* interviews = [(CandidateEntry*)[mutableFetchResults objectAtIndex:0] interviews];
-                
-                int index = -1;
-                for (int i=0;i<[interviews count];i++)
-                {
-                    NSDictionary* dic = [interviews objectAtIndex:i];
-                    if ([dic isEqualToDictionary:@{@"time" : [(YRTimeCardView*)owner interviewStartTime], @"interviewer" : [(YRTimeCardView*)owner interviewerNameLabel].text}]) {
-                        index = i;
-                    }
-                }
-                if (index >=0) {
-                    [interviews removeObjectAtIndex:index];
-                }
-                if ([interviews count] == 0) {
-                    [(CandidateEntry*)[mutableFetchResults objectAtIndex:0] setStatus:@"pending"];
-                }
+                NSLog(@"The candidate doesn't exist");
             }
             if (![[self managedObjectContext] save:&error]) {
                 NSLog(@"ERROR -- saving coredata");
+            }
+        }
+        else
+        {
+            //when candidate is not set, don't save the data
+        }
+    }
+    else
+    {
+        //appointment need to be modifyed
+        Appointment* selectedAppointment = [FetchResults objectAtIndex:0];
+        if ([self.selectedCode isEqualToString:@""]) {
+            //candidate is not set, remove the data from previous Candidate
+            NSFetchRequest *fetchRequestC = [[NSFetchRequest alloc] init];
+            [fetchRequestC setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+            [fetchRequestC setPredicate:[NSPredicate predicateWithFormat:@"code = %@",previousCode]];
+            
+            NSArray* candidate = [self.managedObjectContext executeFetchRequest:fetchRequestC error:&error];
+            
+            if ([candidate count] != 0) {
+                CandidateEntry* previousCandidate = (CandidateEntry*)[candidate objectAtIndex:0];
+                [previousCandidate removeAppointmentsObject:selectedAppointment];
+                if ([[previousCandidate appointments] count] == 0) {
+                    [previousCandidate setStatus:@"pending"];
+                }
+            }
+            else
+            {
+                NSLog(@"The candidate doesn't exist");
+            }
+            
+            NSFetchRequest *fetchRequestI = [[NSFetchRequest alloc] init];
+            [fetchRequestI setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+            [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@",previousViewer]];
+            
+            NSArray* interviewer = [self.managedObjectContext executeFetchRequest:fetchRequestI error:&error];
+            
+            if ([interviewer count] != 0) {
+                Interviewer* previousInterviewer = (Interviewer*)[interviewer objectAtIndex:0];
+                [previousInterviewer removeAppointmentsObject:selectedAppointment];
+            }
+            
+            //delete the appointment
+            [self.managedObjectContext deleteObject:selectedAppointment];
+
+            //save changes
+            if (![[self managedObjectContext] save:&error]) {
+                NSLog(@"ERROR -- saving coredata");
+            }
+        }
+        else
+        {
+            if (![self.selectedCode isEqualToString:previousCode]) {
+                //remove from previous Candidate
+                NSFetchRequest *fetchRequestCP = [[NSFetchRequest alloc] init];
+                [fetchRequestCP setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+                [fetchRequestCP setPredicate:[NSPredicate predicateWithFormat:@"code = %@",previousCode]];
+                
+                NSArray* candidateP = [self.managedObjectContext executeFetchRequest:fetchRequestCP error:&error];
+                
+                if ([candidateP count] != 0) {
+                    CandidateEntry* previousCandidate = (CandidateEntry*)[candidateP objectAtIndex:0];
+                    [previousCandidate removeAppointmentsObject:selectedAppointment];
+                    if ([[previousCandidate appointments] count] == 0) {
+                        [previousCandidate setStatus:@"pending"];
+                    }
+                }
+                
+                //add to selected Candidate
+                NSFetchRequest *fetchRequestCC = [[NSFetchRequest alloc] init];
+                [fetchRequestCC setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+                [fetchRequestCC setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.selectedCode]];
+                
+                NSArray* candidateC = [self.managedObjectContext executeFetchRequest:fetchRequestCC error:&error];
+                
+                if ([candidateC count] != 0) {
+                    CandidateEntry* currentCandidate = (CandidateEntry*)[candidateC objectAtIndex:0];
+                    [currentCandidate addAppointmentsObject:selectedAppointment];
+                    [currentCandidate setStatus:@"scheduled"];
+                }
+                
+                if (![[self managedObjectContext] save:&error]) {
+                    NSLog(@"ERROR -- saving coredata");
+                }
+            }
+                
+            if (![self.selectedInterviewer isEqualToString:previousViewer]) {
+                //update interviewer
+                
+                NSFetchRequest *fetchRequestIP = [[NSFetchRequest alloc] init];
+                [fetchRequestIP setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+                [fetchRequestIP setPredicate:[NSPredicate predicateWithFormat:@"name = %@",previousViewer]];
+                
+                NSArray* interviewerP = [self.managedObjectContext executeFetchRequest:fetchRequestIP error:&error];
+                
+                if ([interviewerP count] != 0) {
+                    Interviewer* previousInterviewer = (Interviewer*)[interviewerP objectAtIndex:0];
+                    [previousInterviewer removeAppointmentsObject:selectedAppointment];
+                }
+                
+                NSFetchRequest *fetchRequestIC = [[NSFetchRequest alloc] init];
+                [fetchRequestIC setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+                [fetchRequestIC setPredicate:[NSPredicate predicateWithFormat:@"name = %@",self.selectedInterviewer]];
+                
+                NSArray* interviewerC = [self.managedObjectContext executeFetchRequest:fetchRequestIC error:&error];
+                
+                if ([interviewerC count] != 0) {
+                    Interviewer* currentInterviewer = (Interviewer*)[interviewerC objectAtIndex:0];
+                    [currentInterviewer addAppointmentsObject:selectedAppointment];
+                }
+                
+                
+                if (![[self managedObjectContext] save:&error]) {
+                    NSLog(@"ERROR -- saving coredata");
+                }
+            }
+            else
+            {
+                //nothing need to be changed
             }
         }
     }
@@ -333,7 +381,6 @@ NSString* const kYRAppointmentInfoKey = @"appointmentInfo";
     {
         [[(YRTimeCardView*)owner interviewerNameLabel] setText:[NSString stringWithFormat:@"%@",self.selectedInterviewer]];
     }
-    
 }
 
 #pragma mark - UIPickerViewDataSource

@@ -14,9 +14,6 @@
 @implementation Appointment
 
 @dynamic startTime;
-@dynamic candidateRid;
-@dynamic candidateName;
-@dynamic interviewer;
 @dynamic apIndex_x;
 @dynamic apIndex_y;
 @dynamic candidate;

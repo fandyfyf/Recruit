@@ -8,8 +8,9 @@
 
 #import "YRHostTimeCardViewController.h"
 #import "CandidateEntry.h"
+#import "Appointment.h"
+#import "Interviewer.h"
 #import "YRTimeCardView.h"
-#import "YRInterviewAppointmentInfo.h"
 
 @interface YRHostTimeCardViewController ()
 
@@ -25,7 +26,6 @@
 
 @implementation YRHostTimeCardViewController
 {
-    BOOL firstLoad;
     BOOL dataIsReady;
 }
 
@@ -49,6 +49,8 @@
     
     self.columLabels = [NSMutableArray new];
     self.rowLabels = [NSMutableArray new];
+    self.views = [NSMutableArray new];
+    self.yrAppointmentInfo = [NSMutableArray new];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -56,13 +58,15 @@
     [super viewWillAppear:animated];
     [self.columLabels removeAllObjects];
     [self.rowLabels removeAllObjects];
+    [self.views removeAllObjects];
+    [self.yrAppointmentInfo removeAllObjects];
     
-    self.yrAppointmentInfo = [[NSUserDefaults standardUserDefaults] objectForKey:kYRAppointmentInfoKey];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+    NSError* error = nil;
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
-    if (self.yrAppointmentInfo == nil) {
-        self.yrAppointmentInfo = [NSMutableArray new];
-        firstLoad = YES;
-    }
+    [self setYrAppointmentInfo:[FetchResults mutableCopy]];
     
     [self buildSchedule];
 }
@@ -88,6 +92,7 @@
 
 -(void)buildSchedule
 {
+    //======================UI parameters=========================//
     self.cardWidth = [NSNumber numberWithInt:130];
     self.cardHeight = [NSNumber numberWithInt:100];
     self.toTop = [NSNumber numberWithInt:70];
@@ -103,8 +108,8 @@
     self.yrRowNumber = [NSNumber numberWithInt:20];
     self.yrColumNumber = [[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"];
     
+    //======================Basic UI=========================//
     self.yrTimeLabelScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [self.toLeft intValue], self.view.frame.size.height)];
-    //self.yrTimeLabelScrollView.backgroundColor = [UIColor purpleColor];
     self.yrPlaceOrNameScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, [self.toTop intValue])];
     self.yrTimeCardScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(self.yrTimeLabelScrollView.frame.size.width, self.yrPlaceOrNameScrollView.frame.size.height, self.view.frame.size.width-self.yrTimeLabelScrollView.frame.size.width, self.view.frame.size.height-self.yrPlaceOrNameScrollView.frame.size.height-49)];
     
@@ -113,7 +118,7 @@
     [self.yrPlaceOrNameScrollView setContentSize:CGSizeMake(([self.cardWidth intValue]+5)*[self.yrColumNumber intValue]+[self.toLeft intValue], self.yrPlaceOrNameScrollView.frame.size.height)];
     
     
-    //======================add button
+    //======================add button=========================//
     UIButton* addColumButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
     addColumButton.frame = CGRectMake(([self.cardWidth intValue]+5)*[self.yrColumNumber intValue]+[self.toLeft intValue
                                                                                                    ]+10, [self.toTop intValue] - 40, 30, 30);
@@ -145,6 +150,8 @@
     int period = [[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleDuration"] intValue];
     
     for (int i=0; i<[self.yrRowNumber intValue] ; i++) {
+        
+        //=============set up time label for each row============//
         UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, i*([self.cardHeight intValue]+5)+[self.toTop intValue], [self.toLeft intValue], 20)];
         if (min < 10) {
             [timeLabel setText:[NSString stringWithFormat:@"%d : 0%d",hour,min]];
@@ -180,47 +187,34 @@
             cellView.backgroundColor = [UIColor whiteColor];
             
             [cellView addTarget:self action:@selector(cardOnClick:) forControlEvents:UIControlEventTouchUpInside];
-            cellView.index = i*[self.yrColumNumber intValue] + j;
             
+            cellView.roomIndex = j;
+            cellView.slotIndex = i;
             cellView.interviewStartTime = timeLabel.text;
             
-            if (firstLoad) {
-                YRInterviewAppointmentInfo* newInfo = [YRInterviewAppointmentInfo new];
-                newInfo.index = i*[self.yrColumNumber intValue] + j;
-                
-                NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:newInfo];
-                
-                [self.yrAppointmentInfo addObject:encodedData];
-            }
-            else
-            {
-                //load data
-                NSData* curr = [self.yrAppointmentInfo objectAtIndex:i*[self.yrColumNumber intValue]+j];
-                YRInterviewAppointmentInfo* decodedData = [NSKeyedUnarchiver unarchiveObjectWithData:curr];
-                
-                if ([decodedData isTaken]) {
-                    cellView.candidateNameLabel.text = decodedData.candidateName;
-                    if ([decodedData.interviewerName isEqualToString:@""]) {
-                        NSLog(@"%@",decodedData.interviewerName);
-                        cellView.interviewerNameLabel.text = @"";
-                    }
-                    else
-                    {
-                        cellView.interviewerNameLabel.text = [NSString stringWithFormat:@"%@",decodedData.interviewerName];
-                    }
-                    cellView.codeLabel.text = decodedData.candidateRid;
-                }
-            }
-            
-            //cellView.backgroundColor = [UIColor lightGrayColor];
+            [self.views addObject:cellView];//add the view into array
             [self.yrTimeCardScrollView addSubview:cellView];
         }
     }
-    firstLoad = NO;
     
-    [[NSUserDefaults standardUserDefaults] setObject:self.yrAppointmentInfo forKey:kYRAppointmentInfoKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    //================load Data in==================//(iterate through all the data entry)
     
+    if ([self.yrAppointmentInfo count] != 0) {
+        for (Appointment* ap in self.yrAppointmentInfo) {
+            int index = [ap.apIndex_y intValue] * [self.yrColumNumber intValue] + [ap.apIndex_x intValue];
+            
+            if (index < [self.views count]) {
+                YRTimeCardView* targetCell = [self.views objectAtIndex:index];
+                targetCell.candidateNameLabel.text = [NSString stringWithFormat:@"%@ %@",ap.candidate.firstName,ap.candidate.lastName];
+                targetCell.interviewerNameLabel.text = ap.interviewers.name;
+                targetCell.codeLabel.text = ap.candidate.code;
+            }
+            else
+            {
+                NSLog(@"index out of range");
+            }
+        }
+    }
     
     [self.view addSubview:self.yrTimeCardScrollView];
     [self.view addSubview:self.yrTimeLabelScrollView];
@@ -244,10 +238,16 @@
     else
     {
         //after one click
-        NSMutableArray* infoArray = [[[NSUserDefaults standardUserDefaults] objectForKey:kYRAppointmentInfoKey] mutableCopy];
-        YRInterviewAppointmentInfo* selected = [NSKeyedUnarchiver unarchiveObjectWithData:[infoArray objectAtIndex:[(YRTimeCardView*)sender index]]];
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
         
-        if (selected.isTaken) {
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d",[(YRTimeCardView*)sender roomIndex], [(YRTimeCardView*)sender slotIndex]]];
+        
+        NSError* error = nil;
+        NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        //there is an appointment existing in that index
+        if ([FetchResults count] != 0) {
             UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"The slot is taken." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
             [alert show];
         }
@@ -257,36 +257,35 @@
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
             [fetchRequest setPredicate:[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"code = '%@'",self.passedInRid]]];
             NSError* error = nil;
-            //NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
+            
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
-            //highlighted
             if ([FetchResults count] != 0) {
                 CandidateEntry* fetched = (CandidateEntry*)[FetchResults objectAtIndex:0];
                 
-                [fetched.interviews addObject:@{@"time" : [(YRTimeCardView*)sender interviewStartTime], @"interviewer" : @""}];
+                Appointment* item = (Appointment*)[NSEntityDescription insertNewObjectForEntityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext];
+                
+                item.startTime = [(YRTimeCardView*)sender interviewStartTime];
+                item.apIndex_x = [NSNumber numberWithInt:[(YRTimeCardView*)sender roomIndex]];
+                item.apIndex_y = [NSNumber numberWithInt:[(YRTimeCardView*)sender slotIndex]];
+                
+                [fetched addAppointmentsObject:item];
                 [fetched setStatus:@"scheduled"];
+                
+                if (![[self managedObjectContext] save:&error]) {
+                    NSLog(@"ERROR -- saving coredata");
+                }
+                
+                [[(YRTimeCardView*)sender codeLabel] setText:self.passedInRid];
+                
+                [[(YRTimeCardView*)sender candidateNameLabel] setText:[NSString stringWithFormat:@"%@ %@",item.candidate.firstName,item.candidate.lastName]];
+                
+                [[(YRTimeCardView*)sender interviewerNameLabel] setText:@""];
             }
-            
-            if (![[self managedObjectContext] save:&error]) {
-                NSLog(@"ERROR -- saving coredata");
+            else
+            {
+                NSLog(@"the candidate doesn't exist in the list");
             }
-            
-            selected.candidateRid = [self.passedInRid mutableCopy];
-            selected.candidateName = [[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[FetchResults objectAtIndex:0] firstName],[(CandidateEntry*)[FetchResults objectAtIndex:0] lastName]] mutableCopy];
-            selected.interviewerName = [@"" mutableCopy];
-            [selected setTaken:YES];
-            
-            [[(YRTimeCardView*)sender codeLabel] setText:self.passedInRid];
-            
-            [[(YRTimeCardView*)sender candidateNameLabel] setText:selected.candidateName];
-            
-            [[(YRTimeCardView*)sender interviewerNameLabel] setText:@""];
-            
-            [infoArray setObject:[NSKeyedArchiver archivedDataWithRootObject:selected] atIndexedSubscript:[(YRTimeCardView*)sender index]];
-            
-            [[NSUserDefaults standardUserDefaults] setObject:infoArray forKey:kYRAppointmentInfoKey];
-            [[NSUserDefaults standardUserDefaults] synchronize];
             dataIsReady = NO;
         }
     }
@@ -301,19 +300,6 @@
 -(void)reloadSchedule
 {
     [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:@"scheduleColums"];
-    //[[NSUserDefaults standardUserDefaults] synchronize];
-    
-    NSMutableArray* infoArray = [[[NSUserDefaults standardUserDefaults] objectForKey:kYRAppointmentInfoKey] mutableCopy];
-    
-    for (int i = 0; i < [self.yrRowNumber intValue]; i++) {
-        YRInterviewAppointmentInfo* newInfo = [YRInterviewAppointmentInfo new];
-        
-        NSData* encodedData = [NSKeyedArchiver archivedDataWithRootObject:newInfo];
-        
-        [infoArray insertObject:encodedData atIndex:[self.yrColumNumber intValue]*(i+1) + i];
-    }
-    
-    [[NSUserDefaults standardUserDefaults] setObject:infoArray forKey:kYRAppointmentInfoKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [self.yrSchedulingController.view removeFromSuperview];
@@ -324,7 +310,16 @@
     self.yrTimeLabelScrollView = nil;
     self.yrPlaceOrNameScrollView = nil;
     
-    self.yrAppointmentInfo = [[NSUserDefaults standardUserDefaults] objectForKey:kYRAppointmentInfoKey];
+    [self.views removeAllObjects];
+    [self.yrAppointmentInfo removeAllObjects];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+    NSError* error = nil;
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    [self setYrAppointmentInfo:[FetchResults mutableCopy]];
+    
     [self buildSchedule];
 }
 

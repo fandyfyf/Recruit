@@ -25,6 +25,7 @@
 
 @property (strong, nonatomic) NSMutableArray* columLabels;
 @property (strong, nonatomic) NSMutableArray* rowLabels;
+@property (strong, nonatomic) NSMutableArray* views;
 
 @property (strong, nonatomic) UIView * cardDetailView;
 //@property (strong, nonatomic) UITableView * recommandListTable;

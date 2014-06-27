@@ -8,9 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-
-FOUNDATION_EXPORT NSString* const kYRAppointmentInfoKey;
-
 @interface YRSchedulingViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate>
 
 @property (strong, nonatomic) UIPickerView* candidatesPickerView;

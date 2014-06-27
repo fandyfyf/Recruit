@@ -10,7 +10,8 @@
 
 @interface YRTimeCardView : UIControl
 
-@property (assign) int index;
+@property (assign) int roomIndex;
+@property (assign) int slotIndex;
 @property (strong, nonatomic) UILabel* codeLabel;
 @property (strong, nonatomic) UILabel* candidateNameLabel;
 @property (strong, nonatomic) UILabel* interviewerNameLabel;
