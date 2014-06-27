@@ -25,7 +25,6 @@
 @property (strong, nonatomic) UITableView *yrNameList;
 
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
-//@property (strong, nonatomic) YRDataManager *yrDataManager;
 
 
 - (IBAction)browseForDevices:(id)sender;

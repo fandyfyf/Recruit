@@ -2,11 +2,12 @@
 //  CandidateEntry.m
 //  Recruit
 //
-//  Created by Yifan Fu on 6/26/14.
+//  Created by Yifan Fu on 6/27/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
 #import "CandidateEntry.h"
+#import "Appointment.h"
 
 
 @implementation CandidateEntry
@@ -26,5 +27,6 @@
 @dynamic rank;
 @dynamic recommand;
 @dynamic status;
+@dynamic appointments;
 
 @end

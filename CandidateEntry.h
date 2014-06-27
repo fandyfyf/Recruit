@@ -2,13 +2,14 @@
 //  CandidateEntry.h
 //  Recruit
 //
-//  Created by Yifan Fu on 6/26/14.
+//  Created by Yifan Fu on 6/27/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
+@class Appointment;
 
 @interface CandidateEntry : NSManagedObject
 
@@ -27,5 +28,14 @@
 @property (nonatomic, retain) NSNumber * rank;
 @property (nonatomic, retain) NSNumber * recommand;
 @property (nonatomic, retain) NSString * status;
+@property (nonatomic, retain) NSSet *appointments;
+@end
+
+@interface CandidateEntry (CoreDataGeneratedAccessors)
+
+- (void)addAppointmentsObject:(Appointment *)value;
+- (void)removeAppointmentsObject:(Appointment *)value;
+- (void)addAppointments:(NSSet *)values;
+- (void)removeAppointments:(NSSet *)values;
 
 @end

@@ -26,42 +26,32 @@
 
 @implementation YRClientConnectionViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
-    
-    
     self.clientUserName = [self.appDelegate.mcManager userName];
     
     NSLog(@"Hello: %@ as a client",self.clientUserName);
     [self.yrnameLabel setText:self.clientUserName];
     
-    
-    //set up session with host username
-    
+    //Listen to notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:@"NeedUpdateCodeNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:@"NameListReadyNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
-    [self.yrtableView setDelegate:self];
-    [self.yrtableView setDataSource:self];
     self.yrIDCode = [NSMutableString new];
     
+    
+    [self.yrtableView setDelegate:self];
+    [self.yrtableView setDataSource:self];
     [self.yrbrowseButton setHidden:YES];//this button is no longer needed
     
+    
+    //reset session and make the connect
     [self.appDelegate.mcManager.session disconnect];
     self.appDelegate.mcManager.session = nil;
     self.appDelegate.mcManager.autoBrowser = nil;
@@ -312,11 +302,9 @@
     
     NSLog(@"Browser found %@", remotePeerName);
     
-    //MCPeerID *myPeerID = self.appDelegate.mcManager.session.myPeerID;
-    
-    //BOOL shouldInvite = ([myPeerID.displayName compare:remotePeerName] == NSOrderedDescending);
-    
     NSLog(@"Inviting %@", remotePeerName);
+    
+    //since the host will be the only one we advertise, so there are only one
     [browser invitePeer:peerID toSession:self.appDelegate.mcManager.session withContext:nil timeout:30.0];
     
     [browser stopBrowsingForPeers];

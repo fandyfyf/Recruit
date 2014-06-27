@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3400" systemVersion="13D65" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="Appointment" syncable="YES">
-        <attribute name="appointmentId" optional="YES" attributeType="String" syncable="YES"/>
+    <entity name="Appointment" representedClassName="Appointment" syncable="YES">
+        <attribute name="apIndex_x" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="apIndex_y" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="candidateName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="candidateRid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="interviewer" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="startTime" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="candidate" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CandidateEntry" inverseName="appointments" inverseEntity="CandidateEntry" syncable="YES"/>
+        <relationship name="interviewers" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Interviewer" inverseName="appointments" inverseEntity="Interviewer" syncable="YES"/>
     </entity>
     <entity name="CandidateEntry" representedClassName="CandidateEntry" syncable="YES">
         <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
@@ -23,12 +26,14 @@
         <attribute name="rank" optional="YES" attributeType="Float" defaultValueString="0" syncable="YES"/>
         <attribute name="recommand" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Appointment" inverseName="candidate" inverseEntity="Appointment" syncable="YES"/>
     </entity>
     <entity name="Interviewer" representedClassName="Interviewer" syncable="YES">
         <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="interviewerId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Appointment" inverseName="interviewers" inverseEntity="Appointment" syncable="YES"/>
     </entity>
     <elements>
         <element name="CandidateEntry" positionX="0" positionY="0" width="0" height="0"/>
