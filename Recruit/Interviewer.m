@@ -12,10 +12,9 @@
 
 @implementation Interviewer
 
-@dynamic name;
-@dynamic email;
-@dynamic interviewerId;
 @dynamic code;
+@dynamic email;
+@dynamic name;
 @dynamic appointments;
 
 @end

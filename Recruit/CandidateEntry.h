@@ -2,7 +2,7 @@
 //  CandidateEntry.h
 //  Recruit
 //
-//  Created by Yifan Fu on 6/27/14.
+//  Created by Yifan Fu on 7/1/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -19,7 +19,6 @@
 @property (nonatomic, retain) NSString * firstName;
 @property (nonatomic, retain) NSNumber * gpa;
 @property (nonatomic, retain) NSString * interviewer;
-@property (nonatomic, retain) id interviews;
 @property (nonatomic, retain) NSString * lastName;
 @property (nonatomic, retain) NSString * notes;
 @property (nonatomic, retain) NSNumber * pdf;
@@ -28,6 +27,8 @@
 @property (nonatomic, retain) NSNumber * rank;
 @property (nonatomic, retain) NSNumber * recommand;
 @property (nonatomic, retain) NSString * status;
+@property (nonatomic, retain) NSString * businessUnit1;
+@property (nonatomic, retain) NSString * businessUnit2;
 @property (nonatomic, retain) NSSet *appointments;
 @end
 

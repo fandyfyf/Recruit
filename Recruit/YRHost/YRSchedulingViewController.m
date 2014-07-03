@@ -17,6 +17,8 @@
 -(void)cancelDetail;
 -(void)saveDetail;
 -(void)fetch;
+-(BOOL)checkCandidateAvailability:(CandidateEntry*)candidate atTime:(NSString*)time;
+-(BOOL)checkInterviewerAvailability:(Interviewer*)interviewer atTime:(NSString*)time;
 -(void)addContent:(UIControl*)owner;
 
 @end
@@ -198,6 +200,26 @@
     self.yrinterviewerEntry = [FetchResults mutableCopy];
 }
 
+-(BOOL)checkCandidateAvailability:(CandidateEntry*)candidate atTime:(NSString*)time
+{
+    for (Appointment* ap in candidate.appointments) {
+        if ([ap.startTime isEqualToString:time]) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
+-(BOOL)checkInterviewerAvailability:(Interviewer*)interviewer atTime:(NSString*)time
+{
+    for (Appointment* ap in interviewer.appointments) {
+        if ([ap.startTime isEqualToString:time]) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
 -(void)addContent:(UIControl*)owner
 {
     NSString* previousCode = [(YRTimeCardView*)owner codeLabel].text;
@@ -215,10 +237,6 @@
         //the appointment doesn't exist
         if (![self.selectedCode isEqualToString:@""]) {
             //when the candidate is set, save the data
-            Appointment* item = (Appointment*)[NSEntityDescription insertNewObjectForEntityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext];
-            item.startTime = [(YRTimeCardView*)owner interviewStartTime];
-            item.apIndex_x = [NSNumber numberWithInt:[(YRTimeCardView*)owner roomIndex]];
-            item.apIndex_y = [NSNumber numberWithInt:[(YRTimeCardView*)owner slotIndex]];
             
             NSFetchRequest *fetchRequestC = [[NSFetchRequest alloc] init];
             [fetchRequestC setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
@@ -234,19 +252,64 @@
             
             
             if ([candidate count] != 0) {
-                item.candidate = (CandidateEntry*)[candidate objectAtIndex:0];
-                
-                if ([interviewer count] != 0) {
-                    item.interviewers = (Interviewer*)[interviewer objectAtIndex:0];
+                //check availability
+                if ([self checkCandidateAvailability:(CandidateEntry*)[candidate objectAtIndex:0] atTime:[(YRTimeCardView*)owner interviewStartTime]]) {
+                    
+                    Appointment* item = (Appointment*)[NSEntityDescription insertNewObjectForEntityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext];
+                    item.startTime = [(YRTimeCardView*)owner interviewStartTime];
+                    item.apIndex_x = [NSNumber numberWithInt:[(YRTimeCardView*)owner roomIndex]];
+                    item.apIndex_y = [NSNumber numberWithInt:[(YRTimeCardView*)owner slotIndex]];
+                        
+                    item.candidate = (CandidateEntry*)[candidate objectAtIndex:0];
+                    
+                    [[(YRTimeCardView*)owner codeLabel] setText:self.selectedCode];
+                    [[(YRTimeCardView*)owner candidateNameLabel] setText:self.selectedCandidate];
+                    
+                    if ([interviewer count] != 0)
+                    {
+                        if ([self checkInterviewerAvailability:(Interviewer*)[interviewer objectAtIndex:0] atTime:[(YRTimeCardView*)owner interviewStartTime]]) {
+                            item.interviewers = (Interviewer*)[interviewer objectAtIndex:0];
+                            
+                            [[(YRTimeCardView*)owner interviewerNameLabel] setText:[NSString stringWithFormat:@"%@",self.selectedInterviewer]];
+                        }
+                        else
+                        {
+                            NSLog(@"There is a conflict with interviewer");
+                            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Interviewer %@ has a conflict schedule",[(Interviewer*)[interviewer objectAtIndex:0] name]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                            [alert show];
+                            
+                            [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
+                        }
+                    }
+                    else
+                    {
+                        //interviewer is not set
+                        [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
+                    }
+                    
+                    [item.candidate setStatus:@"scheduled"];
+                    
+                    if (![[self managedObjectContext] save:&error]) {
+                        NSLog(@"ERROR -- saving coredata");
+                    }
                 }
-                [item.candidate setStatus:@"scheduled"];
+                else
+                {
+                    NSLog(@"There is a conflict with candidate");
+                    
+                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[candidate objectAtIndex:0] firstName],[(CandidateEntry*)[candidate objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                    [alert show];
+                    
+                    [[(YRTimeCardView*)owner codeLabel] setText:@""];
+                    
+                    [[(YRTimeCardView*)owner candidateNameLabel] setText:@""];
+                    
+                    [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
+                }
             }
             else
             {
                 NSLog(@"The candidate doesn't exist");
-            }
-            if (![[self managedObjectContext] save:&error]) {
-                NSLog(@"ERROR -- saving coredata");
             }
         }
         else
@@ -296,6 +359,12 @@
             if (![[self managedObjectContext] save:&error]) {
                 NSLog(@"ERROR -- saving coredata");
             }
+            
+            [[(YRTimeCardView*)owner codeLabel] setText:@""];
+            
+            [[(YRTimeCardView*)owner candidateNameLabel] setText:@""];
+            
+            [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
         }
         else
         {
@@ -323,9 +392,31 @@
                 NSArray* candidateC = [self.managedObjectContext executeFetchRequest:fetchRequestCC error:&error];
                 
                 if ([candidateC count] != 0) {
-                    CandidateEntry* currentCandidate = (CandidateEntry*)[candidateC objectAtIndex:0];
-                    [currentCandidate addAppointmentsObject:selectedAppointment];
-                    [currentCandidate setStatus:@"scheduled"];
+                    if ([self checkCandidateAvailability:(CandidateEntry*)[candidateC objectAtIndex:0] atTime:[(YRTimeCardView*)owner interviewStartTime]]) {
+                        CandidateEntry* currentCandidate = (CandidateEntry*)[candidateC objectAtIndex:0];
+                        [currentCandidate addAppointmentsObject:selectedAppointment];
+                        [currentCandidate setStatus:@"scheduled"];
+                        
+                        [[(YRTimeCardView*)owner codeLabel] setText:self.selectedCode];
+                        [[(YRTimeCardView*)owner candidateNameLabel] setText:self.selectedCandidate];
+                    }
+                    else
+                    {
+                        NSLog(@"There is a conflict with candidate");
+                        
+                        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[candidateC objectAtIndex:0] firstName],[(CandidateEntry*)[candidateC objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                        [alert show];
+                        
+                        [[(YRTimeCardView*)owner codeLabel] setText:@""];
+                        
+                        [[(YRTimeCardView*)owner candidateNameLabel] setText:@""];
+                        
+                        [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
+                    }
+                }
+                else
+                {
+                    NSLog(@"The candidate doesn't exist");
                 }
                 
                 if (![[self managedObjectContext] save:&error]) {
@@ -354,10 +445,24 @@
                 NSArray* interviewerC = [self.managedObjectContext executeFetchRequest:fetchRequestIC error:&error];
                 
                 if ([interviewerC count] != 0) {
-                    Interviewer* currentInterviewer = (Interviewer*)[interviewerC objectAtIndex:0];
-                    [currentInterviewer addAppointmentsObject:selectedAppointment];
+                    if ([self checkInterviewerAvailability:(Interviewer*)[interviewerC objectAtIndex:0] atTime:[(YRTimeCardView*)owner interviewStartTime]]) {
+                        Interviewer* currentInterviewer = (Interviewer*)[interviewerC objectAtIndex:0];
+                        [currentInterviewer addAppointmentsObject:selectedAppointment];
+                        
+                        [[(YRTimeCardView*)owner interviewerNameLabel] setText:[NSString stringWithFormat:@"%@",self.selectedInterviewer]];
+                    }
+                    else
+                    {
+                        NSLog(@"There is a conflict with interviewer");
+                        [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
+                        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Interviewer %@ has a conflict schedule",[(Interviewer*)[interviewerC objectAtIndex:0] name]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                        [alert show];
+                    }
                 }
-                
+                else
+                {
+                    [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
+                }
                 
                 if (![[self managedObjectContext] save:&error]) {
                     NSLog(@"ERROR -- saving coredata");
@@ -368,18 +473,6 @@
                 //nothing need to be changed
             }
         }
-    }
-    
-    [[(YRTimeCardView*)owner codeLabel] setText:self.selectedCode];
-    
-    [[(YRTimeCardView*)owner candidateNameLabel] setText:self.selectedCandidate];
-    
-    if ([self.selectedInterviewer isEqualToString:@""]) {
-        [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
-    }
-    else
-    {
-        [[(YRTimeCardView*)owner interviewerNameLabel] setText:[NSString stringWithFormat:@"%@",self.selectedInterviewer]];
     }
 }
 

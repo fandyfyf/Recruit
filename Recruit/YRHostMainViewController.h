@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *yrdisconnectButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrbrowseButton;
 @property (weak, nonatomic) IBOutlet UISwitch *yrVisibilityControl;
+@property (weak, nonatomic) IBOutlet UIButton *yrSignOutButton;
 @property (weak, nonatomic) IBOutlet UITextField *yrPrefixTextField;
 
 @property (strong, nonatomic) NSString *yrPrefix;

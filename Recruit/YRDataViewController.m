@@ -154,6 +154,11 @@
     return 1;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return @"Data Entries";
+}
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return self.yrdataEntry.count;
@@ -195,7 +200,7 @@
     }
     else if([current.status isEqualToString:@"scheduled"])
     {
-        cell.yrstatusLabel.textColor = [UIColor greenColor];
+        cell.yrstatusLabel.textColor = [UIColor colorWithRed:110.0/255.0 green:163.0/255.0 blue:41.0/255.0 alpha:1.0];
     }
     else
     {

@@ -21,10 +21,15 @@
 		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
 		D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */; };
-		D2BB420C195DA46E002ECCC9 /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2BB420B195DA46E002ECCC9 /* CandidateEntry.m */; };
-		D2BB420F195DA46E002ECCC9 /* Interviewer.m in Sources */ = {isa = PBXBuildFile; fileRef = D2BB420E195DA46E002ECCC9 /* Interviewer.m */; };
 		D2BB4212195DC7E8002ECCC9 /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = D2BB4211195DC7E8002ECCC9 /* Appointment.m */; };
 		D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */; };
+		D2D1E56C195DECF10084D8DA /* Interviewer.m in Sources */ = {isa = PBXBuildFile; fileRef = D2D1E56B195DECF10084D8DA /* Interviewer.m */; };
+		D2D1E571195F36DF0084D8DA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2D1E570195F36DF0084D8DA /* QuartzCore.framework */; };
+		D2D1E5731960E3370084D8DA /* email.png in Resources */ = {isa = PBXBuildFile; fileRef = D2D1E5721960E3370084D8DA /* email.png */; };
+		D2D1E57519611BC90084D8DA /* Columbia_engineering.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D2D1E57419611BC90084D8DA /* Columbia_engineering.jpg */; };
+		D2D1E5771961BE2B0084D8DA /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = D2D1E5761961BE2B0084D8DA /* camera.png */; };
+		D2D1E57A1962FCA70084D8DA /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2D1E5791962FCA70084D8DA /* CandidateEntry.m */; };
+		D2D1E57D19633D4A0084D8DA /* YREmailGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = D2D1E57C19633D4A0084D8DA /* YREmailGenerator.m */; };
 		D2F8185B19465FE5006E88FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185A19465FE5006E88FD /* Foundation.framework */; };
 		D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185C19465FE5006E88FD /* CoreGraphics.framework */; };
 		D2F8185F19465FE5006E88FD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F8185E19465FE5006E88FD /* UIKit.framework */; };
@@ -81,14 +86,20 @@
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostDetailViewController.m; path = Recruit/YRHostDetailViewController.m; sourceTree = SOURCE_ROOT; };
 		D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yahoo-icon.png"; sourceTree = "<group>"; };
-		D2BB420A195DA46E002ECCC9 /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CandidateEntry.h; path = ../CandidateEntry.h; sourceTree = "<group>"; };
-		D2BB420B195DA46E002ECCC9 /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CandidateEntry.m; path = ../CandidateEntry.m; sourceTree = "<group>"; };
-		D2BB420D195DA46E002ECCC9 /* Interviewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Interviewer.h; path = ../Interviewer.h; sourceTree = "<group>"; };
-		D2BB420E195DA46E002ECCC9 /* Interviewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Interviewer.m; path = ../Interviewer.m; sourceTree = "<group>"; };
 		D2BB4210195DC7E8002ECCC9 /* Appointment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Appointment.h; sourceTree = "<group>"; };
 		D2BB4211195DC7E8002ECCC9 /* Appointment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Appointment.m; sourceTree = "<group>"; };
 		D2CB59AD195393D900CAB252 /* YRClientSignInViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRClientSignInViewController.h; sourceTree = "<group>"; };
 		D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRClientSignInViewController.m; sourceTree = "<group>"; };
+		D2D1E56A195DECF10084D8DA /* Interviewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interviewer.h; sourceTree = "<group>"; };
+		D2D1E56B195DECF10084D8DA /* Interviewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Interviewer.m; sourceTree = "<group>"; };
+		D2D1E570195F36DF0084D8DA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		D2D1E5721960E3370084D8DA /* email.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = email.png; sourceTree = "<group>"; };
+		D2D1E57419611BC90084D8DA /* Columbia_engineering.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Columbia_engineering.jpg; sourceTree = "<group>"; };
+		D2D1E5761961BE2B0084D8DA /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
+		D2D1E5781962FCA70084D8DA /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
+		D2D1E5791962FCA70084D8DA /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
+		D2D1E57B19633D4A0084D8DA /* YREmailGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YREmailGenerator.h; path = Recruit/YREmailGenerator.h; sourceTree = SOURCE_ROOT; };
+		D2D1E57C19633D4A0084D8DA /* YREmailGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YREmailGenerator.m; path = Recruit/YREmailGenerator.m; sourceTree = SOURCE_ROOT; };
 		D2F8185719465FE5006E88FD /* Recruit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recruit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2F8185A19465FE5006E88FD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2F8185C19465FE5006E88FD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -131,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2D1E571195F36DF0084D8DA /* QuartzCore.framework in Frameworks */,
 				D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */,
 				D2F818A719489FF8006E88FD /* CoreData.framework in Frameworks */,
 				D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */,
@@ -183,6 +195,7 @@
 		D2F8185919465FE5006E88FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D2D1E570195F36DF0084D8DA /* QuartzCore.framework */,
 				D25268A7194F3E6100EBE43E /* MessageUI.framework */,
 				D2A6806F194BA00F0091B768 /* Guile.framework */,
 				D2F818A619489FF8006E88FD /* CoreData.framework */,
@@ -197,6 +210,9 @@
 		D2F8186019465FE5006E88FD /* Recruit */ = {
 			isa = PBXGroup;
 			children = (
+				D2D1E5761961BE2B0084D8DA /* camera.png */,
+				D2D1E57419611BC90084D8DA /* Columbia_engineering.jpg */,
+				D2D1E5721960E3370084D8DA /* email.png */,
 				D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */,
 				D25268B519507E5300EBE43E /* gear.png */,
 				D25268B319507DE400EBE43E /* wifi.png */,
@@ -207,15 +223,17 @@
 				D2F818A219478777006E88FD /* YRHost */,
 				D2F8186919465FE5006E88FD /* YRAppDelegate.h */,
 				D2F8186A19465FE5006E88FD /* YRAppDelegate.m */,
-				D2BB420D195DA46E002ECCC9 /* Interviewer.h */,
-				D2BB420E195DA46E002ECCC9 /* Interviewer.m */,
-				D2BB420A195DA46E002ECCC9 /* CandidateEntry.h */,
-				D2BB420B195DA46E002ECCC9 /* CandidateEntry.m */,
 				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
+				D2D1E5781962FCA70084D8DA /* CandidateEntry.h */,
+				D2D1E5791962FCA70084D8DA /* CandidateEntry.m */,
+				D2D1E56A195DECF10084D8DA /* Interviewer.h */,
+				D2D1E56B195DECF10084D8DA /* Interviewer.m */,
 				D2BB4210195DC7E8002ECCC9 /* Appointment.h */,
 				D2BB4211195DC7E8002ECCC9 /* Appointment.m */,
 				D2F818B11948E691006E88FD /* YRDataManager.h */,
 				D2F818B21948E691006E88FD /* YRDataManager.m */,
+				D2D1E57B19633D4A0084D8DA /* YREmailGenerator.h */,
+				D2D1E57C19633D4A0084D8DA /* YREmailGenerator.m */,
 				D2F8186C19465FE5006E88FD /* Main_iPhone.storyboard */,
 				D2F8186F19465FE5006E88FD /* YRMainViewController.h */,
 				D2F8187019465FE5006E88FD /* YRMainViewController.m */,
@@ -374,6 +392,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2D1E57519611BC90084D8DA /* Columbia_engineering.jpg in Resources */,
 				D25268B019507D7700EBE43E /* document.png in Resources */,
 				D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */,
 				D2F8187319465FE5006E88FD /* Images.xcassets in Resources */,
@@ -382,6 +401,8 @@
 				D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */,
 				D2F8186519465FE5006E88FD /* InfoPlist.strings in Resources */,
 				D2F8186E19465FE5006E88FD /* Main_iPhone.storyboard in Resources */,
+				D2D1E5731960E3370084D8DA /* email.png in Resources */,
+				D2D1E5771961BE2B0084D8DA /* camera.png in Resources */,
 				D25268B219507D8D00EBE43E /* folder.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -405,7 +426,9 @@
 				D2BB4212195DC7E8002ECCC9 /* Appointment.m in Sources */,
 				D2F818A019476113006E88FD /* YRinfoDataCell.m in Sources */,
 				D2F8187119465FE5006E88FD /* YRMainViewController.m in Sources */,
+				D2D1E56C195DECF10084D8DA /* Interviewer.m in Sources */,
 				D2F818941946696D006E88FD /* YRClientConnectionViewController.m in Sources */,
+				D2D1E57A1962FCA70084D8DA /* CandidateEntry.m in Sources */,
 				D2F8189719469FC1006E88FD /* YRMCManager.m in Sources */,
 				D2F818B31948E691006E88FD /* YRDataManager.m in Sources */,
 				D2F8186719465FE5006E88FD /* main.m in Sources */,
@@ -417,11 +440,10 @@
 				D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */,
 				D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */,
 				D2F8189D19474712006E88FD /* YRDataViewController.m in Sources */,
-				D2BB420C195DA46E002ECCC9 /* CandidateEntry.m in Sources */,
 				D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */,
+				D2D1E57D19633D4A0084D8DA /* YREmailGenerator.m in Sources */,
 				D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */,
 				D2F8189A1946B3E4006E88FD /* YRFormViewController.m in Sources */,
-				D2BB420F195DA46E002ECCC9 /* Interviewer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

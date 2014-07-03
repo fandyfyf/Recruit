@@ -22,15 +22,6 @@
 
 @implementation YRHostMainViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -62,6 +53,17 @@
     //[[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
     //disable brower button
     [self.yrbrowseButton setEnabled:NO];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[self.yrSignOutButton layer] setCornerRadius:35];
+        [[self.yrSignOutButton layer] setBorderColor:[[UIColor lightGrayColor] CGColor]];
+        [[self.yrSignOutButton layer] setBorderWidth:2];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [[self.yrSignOutButton layer] setCornerRadius:30];
+        [[self.yrSignOutButton layer] setBorderColor:[[UIColor lightGrayColor] CGColor]];
+        [[self.yrSignOutButton layer] setBorderWidth:2];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -182,6 +184,11 @@
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return @"Connected Peers";
 }
 
 

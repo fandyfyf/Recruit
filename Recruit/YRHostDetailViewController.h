@@ -14,7 +14,7 @@
 
 @class AutoSuggestTextField;
 
-@interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate>
+@interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate, UITableViewDataSource, UITableViewDelegate,UIGestureRecognizerDelegate>
 
 @property (strong, nonatomic) CandidateEntry *dataSource;
 @property (strong, nonatomic) YRAppDelegate* appDelegate;
@@ -29,30 +29,50 @@
 
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionSegmentControl;
 @property (weak, nonatomic) IBOutlet UILabel *yrGPALabel;
+@property (weak, nonatomic) IBOutlet UITextField *yrGPATextField;
 @property (weak, nonatomic) IBOutlet UILabel *yrRankLabel;
 @property (weak, nonatomic) IBOutlet UILabel *yrHalfRankLabel;
 
-@property (weak, nonatomic) IBOutlet UILabel *yrPreferenceLabel;
-@property (weak, nonatomic) IBOutlet UILabel *yrRecommendedLabel;
+@property (weak, nonatomic) IBOutlet UITextField *yrPreferenceTextField;
+
 @property (weak, nonatomic) IBOutlet UILabel *yrRecommandMark;
+@property (weak, nonatomic) IBOutlet UISwitch *yrRecommendSwitch;
+@property (weak, nonatomic) IBOutlet UILabel *yrRecommendLabel;
 @property (weak, nonatomic) IBOutlet UIButton *yrSnapshotButton;
-@property (weak, nonatomic) IBOutlet UIButton *yrRetakeButton;
+@property (weak, nonatomic) IBOutlet UIButton *yrFileNameButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrGoBackButton;
-@property (weak, nonatomic) IBOutlet UIButton *yrEmailCandidateButton;
+
 @property (strong, nonatomic) UIScrollView* yrScrollView;
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrScheduleButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrEmailButton;
 @property (weak, nonatomic) IBOutlet UIButton *checkInterviewButton;
 
+@property (weak, nonatomic) IBOutlet UILabel *YRCommentLabel;
 @property (weak, nonatomic) IBOutlet UITextView *yrCommentTextView;
+@property (strong, nonatomic) UIView* scheduleView;
+@property (strong, nonatomic) UITableView* scheduleTable;
+@property (strong, nonatomic) UIView* emailOptionView;
+@property (strong, nonatomic) UITableView* emailOptionTable;
+
+@property (strong, nonatomic) UIControl* grayView;
+@property (strong, nonatomic) UIButton* rankOneButton;
+@property (strong, nonatomic) UIButton* rankTwoButton;
+@property (strong, nonatomic) UIButton* rankThreeButton;
+@property (strong, nonatomic) UIButton* rankThreeHalfButton;
+@property (strong, nonatomic) UIButton* rankFourButton;
+
+@property (strong, nonatomic) UIPopoverController* popOver;
+
 @property (strong, nonatomic) MFMailComposeViewController* yrMailViewController;
 
 - (IBAction)takeAnImage:(id)sender;
 - (IBAction)goBack:(id)sender;
-- (IBAction)retakeImage:(id)sender;
+- (IBAction)checkImage:(id)sender;
 - (IBAction)backgroundTapped:(id)sender;
 - (IBAction)emailCandidate:(id)sender;
 - (IBAction)scheduleInterview:(id)sender;
+- (IBAction)checkSchedule:(id)sender;
+- (IBAction)recommendChange:(id)sender;
 
 @end

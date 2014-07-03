@@ -13,10 +13,9 @@
 
 @interface Interviewer : NSManagedObject
 
-@property (nonatomic, retain) NSString * name;
-@property (nonatomic, retain) NSString * email;
-@property (nonatomic, retain) NSString * interviewerId;
 @property (nonatomic, retain) NSString * code;
+@property (nonatomic, retain) NSString * email;
+@property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSSet *appointments;
 @end
 

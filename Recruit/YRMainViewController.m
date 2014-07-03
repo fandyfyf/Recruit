@@ -21,6 +21,24 @@
 	// Do any additional setup after loading the view, typically from a nib.
     self.yrtextField.delegate = self;
     self.yrsegmentedControl.selectedSegmentIndex = 0;
+    
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"tempBackUp"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[self.yrSignInButton layer] setCornerRadius:60];
+        [[self.yrSignInButton layer] setBorderWidth:5];
+        [[self.yrSignInButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        //[[self.yrSignInButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.yrsegmentedControl setFrame:CGRectMake(self.view.center.x-200, 380, 400, 50)];
+        [self.yrtextField setFrame:CGRectMake(self.view.center.x-200, 280, 400, 50)];
+        
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [[self.yrSignInButton layer] setCornerRadius:30];
+        [[self.yrSignInButton layer] setBorderWidth:2];
+        [[self.yrSignInButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+    }
 }
 
 - (void)didReceiveMemoryWarning

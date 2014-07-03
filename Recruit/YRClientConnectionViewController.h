@@ -12,7 +12,6 @@
 
 @interface YRClientConnectionViewController : UIViewController <MCBrowserViewControllerDelegate, UITableViewDataSource, UITableViewDelegate,MCNearbyServiceBrowserDelegate>
 
-@property (strong, nonatomic) UIViewController* source;
 @property (strong, nonatomic) NSString* clientUserName;
 @property (weak, nonatomic) IBOutlet UILabel *yrnameLabel;
 

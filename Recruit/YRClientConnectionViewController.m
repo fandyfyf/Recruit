@@ -19,6 +19,7 @@
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
 -(void)needUpdateCodeNotification:(NSNotification *)notification;
 -(void)popUpNameListNotification:(NSNotification*)notification;
+-(void)removeNameListNotification:(NSNotification *)notification;
 -(void)reconnectNotification:(NSNotification *)notification;
 -(void)removeListView;
 
@@ -40,6 +41,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:@"NeedUpdateCodeNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:@"NameListReadyNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
@@ -174,8 +177,8 @@
         UILabel* titleLabel;
         UIButton* cancelButton;
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(50, 100, 220, 300)];
-            self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(0, 50, 220, 250) style:UITableViewStylePlain];
+            self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x - 110, 100, 220, 300)];
+            self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(5, 40, 210, 255) style:UITableViewStylePlain];
             titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 180, 30)];
             titleLabel.font = [UIFont boldSystemFontOfSize:20];
             cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(self.yrNameListView.frame.size.width-30, 0, 30, 30)];
@@ -183,16 +186,19 @@
         }
         else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         {
-            self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(150, 250, 468, 600)];
-            self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(0, 100, 468, 500) style:UITableViewStylePlain];
-            titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 428, 70)];
+            self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x-250, 250, 500, 600)];
+            self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(5, 80, 490, 515) style:UITableViewStylePlain];
+            titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, self.yrNameListView.frame.size.width-40, 70)];
             titleLabel.font = [UIFont boldSystemFontOfSize:30];
             cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(self.yrNameListView.frame.size.width-50, 0, 50, 50)];
         }
+        [[self.yrNameListView layer] setCornerRadius:12];
+        [[self.yrNameList layer] setCornerRadius:10];
+        [titleLabel setTextColor:[UIColor whiteColor]];
         
         [cancelButton addTarget:self action:@selector(removeListView) forControlEvents:UIControlEventTouchUpInside];
         [cancelButton setTitle:@"X" forState:UIControlStateNormal];
-        cancelButton.titleLabel.textColor = [UIColor redColor];
+        cancelButton.tintColor = [UIColor whiteColor];
         
         [self.yrNameList setContentInset:UIEdgeInsetsMake(1.0, 0, 0, 0)];
         titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -204,13 +210,19 @@
         [self.yrNameListView addSubview:self.yrNameList];
         [self.yrNameListView addSubview:titleLabel];
         [self.yrNameListView addSubview:cancelButton];
-        [[self.yrNameListView layer] setCornerRadius:20];
-        [[self.yrNameListView layer] setBorderColor:[[UIColor grayColor] CGColor]];
-        [[self.yrNameListView layer] setBorderWidth:2];
-        self.yrNameListView.backgroundColor = [UIColor whiteColor];
+//        [[self.yrNameListView layer] setBorderColor:[[UIColor grayColor] CGColor]];
+//        [[self.yrNameListView layer] setBorderWidth:2];
+        self.yrNameListView.backgroundColor = [UIColor purpleColor];
         
         [self.view addSubview:self.yrNameListView];
+
     });
+}
+
+-(void)removeNameListNotification:(NSNotification *)notification
+{
+    [self.yrnameLabel setText:self.appDelegate.mcManager.userName];
+    [self.yrNameListView removeFromSuperview];
 }
 
 -(void)reconnectNotification:(NSNotification *)notification
@@ -242,13 +254,14 @@
     [self.yrNameListView removeFromSuperview];
     UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
     [alert show];
+    [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
 }
 
 #pragma mark - MCBrowserViewControllerDelegate
 
 -(void)browserViewControllerDidFinish:(MCBrowserViewController *)browserViewController{
     [[self.appDelegate mcManager].browser dismissViewControllerAnimated:YES completion:nil];
-    
+
     UILabel* titleLabel;
     UIButton* cancelButton;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
@@ -261,16 +274,18 @@
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
-        self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(150, 250, 468, 600)];
-        self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(0, 100, 468, 500) style:UITableViewStylePlain];
-        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 428, 70)];
+        self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x-250, 250, 500, 600)];
+        self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(5, 40, 490, 555) style:UITableViewStylePlain];
+        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 460, 70)];
         titleLabel.font = [UIFont boldSystemFontOfSize:30];
         cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(self.yrNameListView.frame.size.width-50, 0, 50, 50)];
     }
+    [[self.yrNameListView layer] setCornerRadius:12];
+    [[self.yrNameList layer] setCornerRadius:10];
     
     [cancelButton addTarget:self action:@selector(removeListView) forControlEvents:UIControlEventTouchUpInside];
     [cancelButton setTitle:@"X" forState:UIControlStateNormal];
-    cancelButton.titleLabel.textColor = [UIColor redColor];
+    cancelButton.tintColor = [UIColor whiteColor];
     
     [self.yrNameList setContentInset:UIEdgeInsetsMake(1.0, 0, 0, 0)];
     titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -387,6 +402,10 @@
         [self.yrNameListView removeFromSuperview];
         
         [self.yrnameLabel setText:self.appDelegate.mcManager.userName];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"removeNameListNotification" object:nil];
+        
+        [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
     }
 }
 

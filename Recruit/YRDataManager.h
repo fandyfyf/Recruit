@@ -19,7 +19,7 @@
 @property (assign) int counter;
 @property (assign, getter = isHost) BOOL host;
 
-@property (strong,nonatomic) NSDictionary* localBackUp;
+@property (strong,nonatomic) NSMutableArray* localBackUp;
 @property (strong,nonatomic) NSMutableArray* nameList;
 
 -(id) init;

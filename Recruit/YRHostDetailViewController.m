@@ -9,15 +9,27 @@
 #import "YRHostDetailViewController.h"
 #import <Guile/UITextField+AutoSuggestAdditions.h>
 #import <Guile/Guile.h>
+#import "Appointment.h"
+#import "Interviewer.h"
 
 @interface YRHostDetailViewController ()
 
 -(void)cancelScrollView;
 -(void)updateCoreData;
+- (void) spinWithOptions: (UIViewAnimationOptions) options onView:(UIView*)view withDuration:(NSTimeInterval)duration withAngle:(CGFloat)angle;
+-(void)email;
+-(void)tapOnLabel:(UITapGestureRecognizer*)gestureRecognizer;
+-(void)doneWithPad;
+-(void)changeRank:(id)sender;
+-(void)cancelRankChange;
+-(void)removeViews;
 
 @end
 
 @implementation YRHostDetailViewController
+{
+    BOOL spin;
+}
 
 - (void)viewDidLoad
 {
@@ -28,16 +40,18 @@
     self.yrCodeLabel.text = self.dataSource.code;
     
     if ([self.dataSource.preference isEqualToString:@"FE"]) {
-        self.yrPreferenceLabel.text = @"Back End";
+        self.yrPreferenceTextField.text = @"Back End";
     }
     else if ([self.dataSource.preference isEqualToString:@"BE"])
     {
-        self.yrPreferenceLabel.text = @"Front End";
+        self.yrPreferenceTextField.text = @"Front End";
     }
     else
     {
-        self.yrPreferenceLabel.text = self.dataSource.preference;
+        self.yrPreferenceTextField.text = self.dataSource.preference;
     }
+    self.yrBusinessUnit1.text = self.dataSource.businessUnit1;
+    self.yrBusinessUnit2.text = self.dataSource.businessUnit2;
     
     self.yrFirstNameTextField.delegate = self;
     self.yrLastNameTextField.delegate = self;
@@ -49,13 +63,22 @@
     self.yrFirstNameTextField.text = self.dataSource.firstName;
     self.yrLastNameTextField.text = self.dataSource.lastName;
     self.yrEmailTextField.text = self.dataSource.emailAddress;
+    self.yrRecommendLabel.text = self.dataSource.interviewer;
     
     if ([self.dataSource.recommand boolValue]) {
-        self.yrRecommendedLabel.text = self.dataSource.interviewer;
+        
+        [self.yrRecommendSwitch setOn:YES animated:YES];
+        self.yrRecommendLabel.hidden = NO;
         self.yrRecommandMark.textColor = [UIColor redColor];
     }
+    else
+    {
+        self.yrRecommendLabel.hidden = YES;
+        [self.yrRecommendSwitch setOn:NO animated:NO];
+    }
+    
     if ([self.dataSource.pdf boolValue]) {
-        [self.yrRetakeButton setHidden:NO];
+        [self.yrFileNameButton setHidden:NO];
         
         NSDateFormatter* format = [[NSDateFormatter alloc] init];
         [format setDateFormat:@"MMddyyyHHmm"];
@@ -65,7 +88,11 @@
         
         NSString *fullPath = [fileName stringByAppendingPathExtension:@"jpg"];
         
-        [self.yrSnapshotButton setTitle:fullPath forState:UIControlStateNormal];
+        [self.yrFileNameButton setTitle:fullPath forState:UIControlStateNormal];
+    }
+    else
+    {
+        [self.yrFileNameButton setHidden:YES];
     }
     
     [self.yrCommentTextView setDelegate:self];
@@ -73,14 +100,6 @@
     [[self.yrCommentTextView layer] setCornerRadius:10];
     
     [self.yrCommentTextView setText:self.dataSource.notes];
-    
-    if (self.yrEmailTextField.text.length == 0) {
-        [self.yrEmailCandidateButton setEnabled:NO];
-    }
-    else
-    {
-        [self.yrEmailCandidateButton setEnabled:YES];
-    }
     
     if ([self.dataSource.position isEqualToString:@"Intern"]) {
         self.yrPositionSegmentControl.selectedSegmentIndex = 0;
@@ -90,6 +109,11 @@
         self.yrPositionSegmentControl.selectedSegmentIndex = 1;
     }
     
+    
+    UITapGestureRecognizer* tapAction = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnLabel:)];
+    tapAction.delegate = self;
+    [self.yrRankLabel setUserInteractionEnabled:YES];
+    [self.yrRankLabel addGestureRecognizer:tapAction];
     
     if ([self.dataSource.rank floatValue] == 3.5) {
         self.yrHalfRankLabel.hidden = NO;
@@ -102,18 +126,98 @@
     }
     
     
-    self.yrGPALabel.text = [NSString stringWithFormat:@"GPA: %@",self.dataSource.gpa];
+    self.yrGPATextField.text = [NSString stringWithFormat:@"%@",self.dataSource.gpa];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrScheduleButton layer] setCornerRadius:35];
+        [[self.yrScheduleButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.yrScheduleButton layer] setBorderWidth:2];
+        
         [[self.yrGoBackButton layer] setCornerRadius:35];
+        [[self.yrGoBackButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.yrGoBackButton layer] setBorderWidth:2];
+        
         [[self.yrEmailButton layer] setCornerRadius:35];
+        [[self.yrEmailButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.yrEmailButton layer] setBorderWidth:2];
+        
         [[self.checkInterviewButton layer] setCornerRadius:35];
+        [[self.checkInterviewButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.checkInterviewButton layer] setBorderWidth:2];
+        
+        [self.yrGPATextField setFrame:CGRectMake(540, 221, 144, 40)];
     }
     else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
         [[self.yrGoBackButton layer] setCornerRadius:25];
+        [[self.yrGoBackButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.yrGoBackButton layer] setBorderWidth:2];
         [[self.yrEmailButton layer] setCornerRadius:25];
+        [[self.yrEmailButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.yrEmailButton layer] setBorderWidth:2];
+        [[self.yrScheduleButton layer] setCornerRadius:25];
+        [[self.yrScheduleButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.yrScheduleButton layer] setBorderWidth:2];
+        [[self.checkInterviewButton layer] setCornerRadius:25];
+        [[self.checkInterviewButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.checkInterviewButton layer] setBorderWidth:2];
+    }
+    spin = YES;
+    
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],
+                         nil];
+    self.yrFirstNameTextField.inputAccessoryView = doneToolbar;
+    self.yrLastNameTextField.inputAccessoryView = doneToolbar;
+    self.yrEmailTextField.inputAccessoryView = doneToolbar;
+    self.yrGPATextField.inputAccessoryView = doneToolbar;
+    self.yrPreferenceTextField.inputAccessoryView = doneToolbar;
+    self.yrBusinessUnit1.inputAccessoryView = doneToolbar;
+    self.yrBusinessUnit2.inputAccessoryView = doneToolbar;
+    self.yrCommentTextView.inputAccessoryView = doneToolbar;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(621, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
+        
+        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(548, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
+        
+        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(475, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(260, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
+        
+        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(208, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
+        
+        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(156, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+    }
+}
+
+-(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+        [self.yrCommentTextView setFrame:CGRectMake(550, 100, 250, 600)];
+        [self.YRCommentLabel setFrame:CGRectMake(770, 50, 160, 30)];
+    }
+    else
+    {
+        [self.yrCommentTextView setFrame:CGRectMake(84, 610, 600, 325)];
+        [self.YRCommentLabel setFrame:CGRectMake(304, 572, 160, 30)];
     }
 }
 
@@ -124,75 +228,12 @@
 }
 
 - (IBAction)takeAnImage:(id)sender {
-    if (self.yrRetakeButton.isHidden) {
-        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-        picker.delegate = self;
-        picker.allowsEditing = NO;
-        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
-        
-        [self presentViewController:picker animated:YES completion:NULL];
-    }
-    else
-    {
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
-        
-        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
-        
-        NSError *error;
-        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
-            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-        
-        NSDateFormatter* format = [[NSDateFormatter alloc] init];
-        [format setDateFormat:@"MMddyyyHHmm"];
-        NSString* date = [format stringFromDate:self.dataSource.date];
-        
-        NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
-        
-        NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
-        
-        UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
-        
-        
-        UIImageView* imageview = [[UIImageView alloc] initWithImage:image];
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-        }
-        else{
-            [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
-        }
-        
-        self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        
-        
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-            self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-50, 0, 50, 50);
-        }
-        else{
-            self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
-            self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-50, 45, 50, 50);
-        }
-        //self.yrScrollView.contentSize = image.size;
-        self.yrScrollView.contentSize = imageview.frame.size;
-        [self.yrScrollView addSubview:imageview];
-        [self.yrScrollView setDelegate:self];
-        [self.yrScrollView setMaximumZoomScale:4];
-        [self.yrScrollView setMinimumZoomScale:1];
-        
-        [self.view addSubview:self.yrScrollView];
-        
-        [self.yrGoBackButton setHidden:YES];
-        
-        [self.yrScrollViewCancelButton setTitle:@"X" forState:UIControlStateNormal];
-        
-        self.yrScrollViewCancelButton.titleLabel.textColor = [UIColor redColor];
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
-        [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
-        
-        [self.view addSubview:self.yrScrollViewCancelButton];
-    }
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.allowsEditing = NO;
+    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    
+    [self presentViewController:picker animated:YES completion:NULL];
 }
 
 - (IBAction)goBack:(id)sender {
@@ -200,13 +241,65 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (IBAction)retakeImage:(id)sender {
-    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-    picker.delegate = self;
-    picker.allowsEditing = NO;
-    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+- (IBAction)checkImage:(id)sender {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
     
-    [self presentViewController:picker animated:YES completion:NULL];
+    NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+    
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MMddyyyHHmm"];
+    NSString* date = [format stringFromDate:self.dataSource.date];
+    
+    NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
+    
+    NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
+    
+    UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
+    
+    
+    UIImageView* imageview = [[UIImageView alloc] initWithImage:image];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    }
+    else{
+        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
+    }
+    
+    self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-50, 0, 50, 50);
+    }
+    else{
+        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
+        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-50, 45, 50, 50);
+    }
+    //self.yrScrollView.contentSize = image.size;
+    self.yrScrollView.contentSize = imageview.frame.size;
+    [self.yrScrollView addSubview:imageview];
+    [self.yrScrollView setDelegate:self];
+    [self.yrScrollView setMaximumZoomScale:4];
+    [self.yrScrollView setMinimumZoomScale:1];
+    
+    [self.view addSubview:self.yrScrollView];
+    
+    [self.yrGoBackButton setHidden:YES];
+    
+    [self.yrScrollViewCancelButton setTitle:@"X" forState:UIControlStateNormal];
+    
+    self.yrScrollViewCancelButton.titleLabel.textColor = [UIColor redColor];
+    self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+    [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.view addSubview:self.yrScrollViewCancelButton];
 }
 
 - (IBAction)backgroundTapped:(id)sender {
@@ -227,55 +320,136 @@
     [self.yrEmailTextField acceptSuggestion];
     [self.yrBusinessUnit1 resignFirstResponder];
     [self.yrBusinessUnit2 resignFirstResponder];
+    [self.yrGPATextField resignFirstResponder];
+    [self.yrPreferenceTextField resignFirstResponder];
+    [self removeViews];
 }
 
 - (IBAction)emailCandidate:(id)sender {
-    if ([MFMailComposeViewController canSendMail]) {
-        NSString *emailTitle = @"Letter From Yahoo!";
-        NSString *messageBody = @"Message goes here!";
-        NSArray *toRecipents = [NSArray arrayWithObject:self.yrEmailTextField.text];
-        
-        self.yrMailViewController = [[MFMailComposeViewController alloc] init];
-        self.yrMailViewController.mailComposeDelegate = self;
-        [self.yrMailViewController setSubject:emailTitle];
-        [self.yrMailViewController setMessageBody:messageBody isHTML:NO];
-        [self.yrMailViewController setToRecipients:toRecipents];
-        
-        if (! self.yrRetakeButton.isHidden) {
-            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-            NSString *documentsDirectory = [paths objectAtIndex:0];
-            
-            NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
-            
-            NSError *error;
-            if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
-                [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-            
-            NSDateFormatter* format = [[NSDateFormatter alloc] init];
-            [format setDateFormat:@"MMddyyyHHmm"];
-            NSString* date = [format stringFromDate:self.dataSource.date];
-            
-            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
-            
-            NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
-            
-            [self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"image/jpeg" fileName:[NSString stringWithFormat:@"%@.jpg",[self.yrCodeLabel text]]];
-        }
-        // Present mail view controller on screen
-        [self presentViewController:self.yrMailViewController animated:YES completion:NULL];
+    [self removeViews];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.emailOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 150, 200)];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        self.emailOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 100, 200)];
+    }
+    [[self.emailOptionView layer] setCornerRadius:12];
+    
+    self.emailOptionTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 40, self.emailOptionView.frame.size.width-10, 155) style:UITableViewStylePlain];
+    [[self.emailOptionTable layer] setCornerRadius:10];
+    
+    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, self.emailOptionView.frame.size.width-20, 20)];
+    titleLabel.text = @"Options";
+    titleLabel.textColor = [UIColor purpleColor];
+    titleLabel.textAlignment = NSTextAlignmentLeft;
+    titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    
+    [self.emailOptionView addSubview:titleLabel];
+    [self.emailOptionView addSubview:self.emailOptionTable];
+    
+   
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        UIViewController* newController = [UIViewController new];
+        self.popOver = [[UIPopoverController alloc] initWithContentViewController:newController];
+        newController.view = self.emailOptionView;
+        [self.popOver setPopoverContentSize:CGSizeMake(150, 200)];
+        [self.popOver presentPopoverFromRect:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 150, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
     }
     else
     {
-        NSLog(@"Fail");
+//        [self.popOver setPopoverContentSize:CGSizeMake(100, 200)];
+//        [self.popOver presentPopoverFromRect:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 100, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        [self.emailOptionView setBackgroundColor:[UIColor purpleColor]];
+        titleLabel.textColor = [UIColor whiteColor];
+        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+        self.grayView.backgroundColor = [UIColor darkGrayColor];
+        self.grayView.alpha = 0.5;
+        [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:self.grayView];
+
+        [self.view addSubview:self.emailOptionView];
     }
-    
+    self.emailOptionTable.delegate = self;
+    self.emailOptionTable.dataSource = self;
 }
 
 - (IBAction)scheduleInterview:(id)sender {
+    [self updateCoreData];
     NSDictionary* dic = @{@"code" : self.yrCodeLabel.text};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SetUpInterview" object:dic];
     
     [self dismissViewControllerAnimated:YES completion:Nil];
+}
+
+- (IBAction)checkSchedule:(id)sender {
+    [self removeViews];
+    int half = 0;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        half = 150;
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        half = 120;
+    }
+    
+    for (Appointment* ap in self.dataSource.appointments)
+    {
+        NSLog(@"%@ with %@",ap.startTime,ap.interviewers.name);
+    }
+    
+    self.scheduleView = [[UIView alloc] initWithFrame:CGRectMake(self.checkInterviewButton.center.x-half, self.checkInterviewButton.center.y+[self.checkInterviewButton layer].cornerRadius+5, 2*half, 200)];
+    [[self.scheduleView layer] setCornerRadius:12];
+    
+    self.scheduleTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 40, 2*half - 10, 155) style:UITableViewStylePlain];
+    [[self.scheduleTable layer] setCornerRadius:10];
+    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 2*half - 100, 20)];
+    titleLabel.text = @"Schedule Info";
+    titleLabel.textColor = [UIColor purpleColor];
+    titleLabel.textAlignment = NSTextAlignmentLeft;
+    titleLabel.font = [UIFont boldSystemFontOfSize:15];
+
+    [self.scheduleView addSubview:titleLabel];
+    [self.scheduleView addSubview:self.scheduleTable];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        UIViewController* newController = [UIViewController new];
+        self.popOver = [[UIPopoverController alloc] initWithContentViewController:newController];
+        newController.view = self.scheduleView;
+        
+        [self.popOver setPopoverContentSize:CGSizeMake(2*half, 200)];
+        
+        [self.popOver presentPopoverFromRect:CGRectMake(self.checkInterviewButton.center.x-half, self.checkInterviewButton.center.y+[self.checkInterviewButton layer].cornerRadius+5, 2*half, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    }
+    else
+    {
+        self.scheduleView.backgroundColor = [UIColor purpleColor];
+        titleLabel.textColor = [UIColor whiteColor];
+        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+        self.grayView.backgroundColor = [UIColor darkGrayColor];
+        self.grayView.alpha = 0.5;
+        [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:self.grayView];
+        
+        [self.view addSubview:self.scheduleView];
+    }
+    
+    
+    self.scheduleTable.delegate = self;
+    self.scheduleTable.dataSource = self;
+}
+
+- (IBAction)recommendChange:(id)sender {
+    if (self.yrRecommendSwitch.isOn) {
+        self.yrRecommendLabel.hidden = NO;
+        [self.yrRecommandMark setTextColor:[UIColor redColor]];
+    }
+    else
+    {
+        self.yrRecommendLabel.hidden = YES;
+        [self.yrRecommandMark setTextColor:[UIColor blackColor]];
+    }
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
@@ -321,8 +495,8 @@
                 
                 [selected setPdf:[NSNumber numberWithBool:YES]];
                 
-                [self.yrSnapshotButton setTitle:[NSString stringWithFormat:@"%@.jpg",fileName] forState:UIControlStateNormal];
-                [self.yrRetakeButton setHidden:NO];
+                [self.yrFileNameButton setTitle:[NSString stringWithFormat:@"%@.jpg",fileName] forState:UIControlStateNormal];
+                [self.yrFileNameButton setHidden:NO];
                 
                 if (![[self.appDelegate managedObjectContext] save:&error]) {
                     NSLog(@"ERROR -- saving coredata");
@@ -361,10 +535,271 @@
     [selected setEmailAddress:self.yrEmailTextField.text];
     [selected setPosition:[self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex]];
     [selected setNotes:self.yrCommentTextView.text];
+    [selected setBusinessUnit1:self.yrBusinessUnit1.text];
+    [selected setBusinessUnit2:self.yrBusinessUnit2.text];
+    [selected setGpa:[NSNumber numberWithFloat:[self.yrGPATextField.text floatValue]]];
+    [selected setPreference:self.yrPreferenceTextField.text];
+    if (self.yrRecommendSwitch.isOn) {
+        [selected setRecommand:[NSNumber numberWithBool:YES]];
+    }
+    else
+    {
+        [selected setRecommand:[NSNumber numberWithBool:NO]];
+    }
+    
     
     if (![[self.appDelegate managedObjectContext] save:&error]) {
         NSLog(@"ERROR -- saving coredata");
     }
+}
+
+- (void) spinWithOptions: (UIViewAnimationOptions) options onView:(UIView*)view withDuration:(NSTimeInterval)duration withAngle:(CGFloat)angle{
+    [UIView animateWithDuration: duration
+                          delay: 0.0f
+                        options: options
+                     animations: ^{
+                         view.transform = CGAffineTransformRotate(view.transform, angle);
+                     }
+                     completion: ^(BOOL finished) {
+                         if (finished) {
+                             if (spin || !CGAffineTransformEqualToTransform(view.transform, CGAffineTransformIdentity))
+                             {
+                                 // if flag still set, keep spinning with constant speed
+                                 [self spinWithOptions: UIViewAnimationOptionCurveLinear onView:view withDuration:duration withAngle:angle];
+                             }
+                         }
+                     }];
+}
+
+
+-(void)email
+{
+    if ([MFMailComposeViewController canSendMail]) {
+        NSString *emailTitle = @"Letter From Yahoo!";
+        NSString *messageBody = @"Message goes here!";
+        NSArray *toRecipents = [NSArray arrayWithObject:self.yrEmailTextField.text];
+        
+        self.yrMailViewController = [[MFMailComposeViewController alloc] init];
+        self.yrMailViewController.mailComposeDelegate = self;
+        [self.yrMailViewController setSubject:emailTitle];
+        [self.yrMailViewController setMessageBody:messageBody isHTML:NO];
+        [self.yrMailViewController setToRecipients:toRecipents];
+        
+        if (! self.yrFileNameButton.isHidden) {
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            
+            NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+            
+            NSError *error;
+            if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+                [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+            
+            NSDateFormatter* format = [[NSDateFormatter alloc] init];
+            [format setDateFormat:@"MMddyyyHHmm"];
+            NSString* date = [format stringFromDate:self.dataSource.date];
+            
+            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
+            
+            NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
+            
+            [self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"image/jpeg" fileName:[NSString stringWithFormat:@"%@.jpg",[self.yrCodeLabel text]]];
+        }
+        // Present mail view controller on screen
+        [self presentViewController:self.yrMailViewController animated:YES completion:NULL];
+    }
+    else
+    {
+        NSLog(@"Fail");
+    }
+}
+
+-(void)tapOnLabel:(UITapGestureRecognizer*)gestureRecognizer
+{
+    [self removeViews];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+        self.grayView.backgroundColor = [UIColor darkGrayColor];
+        self.grayView.alpha = 0.5;
+        [self.grayView addTarget:self action:@selector(cancelRankChange) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:self.grayView];
+        
+        
+        self.rankOneButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankOneButton setTitle:@"1" forState:UIControlStateNormal];
+        [self.rankOneButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankOneButton.backgroundColor = [UIColor redColor];
+        [[self.rankOneButton layer] setCornerRadius:30];
+        [[self.rankOneButton layer] setBorderWidth:5];
+        [[self.rankOneButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankOneButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:50]];
+        [self.rankOneButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankOneButton.alpha = 0.6;
+        
+        self.rankTwoButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankTwoButton setTitle:@"2" forState:UIControlStateNormal];
+        [self.rankTwoButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankTwoButton.backgroundColor = [UIColor redColor];
+        [[self.rankTwoButton layer] setCornerRadius:35];
+        [[self.rankTwoButton layer] setBorderWidth:5];
+        [[self.rankTwoButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankTwoButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:60]];
+        [self.rankTwoButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankTwoButton.alpha = 0.7;
+        
+        self.rankThreeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankThreeButton setTitle:@"3" forState:UIControlStateNormal];
+        [self.rankThreeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankThreeButton.backgroundColor = [UIColor redColor];
+        [[self.rankThreeButton layer] setCornerRadius:40];
+        [[self.rankThreeButton layer] setBorderWidth:5];
+        [[self.rankThreeButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankThreeButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:70]];
+        [self.rankThreeButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankThreeButton.alpha = 0.8;
+        
+        self.rankThreeHalfButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankThreeHalfButton setTitle:@"3.5" forState:UIControlStateNormal];
+        [self.rankThreeHalfButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankThreeHalfButton.backgroundColor = [UIColor redColor];
+        [[self.rankThreeHalfButton layer] setCornerRadius:45];
+        [[self.rankThreeHalfButton layer] setBorderWidth:5];
+        [[self.rankThreeHalfButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankThreeHalfButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:50]];
+        [self.rankThreeHalfButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankThreeHalfButton.alpha = 0.9;
+        
+        self.rankFourButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankFourButton setTitle:@"4" forState:UIControlStateNormal];
+        [self.rankFourButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankFourButton.backgroundColor = [UIColor redColor];
+        [[self.rankFourButton layer] setCornerRadius:50];
+        [[self.rankFourButton layer] setBorderWidth:5];
+        [[self.rankFourButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankFourButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:80]];
+        [self.rankFourButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankFourButton.alpha = 1.0;
+        
+        [self.rankOneButton setFrame:CGRectMake(603, 157, 80, 80)];
+        [self.rankTwoButton setFrame:CGRectMake(603, 157, 85, 85)];
+        [self.rankThreeButton setFrame:CGRectMake(603, 157, 90, 90)];
+        [self.rankThreeHalfButton setFrame:CGRectMake(603, 157, 95, 95)];
+        [self.rankFourButton setFrame:CGRectMake(603, 157, 100, 100)];
+        
+        [self.rankOneButton setCenter:CGPointMake(603, 157)];
+        [self.rankTwoButton setCenter:CGPointMake(603, 157)];
+        [self.rankThreeButton setCenter:CGPointMake(603, 157)];
+        [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
+        [self.rankFourButton setCenter:CGPointMake(603, 157)];
+        
+        
+        [self.view addSubview:self.rankOneButton];
+        [self.view addSubview:self.rankTwoButton];
+        [self.view addSubview:self.rankThreeButton];
+        [self.view addSubview:self.rankThreeHalfButton];
+        [self.view addSubview:self.rankFourButton];
+        
+        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [self.rankOneButton setFrame:CGRectMake(555, 7, 60, 60)];
+            [self.rankTwoButton setFrame:CGRectMake(470, 42, 70, 70)];
+            [self.rankThreeButton setFrame:CGRectMake(434, 131, 80, 80)];
+            [self.rankThreeHalfButton setFrame:CGRectMake(482, 229, 90, 90)];
+            [self.rankFourButton setFrame:CGRectMake(604, 237, 100, 100)];} completion:^(BOOL finished){spin = NO;}];
+        spin = YES;
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeHalfButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankFourButton withDuration:0.1f withAngle:M_PI/2];
+        
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        
+    }
+//    self.yrRankTextLabel.hidden = NO;
+//    [self.yrRankTextLabel becomeFirstResponder];
+}
+
+-(void)doneWithPad
+{
+    [UIView beginAnimations:@"move" context:nil];
+    [UIView setAnimationDuration:0.5];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.yrCommentTextView.frame = CGRectMake(84, 610, 600, 325);
+    }
+    else{
+        self.yrCommentTextView.frame = CGRectMake(10, 417, 300, 120);
+    }
+    [UIView commitAnimations];
+    
+    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        [self.rankOneButton setFrame:CGRectMake(603, 157, 80, 80)];
+        [self.rankTwoButton setFrame:CGRectMake(603, 157, 85, 85)];
+        [self.rankThreeButton setFrame:CGRectMake(603, 157, 90, 90)];
+        [self.rankThreeHalfButton setFrame:CGRectMake(603, 157, 95, 95)];
+        [self.rankFourButton setFrame:CGRectMake(603, 157, 100, 100)];;} completion:nil];
+    
+    [self.yrCommentTextView resignFirstResponder];
+    [self.yrFirstNameTextField resignFirstResponder];
+    [self.yrLastNameTextField resignFirstResponder];
+    [self.yrEmailTextField resignFirstResponder];
+    [self.yrEmailTextField acceptSuggestion];
+    [self.yrBusinessUnit1 resignFirstResponder];
+    [self.yrBusinessUnit2 resignFirstResponder];
+    [self.yrGPATextField resignFirstResponder];
+    [self.yrPreferenceTextField resignFirstResponder];
+}
+
+-(void)changeRank:(id)sender
+{
+    self.dataSource.rank = [NSNumber numberWithFloat:[[[(UIButton*)sender titleLabel] text] floatValue]];
+    
+    if ([self.dataSource.rank floatValue] == 3.5) {
+        self.yrHalfRankLabel.hidden = NO;
+        self.yrRankLabel.text = @"3";
+    }
+    else
+    {
+        self.yrRankLabel.text = [self.dataSource.rank stringValue];
+        self.yrHalfRankLabel.hidden = YES;
+    }
+    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        [self.rankOneButton setCenter:CGPointMake(603, 157)];
+         [self.rankTwoButton setCenter:CGPointMake(603, 157)];
+         [self.rankThreeButton setCenter:CGPointMake(603, 157)];
+         [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
+         [self.rankFourButton setCenter:CGPointMake(603, 157)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
+            [self.rankOneButton removeFromSuperview];
+            [self.rankTwoButton removeFromSuperview];
+            [self.rankThreeButton removeFromSuperview];
+            [self.rankThreeHalfButton removeFromSuperview];
+            [self.rankFourButton removeFromSuperview];}];
+    
+    
+}
+
+-(void)cancelRankChange
+{
+    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        [self.rankOneButton setCenter:CGPointMake(603, 157)];
+        [self.rankTwoButton setCenter:CGPointMake(603, 157)];
+        [self.rankThreeButton setCenter:CGPointMake(603, 157)];
+        [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
+        [self.rankFourButton setCenter:CGPointMake(603, 157)];;} completion:^(BOOL finished){[self.grayView removeFromSuperview];
+            [self.rankOneButton removeFromSuperview];
+            [self.rankTwoButton removeFromSuperview];
+            [self.rankThreeButton removeFromSuperview];
+            [self.rankThreeHalfButton removeFromSuperview];
+            [self.rankFourButton removeFromSuperview];}];
+}
+
+-(void)removeViews
+{
+    [self.scheduleView removeFromSuperview];
+    [self.emailOptionView removeFromSuperview];
+    [self.grayView removeFromSuperview];
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -433,6 +868,8 @@
     [self.yrEmailTextField acceptSuggestion];
     [self.yrBusinessUnit1 resignFirstResponder];
     [self.yrBusinessUnit2 resignFirstResponder];
+    [self.yrGPATextField resignFirstResponder];
+    [self.yrPreferenceTextField resignFirstResponder];
 }
 
 #pragma mark - AutoSuggestDelegate
@@ -476,6 +913,85 @@
 -(UIColor *)suggestedTextColor
 {
     return [UIColor grayColor];
+}
+
+#pragma mark - UITableViewDataSource
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (tableView == self.scheduleTable) {
+        return [self.dataSource.appointments count];
+    }
+    else if (tableView == self.emailOptionTable)
+    {
+        return 3;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString* identifier;
+    if (tableView == self.scheduleTable) {
+        identifier = @"scheduleIdentifier";
+    }
+    else
+    {
+        identifier = @"emailOptionIdentifier";
+    }
+    
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    
+    if (tableView == self.scheduleTable) {
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
+        }
+        cell.textLabel.text = [NSString stringWithFormat:@"%@   with %@",[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] startTime], [[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] interviewers] name]];
+        
+        //cell.detailLabel
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"Room %d",[[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] apIndex_y] intValue]+1];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+            cell.textLabel.font = [UIFont systemFontOfSize:12];
+        }
+        cell.contentView.alpha = 0.5;
+    }
+    else if (tableView == self.emailOptionTable)
+    {
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        }
+        if (indexPath.row == 0) {
+            cell.textLabel.text = @"Opt1";
+        }
+        else if (indexPath.row == 1)
+        {
+            cell.textLabel.text = @"Opt2";
+        }
+        else
+        {
+            cell.textLabel.text = @"Opt3";
+        }
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+            cell.textLabel.font = [UIFont systemFontOfSize:12];
+        }
+    }
+    
+    return cell;
+}
+
+#pragma mark - UITableViewDelegate
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tableView == self.emailOptionTable) {
+        if (indexPath.row == 0) {
+            //default now
+            [self email];
+        }
+    }
 }
 
 @end

@@ -19,6 +19,7 @@
     
     if (self) {
         _managedObjectContext = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] managedObjectContext];
+        _localBackUp = [NSMutableArray new];
     }
     return self;
 }
@@ -88,6 +89,7 @@
         }
         else
         {
+            [self sendACKBack:peerID];
             NSLog(@"duplicate code and firstName found");
         }
     }
@@ -96,9 +98,16 @@
         [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
         NSDictionary *dict = @{@"recruitID": dic[@"code"]};
         
-        if (self.localBackUp != nil) {
-            [self sendBackUp:self.localBackUp];
+        if ([self.localBackUp count] != 0) {
+            
+            for (NSDictionary* dic in self.localBackUp)
+            {
+                [self sendBackUp:dic];
+            }
+            [self.localBackUp removeAllObjects];
         }
+        
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateCodeNotification"
                                                             object:nil
                                                           userInfo:dict];
@@ -145,7 +154,15 @@
     [item setLastName:infoData[@"lastName"]];
     [item setEmailAddress:infoData[@"email"]];
     [item setInterviewer:infoData[@"interviewer"]];
-    [item setCode:infoData[@"code"]];
+    if ([infoData[@"code"] isEqualToString:@"No Connection!"]) {
+        [item setCode:[NSString stringWithFormat:@"%@-%d",self.yrPrefix,[self nextCode]]];
+    }
+    else
+    {
+        [item setCode:infoData[@"code"]];
+    }
+
+    
     [item setRecommand:infoData[@"recommand"]];
     [item setStatus:infoData[@"status"]];
     [item setPdf:infoData[@"pdf"]];
@@ -155,8 +172,6 @@
     [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName]]];
     [item setRank:[NSNumber numberWithFloat:[(NSString*)infoData[@"rank"] floatValue]]];
     [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
-    
-    [item setInterviews:[NSMutableArray new]];
     
     NSError *error = nil;
     if (![self.managedObjectContext save:&error]) {
@@ -185,7 +200,11 @@
     if(error){
         NSLog(@"%@", [error localizedDescription]);
         
-        self.localBackUp = @{@"msg" : @"backup" , @"data" : data[@"data"]};
+        
+        if (self.localBackUp == nil) {
+            self.localBackUp = [NSMutableArray new];
+        }
+        [self.localBackUp addObject:@{@"msg" : @"backup" , @"data" : data[@"data"]}];
     }
 }
 
@@ -254,7 +273,7 @@
     }
     else
     {
-        self.localBackUp = nil;
+        //
     }
 }
 

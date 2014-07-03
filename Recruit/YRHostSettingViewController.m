@@ -23,6 +23,9 @@
 -(void)yrCardViewSave;
 -(void)removeAllInterviewerInfo;
 -(void)saveScheduleInfo;
+-(void)doneWithPad;
+-(void)removeTextView;
+-(void)insertString:(NSString*)insertingString;
 
 @end
 
@@ -31,6 +34,7 @@
 -(void)awakeFromNib
 {
     self.interviewerArray = [[NSMutableArray alloc] init];
+    self.emailKeywordDictionary = [[NSDictionary alloc] init];
 }
 
 - (void)viewDidLoad
@@ -59,6 +63,29 @@
     self.interviewLocations.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"]];
     
     [self fetchInterviewerInfo];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[self.yrRemoveButton layer] setCornerRadius:20];
+        [[self.yrRemoveButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveButton layer] setBorderWidth:5];
+        [[self.yrAddButton layer] setCornerRadius:20];
+        [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddButton layer] setBorderWidth:5];
+        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + 3*44 + 50, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + 3*44 + 50, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [[self.yrRemoveButton layer] setCornerRadius:12.5];
+        [[self.yrRemoveButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveButton layer] setBorderWidth:2];
+        [[self.yrAddButton layer] setCornerRadius:12.5];
+        [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddButton layer] setBorderWidth:2];
+        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + 3*44 + 45, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + 3*44 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -69,6 +96,12 @@
 
 - (IBAction)addInterviewer:(id)sender {
     
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor darkGrayColor];
+    self.grayView.alpha = 0.5;
+    
+    [self.view addSubview:self.grayView];
+    
     UILabel* titleLabel;
     UILabel* nameLabel;
     UILabel* emailLabel;
@@ -78,33 +111,34 @@
     
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(170, 300, 428, 300)];
+        //rotation needs update setting 
+        self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x-214, self.view.center.y-250, 428, 300)];
         
-        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
-        [[self.yrCardView layer] setCornerRadius:30];
-        [[self.yrCardView layer] setBorderWidth:5];
+//        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
+//        [[self.yrCardView layer] setCornerRadius:30];
+//        [[self.yrCardView layer] setBorderWidth:5];
         
         self.yrCardView.backgroundColor = [UIColor whiteColor];
         
-        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(90, 40, 288, 40)];
+        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 288, 40)];
         [titleLabel setText:@"New Interviewer"];
-        [titleLabel setFont:[UIFont boldSystemFontOfSize:26]];
-        [titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:25]];
+        [titleLabel setTextAlignment:NSTextAlignmentLeft];
         
-        self.interviewerName = [[UITextField alloc] initWithFrame:CGRectMake(180, 100, 200, 30)];
+        self.interviewerName = [[UITextField alloc] initWithFrame:CGRectMake(140, 80, 240, 30)];
         self.interviewerName.borderStyle = UITextBorderStyleRoundedRect;
         [self.interviewerName setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerName.autocapitalizationType = UITextAutocapitalizationTypeWords;
         self.interviewerName.autocorrectionType = UITextAutocorrectionTypeNo;
         
-        self.interviewerEmail = [[AutoSuggestTextField alloc] initWithFrame:CGRectMake(180, 145, 200, 30)];
+        self.interviewerEmail = [[AutoSuggestTextField alloc] initWithFrame:CGRectMake(140, 125, 240, 30)];
         self.interviewerEmail.borderStyle = UITextBorderStyleRoundedRect;
         [self.interviewerEmail setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerEmail.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.interviewerEmail.autocorrectionType = UITextAutocorrectionTypeNo;
         self.interviewerEmail.keyboardType = UIKeyboardTypeEmailAddress;
         
-        self.interviewerCode = [[UITextField alloc] initWithFrame:CGRectMake(180, 190, 200, 30)];
+        self.interviewerCode = [[UITextField alloc] initWithFrame:CGRectMake(140, 170, 240, 30)];
         self.interviewerCode.borderStyle = UITextBorderStyleRoundedRect;
         [self.interviewerCode setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerCode.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
@@ -116,26 +150,26 @@
         self.interviewerName.delegate = self;
         self.interviewerCode.delegate = self;
         
-        nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 100, 60, 30)];
+        nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 80, 60, 30)];
         [nameLabel setText:@"name:"];
         [nameLabel setTextAlignment:NSTextAlignmentRight];
         
-        emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 145, 60, 30)];
+        emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 125, 60, 30)];
         [emailLabel setText:@"email:"];
         [emailLabel setTextAlignment:NSTextAlignmentRight];
         
-        codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 190, 60, 30)];
+        codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 170, 60, 30)];
         [codeLabel setText:@"code:"];
         [codeLabel setTextAlignment:NSTextAlignmentRight];
         
         cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        cancelButton.frame = CGRectMake(60, 230, 100, 40);
+        cancelButton.frame = CGRectMake(40, 250, 100, 40);
         [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
         cancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:22];
         [cancelButton addTarget:self action:@selector(yrCardViewCancel) forControlEvents:UIControlEventTouchUpInside];
         
         saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        saveButton.frame = CGRectMake(288, 230, 100, 40);
+        saveButton.frame = CGRectMake(308, 250, 100, 40);
         [saveButton setTitle:@"Save" forState:UIControlStateNormal];
         saveButton.titleLabel.font = [UIFont boldSystemFontOfSize:22];
         [saveButton addTarget:self action:@selector(yrCardViewSave) forControlEvents:UIControlEventTouchUpInside];
@@ -144,31 +178,31 @@
     {
         self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(20, 120, 280, 230)];
         
-        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
-        [[self.yrCardView layer] setCornerRadius:10];
-        [[self.yrCardView layer] setBorderWidth:5];
+//        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
+//        [[self.yrCardView layer] setCornerRadius:10];
+//        [[self.yrCardView layer] setBorderWidth:5];
         
         self.yrCardView.backgroundColor = [UIColor whiteColor];
         
-        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 20, 200, 30)];
+        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 200, 20)];
         [titleLabel setText:@"New Interviewer"];
-        [titleLabel setFont:[UIFont boldSystemFontOfSize:16]];
-        [titleLabel setTextAlignment:NSTextAlignmentCenter];
+        [titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:16]];
+        [titleLabel setTextAlignment:NSTextAlignmentLeft];
         
-        self.interviewerName = [[UITextField alloc] initWithFrame:CGRectMake(80, 60, 160, 30)];
+        self.interviewerName = [[UITextField alloc] initWithFrame:CGRectMake(80, 50, 160, 30)];
         self.interviewerName.borderStyle = UITextBorderStyleRoundedRect;
         [self.interviewerName setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerName.autocapitalizationType = UITextAutocapitalizationTypeWords;
         self.interviewerName.autocorrectionType = UITextAutocorrectionTypeNo;
         
-        self.interviewerEmail = [[AutoSuggestTextField alloc] initWithFrame:CGRectMake(80, 105, 160, 30)];
+        self.interviewerEmail = [[AutoSuggestTextField alloc] initWithFrame:CGRectMake(80, 95, 160, 30)];
         self.interviewerEmail.borderStyle = UITextBorderStyleRoundedRect;
         [self.interviewerEmail setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerEmail.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.interviewerEmail.autocorrectionType = UITextAutocorrectionTypeNo;
         self.interviewerEmail.keyboardType = UIKeyboardTypeEmailAddress;
         
-        self.interviewerCode = [[UITextField alloc] initWithFrame:CGRectMake(80, 150, 160, 30)];
+        self.interviewerCode = [[UITextField alloc] initWithFrame:CGRectMake(80, 140, 160, 30)];
         self.interviewerCode.borderStyle = UITextBorderStyleRoundedRect;
         [self.interviewerCode setFont:[UIFont systemFontOfSize: 14]];
         self.interviewerCode.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
@@ -179,15 +213,15 @@
         self.interviewerName.delegate = self;
         self.interviewerCode.delegate = self;
         
-        nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 60, 60, 30)];
+        nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 50, 60, 30)];
         [nameLabel setText:@"name:"];
         [nameLabel setTextAlignment:NSTextAlignmentRight];
         
-        emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 105, 60, 30)];
+        emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 95, 60, 30)];
         [emailLabel setText:@"email:"];
         [emailLabel setTextAlignment:NSTextAlignmentRight];
         
-        codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 150, 60, 30)];
+        codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 140, 60, 30)];
         [codeLabel setText:@"code:"];
         [codeLabel setTextAlignment:NSTextAlignmentRight];
         
@@ -233,6 +267,7 @@
 -(void)yrCardViewCancel
 {
     [self.yrCardView removeFromSuperview];
+    [self.grayView removeFromSuperview];
     self.interviewerEmail = nil;
     self.interviewerName = nil;
     self.interviewerCode = nil;
@@ -260,6 +295,7 @@
         
         [self.interviewerList reloadData];
         [self.yrCardView removeFromSuperview];
+        [self.grayView removeFromSuperview];
     }
 }
 
@@ -312,6 +348,38 @@
     [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewLocations.text intValue]] forKey:@"scheduleColums"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
+
+-(void)doneWithPad
+{
+    [self.yrEditingView resignFirstResponder];
+    [self.yrEditingView removeFromSuperview];
+    [self.removeFromViewButton removeFromSuperview];
+    [self.yrEditingTable removeFromSuperview];
+}
+
+-(void)removeTextView
+{
+    [self.removeFromViewButton removeFromSuperview];
+    [self.yrEditingTable removeFromSuperview];
+    [self.yrEditingView removeFromSuperview];
+}
+
+-(void)insertString:(NSString*)insertingString
+{
+    NSRange range = self.yrEditingView.selectedRange;
+    NSString * firstHalfString = [self.yrEditingView.text substringToIndex:range.location];
+    NSString * secondHalfString = [self.yrEditingView.text substringFromIndex: range.location];
+    self.yrEditingView.scrollEnabled = NO;  // turn off scrolling
+    
+    self.yrEditingView.text = [NSString stringWithFormat: @"%@%@%@",
+                       firstHalfString,
+                       insertingString,
+                       secondHalfString];
+    range.location += [insertingString length];
+    self.yrEditingView.selectedRange = range;
+    self.yrEditingView.scrollEnabled = YES;  // turn scrolling back on.
+}
+
 
 #pragma mark - AutoSuggestDelegate
 
@@ -378,40 +446,188 @@
 
 #pragma mark- UITableViewDataSource
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if (tableView == self.yrEditingTable) {
+        return 1;
+    }
+    else
+    {
+        return 2;
+    }
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if (tableView == self.yrEditingTable) {
+        return @"Keys";
+    }
+    else
+    {
+        if (section == 0) {
+            return @"Email Forms";
+        }
+        else
+        {
+            return @"Onsite Interviewers";
+        }
+    }
+}
+
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.interviewerArray count];
+    if (tableView == self.yrEditingTable) {
+        return [[self.emailKeywordDictionary allKeys] count];
+    }
+    else
+    {
+        if (section == 0) {
+            return 3;
+        }
+        else
+        {
+            return [self.interviewerArray count];
+        }
+    }
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString* identifier = @"interviewerIdentifier";
-    
-    YRViewerDataCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
-    if (cell == nil) {
-        cell = [YRViewerDataCell new];
+    if (tableView == self.yrEditingTable) {
+        static NSString* identifier = @"keyIdentifier";
+        UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        }
+        cell.textLabel.text = [[self.emailKeywordDictionary allKeys] objectAtIndex:indexPath.row];
+        cell.textLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:15];
+        return cell;
     }
-    Interviewer* current = [self.interviewerArray objectAtIndex:indexPath.row];
-    cell.yrNameLabel.text = current.name;
-    cell.yrEmailLabel.text = current.email;
-    cell.yrCodeLabel.text = current.code;
-    return cell;
+    else
+    {
+        if (indexPath.section == 0) {
+            static NSString* identifier = @"formIdentifier";
+            UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+            if (cell == nil) {
+                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+            }
+            if (indexPath.row == 0) {
+                cell.textLabel.text = @"Opt1";
+            }
+            else if (indexPath.row == 1)
+            {
+                cell.textLabel.text = @"Opt2";
+            }
+            else
+            {
+                cell.textLabel.text = @"Opt3";
+            }
+            return cell;
+        }
+        else
+        {
+            static NSString* identifier = @"interviewerIdentifier";
+            
+            YRViewerDataCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+            if (cell == nil) {
+                cell = [YRViewerDataCell new];
+            }
+            Interviewer* current = [self.interviewerArray objectAtIndex:indexPath.row];
+            cell.yrNameLabel.text = current.name;
+            cell.yrEmailLabel.text = current.email;
+            cell.yrCodeLabel.text = current.code;
+            return cell;
+        }
+    }
 }
 
 #pragma mark- UITableViewDelegate
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        return 60.0;
-    }
-    else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-    {
-        return 100.0;
-    }
-    else{
+    if (tableView == self.yrEditingTable) {
         return 44.0;
     }
+    else
+    {
+        if (indexPath.section == 1) {
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+                return 50.0;
+            }
+            else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+            {
+                return 90.0;
+            }
+            else{
+                return 44.0;
+            }
+        }
+        else
+        {
+            return 44.0;
+        }
+    }
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tableView == self.yrEditingTable) {
+        //
+        [self insertString:[[self.emailKeywordDictionary allValues] objectAtIndex:indexPath.row]];
+    }
+    else
+    {
+        UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+        
+        doneToolbar.items = [NSArray arrayWithObjects:
+                             //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                             [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                             [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],
+                             nil];
+        
+        if (indexPath.section == 0) {
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                //bring up text view
+                self.yrEditingView = [[UITextView alloc] initWithFrame:CGRectMake(self.view.center.x-384, self.view.center.y-450, 584, 650)];
+                self.yrEditingView.delegate = self;
+                self.yrEditingView.keyboardType = UIKeyboardTypeDefault;
+                self.yrEditingView.inputAccessoryView = doneToolbar;
+                [self.yrEditingView setBackgroundColor:[UIColor colorWithRed:1.0 green:247.0/255.0 blue:201.0/255.0 alpha:1]];
+                [[self.yrEditingView layer] setCornerRadius:10];
+                
+                self.yrEditingTable = [[UITableView alloc] initWithFrame:CGRectMake(self.view.center.x+200, self.view.center.y-450, 184, 650) style:UITableViewStyleGrouped];
+                self.emailKeywordDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"emailKeyWords"];
+                self.yrEditingTable.delegate = self;
+                self.yrEditingTable.dataSource = self;
+                [[self.yrEditingTable layer] setCornerRadius:10];
+                //[self.yrEditingTable setSeparatorInset:UIEdgeInsetsZero];
+                
+                self.removeFromViewButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+                [self.removeFromViewButton setFrame:CGRectMake(584-20, self.view.center.y-450-20, 40, 40)];
+                self.removeFromViewButton.backgroundColor = [UIColor redColor];
+                [self.removeFromViewButton setTitle:@"X" forState:UIControlStateNormal];
+                [self.removeFromViewButton.titleLabel setFont:[UIFont boldSystemFontOfSize:30]];
+                self.removeFromViewButton.titleLabel.textColor = [UIColor whiteColor];
+                [self.removeFromViewButton setTintColor:[UIColor whiteColor]];
+                [[self.removeFromViewButton layer] setCornerRadius:20];
+                [[self.removeFromViewButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+                [[self.removeFromViewButton layer] setBorderWidth:4];
+                [self.removeFromViewButton addTarget:self action:@selector(removeTextView) forControlEvents:UIControlEventTouchUpInside];
+                
+                
+                [self.view addSubview:self.yrEditingView];
+                [self.view addSubview:self.yrEditingTable];
+                [self.view addSubview:self.removeFromViewButton];
+            }
+            else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+            {
+                
+            }
+            [self.yrEditingView becomeFirstResponder];
+        }
+    }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 #pragma mark - UIAlertViewDelegate

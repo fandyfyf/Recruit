@@ -12,6 +12,7 @@
 
 @property (weak, nonatomic) IBOutlet UITextField *yrtextField;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrsegmentedControl;
+@property (weak, nonatomic) IBOutlet UIButton *yrSignInButton;
 @property (strong, nonatomic) NSString* userName;
 - (IBAction)backGroundTapped:(id)sender;
 

@@ -9,11 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "YRAppDelegate.h"
 
-@interface YRFormViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate, UITextViewDelegate>
+@interface YRFormViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate, UITextViewDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property (strong, nonatomic) NSKeyedArchiver* yrarchiver;
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+
+@property (strong, nonatomic) UIView * yrNameListView;
+@property (strong, nonatomic) UITableView *yrNameList;
 
 @property (weak, nonatomic) IBOutlet UILabel *yrcodeLabel;
 
@@ -29,9 +32,6 @@
 
 
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
-@property (weak, nonatomic) IBOutlet UIButton *saveButton;
-
-
 
 - (IBAction)refreshInformation:(id)sender;
 

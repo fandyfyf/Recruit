@@ -16,7 +16,11 @@
 
 -(void)buildSchedule;
 
+-(BOOL)checkCandidateAvailability:(CandidateEntry*)candidate atTime:(NSString*)time;
+
 -(void)cardOnClick:(id)sender;
+
+-(void)tabDelete:(UILongPressGestureRecognizer*)gestureRecognizer;
 
 -(void)setUpInterviewNotification:(NSNotification *)notification;
 
@@ -92,6 +96,12 @@
 
 -(void)buildSchedule
 {
+    UILongPressGestureRecognizer* longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(tabDelete:)];
+    longPress.delegate = self;
+    [longPress setMinimumPressDuration:1.0];
+    [longPress setNumberOfTapsRequired:1];
+    [longPress setCancelsTouchesInView:NO];
+    
     //======================UI parameters=========================//
     self.cardWidth = [NSNumber numberWithInt:130];
     self.cardHeight = [NSNumber numberWithInt:100];
@@ -119,12 +129,22 @@
     
     
     //======================add button=========================//
-    UIButton* addColumButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
-    addColumButton.frame = CGRectMake(([self.cardWidth intValue]+5)*[self.yrColumNumber intValue]+[self.toLeft intValue
-                                                                                                   ]+10, [self.toTop intValue] - 40, 30, 30);
-    [self.yrPlaceOrNameScrollView addSubview:addColumButton];
-    [addColumButton addTarget:self action:@selector(reloadSchedule) forControlEvents:UIControlEventTouchUpInside];
+    UIButton* addColumButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    addColumButton.frame = CGRectMake(([self.cardWidth intValue]+5)*[self.yrColumNumber intValue]+[self.toLeft intValue]+10, [self.toTop intValue] - 40, 30, 30);
+    addColumButton.backgroundColor = [UIColor colorWithRed:110.0/255.0 green:163.0/255.0 blue:41.0/255.0 alpha:1.0];
     [addColumButton setTintColor:[UIColor whiteColor]];
+    [addColumButton setTitle:@"+" forState:UIControlStateNormal];
+    [addColumButton.titleLabel setFont:[UIFont boldSystemFontOfSize:30]];
+    [addColumButton setTitleEdgeInsets:UIEdgeInsetsMake(-5, 0, 0, 0)];
+    [[addColumButton layer] setCornerRadius:15];
+    [[addColumButton layer] setBorderWidth:3];
+    [[addColumButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+    [addColumButton addTarget:self action:@selector(reloadSchedule) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.yrPlaceOrNameScrollView addSubview:addColumButton];
+    
+    //=========================================================//
+    
     
     self.yrTimeCardScrollView.delegate = self;
     self.yrTimeCardScrollView.directionalLockEnabled = YES;
@@ -133,7 +153,7 @@
     for (int i=0; i<[self.yrColumNumber intValue]; i++) {
         UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake([self.toLeft intValue]+i*([self.cardWidth intValue]+5), [self.toTop intValue] - 40, [self.cardWidth intValue], 30)];
         
-        [nameLabel setText:[NSString stringWithFormat:@"Room %d",i]];
+        [nameLabel setText:[NSString stringWithFormat:@"Room %d",i+1]];
         nameLabel.textColor = [UIColor whiteColor];
         nameLabel.font = [UIFont boldSystemFontOfSize:20];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -187,6 +207,8 @@
             cellView.backgroundColor = [UIColor whiteColor];
             
             [cellView addTarget:self action:@selector(cardOnClick:) forControlEvents:UIControlEventTouchUpInside];
+            [cellView setUserInteractionEnabled:YES];
+            [cellView addGestureRecognizer:longPress];
             
             cellView.roomIndex = j;
             cellView.slotIndex = i;
@@ -219,6 +241,16 @@
     [self.view addSubview:self.yrTimeCardScrollView];
     [self.view addSubview:self.yrTimeLabelScrollView];
     [self.view addSubview:self.yrPlaceOrNameScrollView];
+}
+
+-(BOOL)checkCandidateAvailability:(CandidateEntry*)candidate atTime:(NSString*)time
+{
+    for (Appointment* ap in candidate.appointments) {
+        if ([ap.startTime isEqualToString:time]) {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 -(void)cardOnClick:(id)sender
@@ -261,26 +293,33 @@
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
             if ([FetchResults count] != 0) {
-                CandidateEntry* fetched = (CandidateEntry*)[FetchResults objectAtIndex:0];
-                
-                Appointment* item = (Appointment*)[NSEntityDescription insertNewObjectForEntityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext];
-                
-                item.startTime = [(YRTimeCardView*)sender interviewStartTime];
-                item.apIndex_x = [NSNumber numberWithInt:[(YRTimeCardView*)sender roomIndex]];
-                item.apIndex_y = [NSNumber numberWithInt:[(YRTimeCardView*)sender slotIndex]];
-                
-                [fetched addAppointmentsObject:item];
-                [fetched setStatus:@"scheduled"];
-                
-                if (![[self managedObjectContext] save:&error]) {
-                    NSLog(@"ERROR -- saving coredata");
+                if ([self checkCandidateAvailability:(CandidateEntry*)[FetchResults objectAtIndex:0] atTime:[(YRTimeCardView*)sender interviewStartTime]]) {
+                    CandidateEntry* fetched = (CandidateEntry*)[FetchResults objectAtIndex:0];
+                    
+                    Appointment* item = (Appointment*)[NSEntityDescription insertNewObjectForEntityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext];
+                    
+                    item.startTime = [(YRTimeCardView*)sender interviewStartTime];
+                    item.apIndex_x = [NSNumber numberWithInt:[(YRTimeCardView*)sender roomIndex]];
+                    item.apIndex_y = [NSNumber numberWithInt:[(YRTimeCardView*)sender slotIndex]];
+                    
+                    [fetched addAppointmentsObject:item];
+                    [fetched setStatus:@"scheduled"];
+                    
+                    if (![[self managedObjectContext] save:&error]) {
+                        NSLog(@"ERROR -- saving coredata");
+                    }
+                    [[(YRTimeCardView*)sender codeLabel] setText:self.passedInRid];
+                    
+                    [[(YRTimeCardView*)sender candidateNameLabel] setText:[NSString stringWithFormat:@"%@ %@",item.candidate.firstName,item.candidate.lastName]];
+                    
+                    [[(YRTimeCardView*)sender interviewerNameLabel] setText:@""];
                 }
-                
-                [[(YRTimeCardView*)sender codeLabel] setText:self.passedInRid];
-                
-                [[(YRTimeCardView*)sender candidateNameLabel] setText:[NSString stringWithFormat:@"%@ %@",item.candidate.firstName,item.candidate.lastName]];
-                
-                [[(YRTimeCardView*)sender interviewerNameLabel] setText:@""];
+                else
+                {
+                    NSLog(@"There is a conflict with candidate");
+                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[FetchResults objectAtIndex:0] firstName],[(CandidateEntry*)[FetchResults objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                    [alert show];
+                }
             }
             else
             {
@@ -288,6 +327,13 @@
             }
             dataIsReady = NO;
         }
+    }
+}
+
+-(void)tabDelete:(UILongPressGestureRecognizer*)gestureRecognizer
+{
+    if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        NSLog(@"Here");
     }
 }
 
@@ -299,28 +345,32 @@
 
 -(void)reloadSchedule
 {
-    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:@"scheduleColums"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    [self.yrSchedulingController.view removeFromSuperview];
-    [self.yrTimeCardScrollView removeFromSuperview];
-    [self.yrTimeLabelScrollView removeFromSuperview];
-    [self.yrPlaceOrNameScrollView removeFromSuperview];
-    self.yrTimeCardScrollView = nil;
-    self.yrTimeLabelScrollView = nil;
-    self.yrPlaceOrNameScrollView = nil;
-    
-    [self.views removeAllObjects];
-    [self.yrAppointmentInfo removeAllObjects];
-    
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-    NSError* error = nil;
-    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-    
-    [self setYrAppointmentInfo:[FetchResults mutableCopy]];
-    
-    [self buildSchedule];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:@"scheduleColums"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [self.yrSchedulingController.view removeFromSuperview];
+        [self.yrTimeCardScrollView removeFromSuperview];
+        [self.yrTimeLabelScrollView removeFromSuperview];
+        [self.yrPlaceOrNameScrollView removeFromSuperview];
+        self.yrTimeCardScrollView = nil;
+        self.yrTimeLabelScrollView = nil;
+        self.yrPlaceOrNameScrollView = nil;
+        
+        [self.views removeAllObjects];
+        [self.yrAppointmentInfo removeAllObjects];
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+        NSError* error = nil;
+        NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        [self setYrAppointmentInfo:[FetchResults mutableCopy]];
+        
+        [self buildSchedule];
+        self.yrTimeCardScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
+        self.yrPlaceOrNameScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
+    });
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -350,6 +400,12 @@
         }
     }
     
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
 }
 
 
