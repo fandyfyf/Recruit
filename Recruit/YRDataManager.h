@@ -18,8 +18,6 @@
 @property (strong, nonatomic) NSString  *yrPrefix;
 @property (assign) int counter;
 @property (assign, getter = isHost) BOOL host;
-
-@property (strong,nonatomic) NSMutableArray* localBackUp;
 @property (strong,nonatomic) NSMutableArray* nameList;
 
 -(id) init;
@@ -31,6 +29,8 @@
 - (BOOL)isNotDuplicateData:(NSDictionary*)infoData;
 
 -(CandidateEntry*)saveCandidate:(NSDictionary *)infoData;
+
+-(CandidateEntry*)queuingLocalCandidate:(NSDictionary *)infoData;
 
 -(void)sendACKBack:(MCPeerID*)peerID;
 

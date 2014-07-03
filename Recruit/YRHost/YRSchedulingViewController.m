@@ -10,7 +10,6 @@
 #import "CandidateEntry.h"
 #import "Interviewer.h"
 #import "Appointment.h"
-#import "YRTimeCardView.h"
 
 @interface YRSchedulingViewController ()
 
@@ -51,6 +50,11 @@
     self.candidatesPickerView.dataSource = self;
     self.interviewerPickerView.delegate = self;
     self.interviewerPickerView.dataSource = self;
+    
+    //diable user interaction on picker view doesn't work
+    if (self.yrTriggeringView.candidateLock) {
+        [self.candidatesPickerView setUserInteractionEnabled:NO];
+    }
     
     [self.view addSubview:self.candidatesPickerView];
     [self.view addSubview:self.interviewerPickerView];
@@ -99,14 +103,14 @@
     
     //setting default appearance of picker view
     
-    if ([(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text != nil) {
-        if (![[(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text isEqualToString:@""]) {
+    if ([self.yrTriggeringView candidateNameLabel].text != nil) {
+        if (![[self.yrTriggeringView candidateNameLabel].text isEqualToString:@""]) {
             //setting default at the beginning
-            self.selectedCandidate = [(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text;
-            self.selectedCode = [(YRTimeCardView*)self.yrTriggeringView codeLabel].text;
+            self.selectedCandidate = [self.yrTriggeringView candidateNameLabel].text;
+            self.selectedCode = [self.yrTriggeringView codeLabel].text;
             int index = 0;
             for (int i = 0; i<[self.yrdataEntry count];i++) {
-                if ([[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] lastName]] isEqualToString:[(YRTimeCardView*)self.yrTriggeringView candidateNameLabel].text]  ) {
+                if ([[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] lastName]] isEqualToString:[self.yrTriggeringView candidateNameLabel].text]  ) {
                     index = i;
                 }
             }
@@ -123,13 +127,13 @@
     }
     
     
-    if ([(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text != nil) {
-        if (![[(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text isEqualToString:@""]) {
+    if ([self.yrTriggeringView interviewerNameLabel].text != nil) {
+        if (![[self.yrTriggeringView interviewerNameLabel].text isEqualToString:@""]) {
             //setting default at the beginning
-            self.selectedInterviewer = [(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text;
+            self.selectedInterviewer = [self.yrTriggeringView interviewerNameLabel].text;
             int index = 0;
             for (int i = 0; i<[self.yrinterviewerEntry count];i++) {
-                if ([[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:i] name] isEqualToString:[(YRTimeCardView*)self.yrTriggeringView interviewerNameLabel].text]) {
+                if ([[[self.yrinterviewerEntry objectAtIndex:i] name] isEqualToString:[self.yrTriggeringView interviewerNameLabel].text]) {
                     index = i;
                 }
             }

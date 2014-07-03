@@ -30,11 +30,15 @@
 @end
 
 @implementation YRHostSettingViewController
+{
+    float add_origin_y;
+    float remove_origin_y;
+}
 
 -(void)awakeFromNib
 {
     self.interviewerArray = [[NSMutableArray alloc] init];
-    self.emailKeywordDictionary = [[NSDictionary alloc] init];
+    self.emailKeywordArray = [[NSArray alloc] init];
 }
 
 - (void)viewDidLoad
@@ -58,9 +62,9 @@
     self.interviewDuration.delegate = self;
     self.interviewLocations.delegate = self;
     
-    self.interviewStartTime.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleStartTime"]];
-    self.interviewDuration.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleDuration"]];
-    self.interviewLocations.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"]];
+    self.interviewStartTime.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartTimeKey]];
+    self.interviewDuration.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleDurationKey]];
+    self.interviewLocations.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleColumsKey]];
     
     [self fetchInterviewerInfo];
     
@@ -86,6 +90,9 @@
         [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + 3*44 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
 
     }
+    
+    add_origin_y = self.yrAddButton.frame.origin.y;
+    remove_origin_y = self.yrRemoveButton.frame.origin.y;
 }
 
 - (void)didReceiveMemoryWarning
@@ -343,9 +350,9 @@
 
 -(void)saveScheduleInfo
 {
-    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewStartTime.text intValue]] forKey:@"scheduleStartTime"];
-    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewDuration.text intValue]] forKey:@"scheduleDuration"];
-    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewLocations.text intValue]] forKey:@"scheduleColums"];
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewStartTime.text intValue]] forKey:kYRScheduleStartTimeKey];
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewDuration.text intValue]] forKey:kYRScheduleDurationKey];
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.interviewLocations.text intValue]] forKey:kYRScheduleColumsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -478,7 +485,7 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (tableView == self.yrEditingTable) {
-        return [[self.emailKeywordDictionary allKeys] count];
+        return [self.emailKeywordArray count];
     }
     else
     {
@@ -500,7 +507,7 @@
         if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         }
-        cell.textLabel.text = [[self.emailKeywordDictionary allKeys] objectAtIndex:indexPath.row];
+        cell.textLabel.text = [(NSDictionary*)[self.emailKeywordArray objectAtIndex:indexPath.row] allKeys][0];
         cell.textLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:15];
         return cell;
     }
@@ -573,8 +580,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tableView == self.yrEditingTable) {
-        //
-        [self insertString:[[self.emailKeywordDictionary allValues] objectAtIndex:indexPath.row]];
+        [self insertString:[(NSDictionary*)[self.emailKeywordArray objectAtIndex:indexPath.row] allValues][0]];
     }
     else
     {
@@ -597,7 +603,7 @@
                 [[self.yrEditingView layer] setCornerRadius:10];
                 
                 self.yrEditingTable = [[UITableView alloc] initWithFrame:CGRectMake(self.view.center.x+200, self.view.center.y-450, 184, 650) style:UITableViewStyleGrouped];
-                self.emailKeywordDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"emailKeyWords"];
+                self.emailKeywordArray = [[NSUserDefaults standardUserDefaults] arrayForKey:kYREmailKeyWordsKey];
                 self.yrEditingTable.delegate = self;
                 self.yrEditingTable.dataSource = self;
                 [[self.yrEditingTable layer] setCornerRadius:10];
@@ -638,6 +644,14 @@
     if ([buttonTitle isEqualToString:@"Yes"]) {
         [self removeAllInterviewerInfo];
     }
+}
+
+#pragma mark - UISrollViewDelegate
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    self.yrAddButton.frame = CGRectMake(self.yrAddButton.frame.origin.x, add_origin_y-scrollView.contentOffset.y, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height);
+    self.yrRemoveButton.frame = CGRectMake(self.yrRemoveButton.frame.origin.x, remove_origin_y-scrollView.contentOffset.y, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height);
 }
 
 @end

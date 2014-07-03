@@ -16,6 +16,7 @@
 @property (strong, nonatomic) UILabel* candidateNameLabel;
 @property (strong, nonatomic) UILabel* interviewerNameLabel;
 @property (strong, nonatomic) NSString* interviewStartTime;
+@property (assign) BOOL candidateLock;
 
 
 @end

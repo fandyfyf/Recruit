@@ -42,6 +42,7 @@
         [self addSubview:_interviewerNameLabel];
         
         _interviewStartTime = [NSString new];
+        _candidateLock = NO;
     }
     return self;
 }

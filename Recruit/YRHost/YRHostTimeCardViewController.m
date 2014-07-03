@@ -116,7 +116,7 @@
     }
     
     self.yrRowNumber = [NSNumber numberWithInt:20];
-    self.yrColumNumber = [[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"];
+    self.yrColumNumber = [[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleColumsKey];
     
     //======================Basic UI=========================//
     self.yrTimeLabelScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, [self.toLeft intValue], self.view.frame.size.height)];
@@ -165,9 +165,9 @@
         [self.columLabels addObject:nameLabel];
     }
     
-    int hour = [[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleStartTime"] intValue];
+    int hour = [[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartTimeKey] intValue];
     int min = 0;
-    int period = [[[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleDuration"] intValue];
+    int period = [[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleDurationKey] intValue];
     
     for (int i=0; i<[self.yrRowNumber intValue] ; i++) {
         
@@ -256,7 +256,7 @@
 -(void)cardOnClick:(id)sender
 {
     if (!dataIsReady) {
-        self.yrSchedulingController.yrTriggeringView = (UIControl*)sender;
+        self.yrSchedulingController.yrTriggeringView = (YRTimeCardView*)sender;
         
         [UIView beginAnimations:@"pop" context:Nil];
         
@@ -313,6 +313,22 @@
                     [[(YRTimeCardView*)sender candidateNameLabel] setText:[NSString stringWithFormat:@"%@ %@",item.candidate.firstName,item.candidate.lastName]];
                     
                     [[(YRTimeCardView*)sender interviewerNameLabel] setText:@""];
+                    
+                    //====================after select slot, bring up picker for engineer==============//
+                    
+                    self.yrSchedulingController.yrTriggeringView = (YRTimeCardView*)sender;
+                    self.yrSchedulingController.yrTriggeringView.candidateLock = YES;
+                    
+                    [UIView beginAnimations:@"pop" context:Nil];
+                    
+                    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
+                    [UIView setAnimationDuration:0.5];
+                    
+                    [self.view addSubview:self.yrSchedulingController.view];
+                    
+                    [UIView commitAnimations];
+                    
+                    dataIsReady = NO;
                 }
                 else
                 {
@@ -325,7 +341,6 @@
             {
                 NSLog(@"the candidate doesn't exist in the list");
             }
-            dataIsReady = NO;
         }
     }
 }
@@ -346,7 +361,7 @@
 -(void)reloadSchedule
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:@"scheduleColums"];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:kYRScheduleColumsKey];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self.yrSchedulingController.view removeFromSuperview];

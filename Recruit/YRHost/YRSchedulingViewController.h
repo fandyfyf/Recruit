@@ -7,12 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "YRTimeCardView.h"
 
 @interface YRSchedulingViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate>
 
 @property (strong, nonatomic) UIPickerView* candidatesPickerView;
 @property (strong, nonatomic) UIPickerView* interviewerPickerView;
-@property (strong, nonatomic) UIControl* yrTriggeringView;
+@property (strong, nonatomic) YRTimeCardView* yrTriggeringView;
 @property (strong, nonatomic) NSMutableArray *yrdataEntry;
 @property (strong, nonatomic) NSMutableArray *yrinterviewerEntry;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;

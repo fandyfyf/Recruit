@@ -19,7 +19,6 @@
     
     if (self) {
         _managedObjectContext = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] managedObjectContext];
-        _localBackUp = [NSMutableArray new];
     }
     return self;
 }
@@ -98,19 +97,27 @@
         [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
         NSDictionary *dict = @{@"recruitID": dic[@"code"]};
         
-        if ([self.localBackUp count] != 0) {
-            
-            for (NSDictionary* dic in self.localBackUp)
-            {
-                [self sendBackUp:dic];
-            }
-            [self.localBackUp removeAllObjects];
-        }
-        
-        
         [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateCodeNotification"
                                                             object:nil
                                                           userInfo:dict];
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+        NSError* error = nil;
+        NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        //reset the core data
+        for (CandidateEntry* backedUpCandidate in FetchResults)
+        {
+            [self.managedObjectContext deleteObject:backedUpCandidate];
+        }
+        
+        for (CandidateEntry* backedUpCandidate in FetchResults)
+        {
+            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":backedUpCandidate.interviewer,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
+            NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+            [self sendBackUp:packet];
+        }
     }
     else if([dic[@"msg"] isEqualToString:@"nameList"])
     {
@@ -181,6 +188,31 @@
     return item;
 }
 
+-(CandidateEntry*)queuingLocalCandidate:(NSDictionary *)infoData
+{
+    CandidateEntry* item = (CandidateEntry*)[NSEntityDescription insertNewObjectForEntityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext];
+    [item setFirstName:infoData[@"firstName"]];
+    [item setLastName:infoData[@"lastName"]];
+    [item setEmailAddress:infoData[@"email"]];
+    [item setInterviewer:infoData[@"interviewer"]];
+    [item setCode:infoData[@"code"]];
+    [item setRecommand:infoData[@"recommand"]];
+    [item setStatus:infoData[@"status"]];
+    [item setPdf:infoData[@"pdf"]];
+    [item setPosition:infoData[@"position"]];
+    [item setPreference:infoData[@"preference"]];
+    [item setDate:infoData[@"date"]];
+    [item setNotes:infoData[@"note"]];
+    [item setRank:[NSNumber numberWithFloat:[(NSString*)infoData[@"rank"] floatValue]]];
+    [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
+    
+    NSError *error = nil;
+    if (![self.managedObjectContext save:&error]) {
+        NSLog(@"ERROR -- saving coredata");
+    }
+    return item;
+}
+
 -(void)sendData:(NSDictionary*)data
 {
     NSMutableData* yrdataToSend = [NSMutableData new];
@@ -200,11 +232,8 @@
     if(error){
         NSLog(@"%@", [error localizedDescription]);
         
-        
-        if (self.localBackUp == nil) {
-            self.localBackUp = [NSMutableArray new];
-        }
-        [self.localBackUp addObject:@{@"msg" : @"backup" , @"data" : data[@"data"]}];
+        //save the data in local core data
+        [self queuingLocalCandidate:data[@"data"]];
     }
 }
 

@@ -92,9 +92,13 @@
     }
     else
     {
-        [[self.yrSignOutButton layer] setCornerRadius:25];
+        [[self.yrSignOutButton layer] setCornerRadius:30];
         [[self.yrSignOutButton layer] setBorderColor:[[UIColor lightGrayColor] CGColor]];
         [[self.yrSignOutButton layer] setBorderWidth:2];
+        
+        [[self.yrContinueButton layer] setCornerRadius:30];
+        [[self.yrContinueButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+        [[self.yrContinueButton layer] setBorderWidth:2];
     }
 }
 

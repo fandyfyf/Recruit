@@ -7,7 +7,11 @@
 //
 
 #import "YRAppDelegate.h"
-#import "YRMCManager.h"
+
+NSString* const kYREmailKeyWordsKey = @"emailKeyWords";
+NSString* const kYRScheduleColumsKey = @"scheduleColums";
+NSString* const kYRScheduleStartTimeKey = @"scheduleStartTime";
+NSString* const kYRScheduleDurationKey = @"scheduleDuration";
 
 @implementation YRAppDelegate
 
@@ -21,45 +25,23 @@
     self.mcManager = [YRMCManager new];
     if([[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"] == nil)
     {
-        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:3] forKey:@"scheduleColums"];
-        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:8] forKey:@"scheduleStartTime"];
-        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:45] forKey:@"scheduleDuration"];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:3] forKey:kYRScheduleColumsKey];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:8] forKey:kYRScheduleStartTimeKey];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:45] forKey:kYRScheduleDurationKey];
     }
-    NSDictionary* dic = @{@"studentRid" : @"studentRid",
-                          @"studentName" : @"studentName",
-                          @"studentEmail" : @"studentEmail",
-                          @"interviewerName" : @"interviewerName",
-                          @"interviewerEmail" : @"interviewerEmail",
-                          @"interviewStartTime" : @"interviewStartTime",
-                          @"interviewDuration" : @"interviewDuration"
-                          };
+    NSArray* dic = @[@{@"studentRid" : @"studentRid"},
+                     @{@"studentName" : @"studentName"},
+                     @{@"studentEmail" : @"studentEmail"},
+                     @{@"interviewerName" : @"interviewerName"},
+                     @{@"interviewerEmail" : @"interviewerEmail"},
+                     @{@"interviewStartTime" : @"interviewStartTime"},
+                     @{@"interviewDuration" : @"interviewDuration"}
+                          ];
     
-    [[NSUserDefaults standardUserDefaults] setObject:dic forKey:@"emailKeyWords"];
+    [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailKeyWordsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    CandidateEntry* item = (CandidateEntry*)[NSEntityDescription insertNewObjectForEntityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext];
-    [item setFirstName:@"Tom"];
-    [item setLastName:@"Cruise"];
-    [item setEmailAddress:@"tom@gmail.com"];
-    [item setInterviewer:@"edgeOfTomorrow"];
-    [item setCode:@"Test-1"];
-    
-    
-    [item setRecommand:[NSNumber numberWithBool:YES]];
-    [item setStatus:@"pending"];
-    [item setPdf:[NSNumber numberWithBool:NO]];
-    [item setPosition:@"Intern"];
-    [item setPreference:@"Actor"];
-    [item setDate:[NSDate date]];
-    [item setNotes:@"Note"];
-    [item setRank:[NSNumber numberWithFloat:3.5]];
-    [item setGpa:[NSNumber numberWithFloat:3.5]];
-    
-    NSError *error = nil;
-    if (![self.managedObjectContext save:&error]) {
-        NSLog(@"ERROR -- saving coredata");
-    }
-
+    self.emailGenerator = [[YREmailGenerator alloc] init];
     
     return YES;
 }

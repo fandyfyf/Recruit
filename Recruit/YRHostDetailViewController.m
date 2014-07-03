@@ -304,7 +304,7 @@
 
 - (IBAction)backgroundTapped:(id)sender {
     [UIView beginAnimations:@"move" context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.2];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrCommentTextView.frame = CGRectMake(84, 610, 600, 325);
@@ -327,6 +327,16 @@
 
 - (IBAction)emailCandidate:(id)sender {
     [self removeViews];
+    [self updateCoreData];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.dataSource.code]];
+    NSError* error = nil;
+    NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
+    CandidateEntry* selected = mutableFetchResults[0];
+    [[self.appDelegate emailGenerator] setSelectedCandidate:selected];
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.emailOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 150, 200)];
     }
@@ -357,10 +367,8 @@
         [self.popOver setPopoverContentSize:CGSizeMake(150, 200)];
         [self.popOver presentPopoverFromRect:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 150, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
     }
-    else
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
-//        [self.popOver setPopoverContentSize:CGSizeMake(100, 200)];
-//        [self.popOver presentPopoverFromRect:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 100, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
         [self.emailOptionView setBackgroundColor:[UIColor purpleColor]];
         titleLabel.textColor = [UIColor whiteColor];
         self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
@@ -396,7 +404,13 @@
     
     for (Appointment* ap in self.dataSource.appointments)
     {
-        NSLog(@"%@ with %@",ap.startTime,ap.interviewers.name);
+        if (ap.interviewers == nil) {
+            NSLog(@"%@ with - TBA",ap.startTime);
+        }
+        else
+        {
+            NSLog(@"%@ with - %@",ap.startTime,ap.interviewers.name);
+        }
     }
     
     self.scheduleView = [[UIView alloc] initWithFrame:CGRectMake(self.checkInterviewButton.center.x-half, self.checkInterviewButton.center.y+[self.checkInterviewButton layer].cornerRadius+5, 2*half, 200)];
@@ -523,7 +537,7 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
     
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@ and lastName = %@",self.dataSource.code,self.dataSource.firstName,self.dataSource.lastName]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.dataSource.code]];
     
     NSError* error = nil;
     NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
@@ -576,7 +590,11 @@
 {
     if ([MFMailComposeViewController canSendMail]) {
         NSString *emailTitle = @"Letter From Yahoo!";
-        NSString *messageBody = @"Message goes here!";
+        //NSString *messageBody = @"Message goes here!";
+        NSString *messageBody = [[self.appDelegate emailGenerator] generateEmail:@"Dear studentName,\n\n    I am thrilled to inform you that you will have an interviewDuration mins interview with one of our Engineer."];
+        
+        
+        
         NSArray *toRecipents = [NSArray arrayWithObject:self.yrEmailTextField.text];
         
         self.yrMailViewController = [[MFMailComposeViewController alloc] init];
@@ -617,14 +635,14 @@
 -(void)tapOnLabel:(UITapGestureRecognizer*)gestureRecognizer
 {
     [self removeViews];
+    
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor darkGrayColor];
+    self.grayView.alpha = 0.5;
+    [self.grayView addTarget:self action:@selector(cancelRankChange) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.grayView];
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-        self.grayView.backgroundColor = [UIColor darkGrayColor];
-        self.grayView.alpha = 0.5;
-        [self.grayView addTarget:self action:@selector(cancelRankChange) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:self.grayView];
-        
-        
         self.rankOneButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.rankOneButton setTitle:@"1" forState:UIControlStateNormal];
         [self.rankOneButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
@@ -715,7 +733,92 @@
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
+        self.rankOneButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankOneButton setTitle:@"1" forState:UIControlStateNormal];
+        [self.rankOneButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankOneButton.backgroundColor = [UIColor redColor];
+        [[self.rankOneButton layer] setCornerRadius:15];
+        [[self.rankOneButton layer] setBorderWidth:2];
+        [[self.rankOneButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankOneButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:30]];
+        [self.rankOneButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankOneButton.alpha = 0.6;
         
+        self.rankTwoButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankTwoButton setTitle:@"2" forState:UIControlStateNormal];
+        [self.rankTwoButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankTwoButton.backgroundColor = [UIColor redColor];
+        [[self.rankTwoButton layer] setCornerRadius:17.5];
+        [[self.rankTwoButton layer] setBorderWidth:2];
+        [[self.rankTwoButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankTwoButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:35]];
+        [self.rankTwoButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankTwoButton.alpha = 0.7;
+        
+        self.rankThreeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankThreeButton setTitle:@"3" forState:UIControlStateNormal];
+        [self.rankThreeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankThreeButton.backgroundColor = [UIColor redColor];
+        [[self.rankThreeButton layer] setCornerRadius:20];
+        [[self.rankThreeButton layer] setBorderWidth:2];
+        [[self.rankThreeButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankThreeButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:40]];
+        [self.rankThreeButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankThreeButton.alpha = 0.8;
+        
+        self.rankThreeHalfButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankThreeHalfButton setTitle:@"3.5" forState:UIControlStateNormal];
+        [self.rankThreeHalfButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankThreeHalfButton.backgroundColor = [UIColor redColor];
+        [[self.rankThreeHalfButton layer] setCornerRadius:22.5];
+        [[self.rankThreeHalfButton layer] setBorderWidth:2];
+        [[self.rankThreeHalfButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankThreeHalfButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:30]];
+        [self.rankThreeHalfButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankThreeHalfButton.alpha = 0.9;
+        
+        self.rankFourButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rankFourButton setTitle:@"4" forState:UIControlStateNormal];
+        [self.rankFourButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rankFourButton.backgroundColor = [UIColor redColor];
+        [[self.rankFourButton layer] setCornerRadius:25];
+        [[self.rankFourButton layer] setBorderWidth:2];
+        [[self.rankFourButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [self.rankFourButton.titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:50]];
+        [self.rankFourButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
+        self.rankFourButton.alpha = 1.0;
+        
+        [self.rankOneButton setFrame:CGRectMake(255, 102, 30, 30)];
+        [self.rankTwoButton setFrame:CGRectMake(255, 102, 35, 35)];
+        [self.rankThreeButton setFrame:CGRectMake(255, 102, 40, 40)];
+        [self.rankThreeHalfButton setFrame:CGRectMake(255, 102, 45, 45)];
+        [self.rankFourButton setFrame:CGRectMake(255, 102, 50, 50)];
+        
+        [self.rankOneButton setCenter:CGPointMake(255, 102)];
+        [self.rankTwoButton setCenter:CGPointMake(255, 102)];
+        [self.rankThreeButton setCenter:CGPointMake(255, 102)];
+        [self.rankThreeHalfButton setCenter:CGPointMake(255, 102)];
+        [self.rankFourButton setCenter:CGPointMake(255, 102)];
+        
+        
+        [self.view addSubview:self.rankOneButton];
+        [self.view addSubview:self.rankTwoButton];
+        [self.view addSubview:self.rankThreeButton];
+        [self.view addSubview:self.rankThreeHalfButton];
+        [self.view addSubview:self.rankFourButton];
+        
+        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [self.rankOneButton setFrame:CGRectMake(240, 11, 30, 30)];
+            [self.rankTwoButton setFrame:CGRectMake(192, 28, 35, 35)];
+            [self.rankThreeButton setFrame:CGRectMake(169, 82, 40, 40)];
+            [self.rankThreeHalfButton setFrame:CGRectMake(192, 134, 45, 45)];
+            [self.rankFourButton setFrame:CGRectMake(251, 146, 50, 50)];} completion:^(BOOL finished){spin = NO;}];
+        spin = YES;
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeHalfButton withDuration:0.1f withAngle:M_PI/2];
+        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankFourButton withDuration:0.1f withAngle:M_PI/2];
     }
 //    self.yrRankTextLabel.hidden = NO;
 //    [self.yrRankTextLabel becomeFirstResponder];
@@ -724,7 +827,7 @@
 -(void)doneWithPad
 {
     [UIView beginAnimations:@"move" context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.2];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrCommentTextView.frame = CGRectMake(84, 610, 600, 325);
@@ -734,12 +837,12 @@
     }
     [UIView commitAnimations];
     
-    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-        [self.rankOneButton setFrame:CGRectMake(603, 157, 80, 80)];
-        [self.rankTwoButton setFrame:CGRectMake(603, 157, 85, 85)];
-        [self.rankThreeButton setFrame:CGRectMake(603, 157, 90, 90)];
-        [self.rankThreeHalfButton setFrame:CGRectMake(603, 157, 95, 95)];
-        [self.rankFourButton setFrame:CGRectMake(603, 157, 100, 100)];;} completion:nil];
+//    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+//        [self.rankOneButton setFrame:CGRectMake(603, 157, 80, 80)];
+//        [self.rankTwoButton setFrame:CGRectMake(603, 157, 85, 85)];
+//        [self.rankThreeButton setFrame:CGRectMake(603, 157, 90, 90)];
+//        [self.rankThreeHalfButton setFrame:CGRectMake(603, 157, 95, 95)];
+//        [self.rankFourButton setFrame:CGRectMake(603, 157, 100, 100)];;} completion:nil];
     
     [self.yrCommentTextView resignFirstResponder];
     [self.yrFirstNameTextField resignFirstResponder];
@@ -765,34 +868,65 @@
         self.yrRankLabel.text = [self.dataSource.rank stringValue];
         self.yrHalfRankLabel.hidden = YES;
     }
-    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-        [self.rankOneButton setCenter:CGPointMake(603, 157)];
-         [self.rankTwoButton setCenter:CGPointMake(603, 157)];
-         [self.rankThreeButton setCenter:CGPointMake(603, 157)];
-         [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
-         [self.rankFourButton setCenter:CGPointMake(603, 157)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
-            [self.rankOneButton removeFromSuperview];
-            [self.rankTwoButton removeFromSuperview];
-            [self.rankThreeButton removeFromSuperview];
-            [self.rankThreeHalfButton removeFromSuperview];
-            [self.rankFourButton removeFromSuperview];}];
     
-    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [self.rankOneButton setCenter:CGPointMake(603, 157)];
+            [self.rankTwoButton setCenter:CGPointMake(603, 157)];
+            [self.rankThreeButton setCenter:CGPointMake(603, 157)];
+            [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
+            [self.rankFourButton setCenter:CGPointMake(603, 157)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
+                [self.rankOneButton removeFromSuperview];
+                [self.rankTwoButton removeFromSuperview];
+                [self.rankThreeButton removeFromSuperview];
+                [self.rankThreeHalfButton removeFromSuperview];
+                [self.rankFourButton removeFromSuperview];}];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [self.rankOneButton setCenter:CGPointMake(255, 102)];
+            [self.rankTwoButton setCenter:CGPointMake(255, 102)];
+            [self.rankThreeButton setCenter:CGPointMake(255, 102)];
+            [self.rankThreeHalfButton setCenter:CGPointMake(255, 102)];
+            [self.rankFourButton setCenter:CGPointMake(255, 102)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
+                [self.rankOneButton removeFromSuperview];
+                [self.rankTwoButton removeFromSuperview];
+                [self.rankThreeButton removeFromSuperview];
+                [self.rankThreeHalfButton removeFromSuperview];
+                [self.rankFourButton removeFromSuperview];}];
+    }
 }
 
 -(void)cancelRankChange
 {
-    [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-        [self.rankOneButton setCenter:CGPointMake(603, 157)];
-        [self.rankTwoButton setCenter:CGPointMake(603, 157)];
-        [self.rankThreeButton setCenter:CGPointMake(603, 157)];
-        [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
-        [self.rankFourButton setCenter:CGPointMake(603, 157)];;} completion:^(BOOL finished){[self.grayView removeFromSuperview];
-            [self.rankOneButton removeFromSuperview];
-            [self.rankTwoButton removeFromSuperview];
-            [self.rankThreeButton removeFromSuperview];
-            [self.rankThreeHalfButton removeFromSuperview];
-            [self.rankFourButton removeFromSuperview];}];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [self.rankOneButton setCenter:CGPointMake(603, 157)];
+            [self.rankTwoButton setCenter:CGPointMake(603, 157)];
+            [self.rankThreeButton setCenter:CGPointMake(603, 157)];
+            [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
+            [self.rankFourButton setCenter:CGPointMake(603, 157)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
+                [self.rankOneButton removeFromSuperview];
+                [self.rankTwoButton removeFromSuperview];
+                [self.rankThreeButton removeFromSuperview];
+                [self.rankThreeHalfButton removeFromSuperview];
+                [self.rankFourButton removeFromSuperview];}];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [self.rankOneButton setCenter:CGPointMake(255, 102)];
+            [self.rankTwoButton setCenter:CGPointMake(255, 102)];
+            [self.rankThreeButton setCenter:CGPointMake(255, 102)];
+            [self.rankThreeHalfButton setCenter:CGPointMake(255, 102)];
+            [self.rankFourButton setCenter:CGPointMake(255, 102)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
+                [self.rankOneButton removeFromSuperview];
+                [self.rankTwoButton removeFromSuperview];
+                [self.rankThreeButton removeFromSuperview];
+                [self.rankThreeHalfButton removeFromSuperview];
+                [self.rankFourButton removeFromSuperview];}];
+    }
 }
 
 -(void)removeViews
@@ -814,7 +948,7 @@
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
     [UIView beginAnimations:@"move" context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.4];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrCommentTextView.frame = CGRectMake(30, 350, 708, 385);
@@ -949,7 +1083,14 @@
         if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
         }
-        cell.textLabel.text = [NSString stringWithFormat:@"%@   with %@",[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] startTime], [[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] interviewers] name]];
+        
+        if ([(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] interviewers] == nil) {
+            cell.textLabel.text = [NSString stringWithFormat:@"%@   with - TBA",[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] startTime]];
+        }
+        else
+        {
+            cell.textLabel.text = [NSString stringWithFormat:@"%@   with - %@",[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] startTime], [[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] interviewers] name]];
+        }
         
         //cell.detailLabel
         cell.detailTextLabel.text = [NSString stringWithFormat:@"Room %d",[[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] apIndex_y] intValue]+1];
@@ -964,15 +1105,15 @@
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         }
         if (indexPath.row == 0) {
-            cell.textLabel.text = @"Opt1";
+            cell.textLabel.text = @"Rejection";
         }
         else if (indexPath.row == 1)
         {
-            cell.textLabel.text = @"Opt2";
+            cell.textLabel.text = @"Invitation";
         }
         else
         {
-            cell.textLabel.text = @"Opt3";
+            cell.textLabel.text = @"Confirmation";
         }
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
             cell.textLabel.font = [UIFont systemFontOfSize:12];
@@ -992,6 +1133,7 @@
             [self email];
         }
     }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end

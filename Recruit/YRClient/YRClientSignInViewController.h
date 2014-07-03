@@ -21,6 +21,7 @@
 @property (strong, nonatomic) NSString* clientUserName;
 @property (weak, nonatomic) IBOutlet UILabel *yrnameLabel;
 @property (weak, nonatomic) IBOutlet UIButton *yrSignOutButton;
+@property (weak, nonatomic) IBOutlet UIButton *yrContinueButton;
 
 @property (weak, nonatomic) IBOutlet UITextField *yrFirstNameTextField;
 @property (weak, nonatomic) IBOutlet UITextField *yrLastNameTextField;

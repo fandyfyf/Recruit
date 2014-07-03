@@ -105,7 +105,8 @@
     }
     else
     {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"GPA can't be empty!" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        //wait until GPA is filled out
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"GPA can't be empty!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
         [alert show];
     }
 }

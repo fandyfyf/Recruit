@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) NSMutableArray *yrarrayConnectedDevices;
 
+-(void)debuggerFunction;
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
 -(void)needUpdateTableNotification:(NSNotification *)notification;
 
@@ -32,6 +33,11 @@
     
     self.hostUserName = self.appDelegate.mcManager.userName;
     NSLog(@"Hello: %@ as a Host",self.hostUserName);
+    
+    [self debuggerFunction];
+    
+    
+    
     
     [self.yrnameLabel setText:self.hostUserName];
     //self.yrnameLabel.textAlignment = NSTextAlignmentCenter;
@@ -130,6 +136,34 @@
 - (IBAction)backgroundTapped:(id)sender {
     [self.yrPrefixTextField resignFirstResponder];
     self.yrPrefix = self.yrPrefixTextField.text;
+}
+
+-(void)debuggerFunction
+{
+    if ([self.hostUserName isEqualToString:@"kirito"]) {
+        CandidateEntry* item = (CandidateEntry*)[NSEntityDescription insertNewObjectForEntityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext];
+        [item setFirstName:@"Tom"];
+        [item setLastName:@"Cruise"];
+        [item setEmailAddress:@"tom@gmail.com"];
+        [item setInterviewer:@"edgeOfTomorrow"];
+        [item setCode:@"Test-1"];
+        
+        
+        [item setRecommand:[NSNumber numberWithBool:YES]];
+        [item setStatus:@"pending"];
+        [item setPdf:[NSNumber numberWithBool:NO]];
+        [item setPosition:@"Intern"];
+        [item setPreference:@"Actor"];
+        [item setDate:[NSDate date]];
+        [item setNotes:@"Note"];
+        [item setRank:[NSNumber numberWithFloat:3.5]];
+        [item setGpa:[NSNumber numberWithFloat:3.5]];
+        
+        NSError *error = nil;
+        if (![self.managedObjectContext save:&error]) {
+            NSLog(@"ERROR -- saving coredata");
+        }
+    }
 }
 
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification{

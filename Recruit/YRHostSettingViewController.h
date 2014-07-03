@@ -22,7 +22,7 @@
 @property (strong,nonatomic) UITextField* interviewerCode;
 
 @property (strong, nonatomic) NSMutableArray* interviewerArray;
-@property (strong, nonatomic) NSDictionary* emailKeywordDictionary;
+@property (strong, nonatomic) NSArray* emailKeywordArray;
 @property (weak, nonatomic) IBOutlet UITextField *interviewStartTime;
 @property (weak, nonatomic) IBOutlet UITextField *interviewDuration;
 @property (weak, nonatomic) IBOutlet UITextField *interviewLocations;
