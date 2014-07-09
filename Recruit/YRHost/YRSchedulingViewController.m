@@ -15,6 +15,7 @@
 
 -(void)cancelDetail;
 -(void)saveDetail;
+-(void)deleteDetail;
 -(void)fetch;
 -(BOOL)checkCandidateAvailability:(CandidateEntry*)candidate atTime:(NSString*)time;
 -(BOOL)checkInterviewerAvailability:(Interviewer*)interviewer atTime:(NSString*)time;
@@ -52,28 +53,35 @@
     self.interviewerPickerView.dataSource = self;
     
     //diable user interaction on picker view doesn't work
-    if (self.yrTriggeringView.candidateLock) {
-        [self.candidatesPickerView setUserInteractionEnabled:NO];
-    }
+//    if (self.yrTriggeringView.candidateLock) {
+//        [self.candidatesPickerView setUserInteractionEnabled:NO];
+//    }
     
     [self.view addSubview:self.candidatesPickerView];
     [self.view addSubview:self.interviewerPickerView];
     
     UIButton* cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     UIButton* doneButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    UIButton* deleteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    
     [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [doneButton setTitle:@"Done" forState:UIControlStateNormal];
+    [deleteButton setTitle:@"Delete" forState:UIControlStateNormal];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [cancelButton setFrame:CGRectMake(50, 480, 150, 50)];
         cancelButton.titleLabel.font = [UIFont systemFontOfSize:35];
         doneButton.titleLabel.font = [UIFont systemFontOfSize:35];
+        deleteButton.titleLabel.font = [UIFont systemFontOfSize:35];
+        
+        [cancelButton setFrame:CGRectMake(50, 480, 150, 50)];
         [doneButton setFrame:CGRectMake(self.view.frame.size.width-200, 480, 150, 50)];
+        [deleteButton setFrame:CGRectMake(self.view.center.x - 75, 480, 150, 50)];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
         [cancelButton setFrame:CGRectMake(20, 480, 50, 30)];
         [doneButton setFrame:CGRectMake(self.view.frame.size.width-70, 480, 50, 30)];
+        [deleteButton setFrame:CGRectMake(self.view.center.x-25, 480, 50, 30)];
     }
     [cancelButton setTintColor:[UIColor purpleColor]];
     [cancelButton addTarget:self action:@selector(cancelDetail) forControlEvents:UIControlEventTouchUpInside];
@@ -85,6 +93,12 @@
     [doneButton.titleLabel setTextAlignment:NSTextAlignmentRight];
     
     [self.view addSubview:doneButton];
+    
+    [deleteButton setTintColor:[UIColor purpleColor]];
+    [deleteButton addTarget:self action:@selector(deleteDetail) forControlEvents:UIControlEventTouchUpInside];
+    [deleteButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+    
+    [self.view addSubview:deleteButton];
     
     [UIView beginAnimations:@"pop" context:Nil];
     
@@ -167,6 +181,7 @@
     [self.view removeFromSuperview];
     
     [UIView commitAnimations];
+    self.yrTriggeringView.candidateLock = NO;
 }
 
 -(void)saveDetail
@@ -180,6 +195,24 @@
     [self.view removeFromSuperview];
     
     [UIView commitAnimations];
+    self.yrTriggeringView.candidateLock = NO;
+}
+
+-(void)deleteDetail
+{
+    self.selectedCode = @"";
+    
+    [self addContent:self.yrTriggeringView];
+    
+    [UIView beginAnimations:@"disappear" context:Nil];
+    
+    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.view.superview cache:NO];
+    [UIView setAnimationDuration:0.5];
+    
+    [self.view removeFromSuperview];
+    
+    [UIView commitAnimations];
+    self.yrTriggeringView.candidateLock = NO;
 }
 
 -(void)fetch

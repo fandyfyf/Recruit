@@ -25,6 +25,8 @@
 -(void)reconnectNotification:(NSNotification *)notification;
 -(void)removeListView;
 -(BOOL)checkReady;
+-(void)nextCandidateField;
+-(void)doneWithCandidateFields;
 @end
 
 @implementation YRClientSignInViewController
@@ -100,6 +102,25 @@
         [[self.yrContinueButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
         [[self.yrContinueButton layer] setBorderWidth:2];
     }
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Next" style:UIBarButtonItemStyleDone target:self action:@selector(nextCandidateField)],
+                         nil];
+    self.yrFirstNameTextField.inputAccessoryView = doneToolbar;
+    self.yrLastNameTextField.inputAccessoryView = doneToolbar;
+    
+    doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithCandidateFields)],
+                         nil];
+    
+    self.yrEmailTextField.inputAccessoryView = doneToolbar;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -265,6 +286,24 @@
     }
 }
 
+-(void)nextCandidateField
+{
+    if ([self.yrFirstNameTextField isFirstResponder]) {
+        //[self.interviewerName resignFirstResponder];
+        [self.yrLastNameTextField becomeFirstResponder];
+    }
+    else if ([self.yrLastNameTextField isFirstResponder]) {
+        //[self.interviewerEmail resignFirstResponder];
+        [self.yrEmailTextField becomeFirstResponder];
+    }
+}
+
+-(void)doneWithCandidateFields
+{
+    [self.yrEmailTextField resignFirstResponder];
+}
+
+
 #pragma mark - MCNearByServiceBrowserDelegate
 
 -(void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary *)info
@@ -401,6 +440,32 @@
         
         [self.yrNameListView removeFromSuperview];
         
+        //send out backUp here with the updated name
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];
+        NSError* error = nil;
+        NSArray* FetchResults = [self.appDelegate.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        for (CandidateEntry* backedUpCandidate in FetchResults)
+        {
+            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
+            NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+            [self.appDelegate.dataManager sendBackUp:packet];
+            NSLog(@"sending one entry");
+        }
+        
+        //reset the core data
+        for (CandidateEntry* backedUpCandidate in FetchResults)
+        {
+            [self.appDelegate.managedObjectContext deleteObject:backedUpCandidate];
+            NSLog(@"deleting one coredata entry");
+        }
+        
+        if (![self.appDelegate.managedObjectContext save:&error]) {
+            NSLog(@"ERROR -- saving coredata");
+        }
+
         [[NSNotificationCenter defaultCenter] postNotificationName:@"removeNameListNotification" object:nil];
     }
 }

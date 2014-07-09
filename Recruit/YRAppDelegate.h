@@ -10,13 +10,12 @@
 #import "YRMCManager.h"
 #import "YRDataManager.h"
 #import "YREmailGenerator.h"
-//@class YRDataManager;
-//@class YRMCManager;
 
 FOUNDATION_EXPORT NSString* const kYREmailKeyWordsKey;
 FOUNDATION_EXPORT NSString* const kYRScheduleDurationKey;
 FOUNDATION_EXPORT NSString* const kYRScheduleColumsKey;
 FOUNDATION_EXPORT NSString* const kYRScheduleStartTimeKey;
+FOUNDATION_EXPORT NSString* const kYREmailFormsKey;
 
 @interface YRAppDelegate : UIResponder <UIApplicationDelegate>
 

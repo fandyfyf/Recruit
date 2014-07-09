@@ -18,6 +18,7 @@
 -(void)debuggerFunction;
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
 -(void)needUpdateTableNotification:(NSNotification *)notification;
+-(void)doneWithPad;
 
 @end
 
@@ -35,9 +36,6 @@
     NSLog(@"Hello: %@ as a Host",self.hostUserName);
     
     [self debuggerFunction];
-    
-    
-    
     
     [self.yrnameLabel setText:self.hostUserName];
     //self.yrnameLabel.textAlignment = NSTextAlignmentCenter;
@@ -70,6 +68,15 @@
         [[self.yrSignOutButton layer] setBorderColor:[[UIColor lightGrayColor] CGColor]];
         [[self.yrSignOutButton layer] setBorderWidth:2];
     }
+    
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],
+                         nil];
+    self.yrPrefixTextField.inputAccessoryView = doneToolbar;
 }
 
 - (void)didReceiveMemoryWarning
@@ -111,23 +118,31 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+//switch has a bug, and need to be fixed in a better way
 - (IBAction)toggleVisibility:(id)sender {
     [self.yrPrefixTextField resignFirstResponder];
     self.yrPrefix = self.yrPrefixTextField.text;
     
     if (self.yrVisibilityControl.isOn) {
-        [self.yrPrefixTextField setEnabled:NO];
+        if (self.yrPrefixTextField.isEnabled) {
+            [self.yrPrefixTextField setEnabled:NO];
+        }
+        self.appDelegate.dataManager = nil;
         if ([self.appDelegate dataManager] == nil) {
             [self.appDelegate setDataManager:[[YRDataManager alloc] initWithPrefix:self.yrPrefix]];
+            [[self.appDelegate dataManager] startListeningForData];
         }
         [[self.appDelegate dataManager] setHost:YES];
-        [[self.appDelegate dataManager] startListeningForData];
     }
     else
     {
-        [self.yrPrefixTextField setEnabled:YES];
-        [self.appDelegate.dataManager stopListeningForData];
-        [self.appDelegate setDataManager:nil];
+        if (!self.yrPrefixTextField.isEnabled) {
+            [self.yrPrefixTextField setEnabled:YES];
+        }
+        if (self.appDelegate.dataManager != nil) {
+            [self.appDelegate.dataManager stopListeningForData];
+            [self.appDelegate setDataManager:nil];
+        }
     }
     
     [[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
@@ -201,6 +216,12 @@
 -(void)needUpdateTableNotification:(NSNotification *)notification
 {
     //
+}
+
+-(void)doneWithPad
+{
+    [self.yrPrefixTextField resignFirstResponder];
+    self.yrPrefix = self.yrPrefixTextField.text;
 }
 
 #pragma mark - MCBrowserViewControllerDelegate

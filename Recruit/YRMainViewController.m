@@ -11,6 +11,8 @@
 
 @interface YRMainViewController ()
 
+-(void)doneWithPad;
+
 @end
 
 @implementation YRMainViewController
@@ -39,6 +41,16 @@
         [[self.yrSignInButton layer] setBorderWidth:2];
         [[self.yrSignInButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
     }
+    
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],
+                         nil];
+    self.yrtextField.inputAccessoryView = doneToolbar;
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -73,6 +85,11 @@
             [self performSegueWithIdentifier:@"MainToClient" sender:self];
         }
     }
+}
+
+-(void)doneWithPad
+{
+    [self.yrtextField resignFirstResponder];
 }
 
 #pragma mark - UITextFieldDelegate

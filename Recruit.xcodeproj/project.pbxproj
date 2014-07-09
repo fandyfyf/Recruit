@@ -10,6 +10,7 @@
 		D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */; };
 		D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */; };
 		D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414D1959D838004A31E1 /* YRTimeCardView.m */; };
+		D251C65F196CA8B8003E86FD /* goldStar.png in Resources */ = {isa = PBXBuildFile; fileRef = D251C65E196CA8B8003E86FD /* goldStar.png */; };
 		D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D25268A7194F3E6100EBE43E /* MessageUI.framework */; };
 		D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */; };
 		D25268B019507D7700EBE43E /* document.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268AF19507D7700EBE43E /* document.png */; };
@@ -20,6 +21,10 @@
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
+		D2B5313B196AF1400019C7D7 /* clock.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B5313A196AF1400019C7D7 /* clock.png */; };
+		D2B5313D196B0AFE0019C7D7 /* Camera1.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B5313C196B0AFE0019C7D7 /* Camera1.png */; };
+		D2B5313F196B0B410019C7D7 /* Camera2.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B5313E196B0B410019C7D7 /* Camera2.png */; };
+		D2B53141196C994B0019C7D7 /* camera3.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B53140196C994B0019C7D7 /* camera3.png */; };
 		D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */; };
 		D2BB4212195DC7E8002ECCC9 /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = D2BB4211195DC7E8002ECCC9 /* Appointment.m */; };
 		D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */; };
@@ -72,6 +77,7 @@
 		D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRSchedulingViewController.m; sourceTree = "<group>"; };
 		D243414C1959D838004A31E1 /* YRTimeCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRTimeCardView.h; sourceTree = "<group>"; };
 		D243414D1959D838004A31E1 /* YRTimeCardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRTimeCardView.m; sourceTree = "<group>"; };
+		D251C65E196CA8B8003E86FD /* goldStar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = goldStar.png; sourceTree = "<group>"; };
 		D25268A7194F3E6100EBE43E /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main_iPad.storyboard; sourceTree = "<group>"; };
 		D25268AF19507D7700EBE43E /* document.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = document.png; sourceTree = "<group>"; };
@@ -85,6 +91,10 @@
 		D2A6806F194BA00F0091B768 /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostDetailViewController.m; path = Recruit/YRHostDetailViewController.m; sourceTree = SOURCE_ROOT; };
+		D2B5313A196AF1400019C7D7 /* clock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clock.png; sourceTree = "<group>"; };
+		D2B5313C196B0AFE0019C7D7 /* Camera1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Camera1.png; sourceTree = "<group>"; };
+		D2B5313E196B0B410019C7D7 /* Camera2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Camera2.png; sourceTree = "<group>"; };
+		D2B53140196C994B0019C7D7 /* camera3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera3.png; sourceTree = "<group>"; };
 		D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yahoo-icon.png"; sourceTree = "<group>"; };
 		D2BB4210195DC7E8002ECCC9 /* Appointment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Appointment.h; sourceTree = "<group>"; };
 		D2BB4211195DC7E8002ECCC9 /* Appointment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Appointment.m; sourceTree = "<group>"; };
@@ -210,7 +220,12 @@
 		D2F8186019465FE5006E88FD /* Recruit */ = {
 			isa = PBXGroup;
 			children = (
+				D251C65E196CA8B8003E86FD /* goldStar.png */,
+				D2B5313A196AF1400019C7D7 /* clock.png */,
+				D2B53140196C994B0019C7D7 /* camera3.png */,
 				D2D1E5761961BE2B0084D8DA /* camera.png */,
+				D2B5313E196B0B410019C7D7 /* Camera2.png */,
+				D2B5313C196B0AFE0019C7D7 /* Camera1.png */,
 				D2D1E57419611BC90084D8DA /* Columbia_engineering.jpg */,
 				D2D1E5721960E3370084D8DA /* email.png */,
 				D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */,
@@ -402,8 +417,13 @@
 				D2F8186519465FE5006E88FD /* InfoPlist.strings in Resources */,
 				D2F8186E19465FE5006E88FD /* Main_iPhone.storyboard in Resources */,
 				D2D1E5731960E3370084D8DA /* email.png in Resources */,
+				D2B53141196C994B0019C7D7 /* camera3.png in Resources */,
+				D251C65F196CA8B8003E86FD /* goldStar.png in Resources */,
+				D2B5313D196B0AFE0019C7D7 /* Camera1.png in Resources */,
 				D2D1E5771961BE2B0084D8DA /* camera.png in Resources */,
 				D25268B219507D8D00EBE43E /* folder.png in Resources */,
+				D2B5313F196B0B410019C7D7 /* Camera2.png in Resources */,
+				D2B5313B196AF1400019C7D7 /* clock.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

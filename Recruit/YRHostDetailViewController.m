@@ -23,12 +23,14 @@
 -(void)changeRank:(id)sender;
 -(void)cancelRankChange;
 -(void)removeViews;
+-(void)checkScheduleFunction;
 
 @end
 
 @implementation YRHostDetailViewController
 {
     BOOL spin;
+    int currentSelectedEmailForm;
 }
 
 - (void)viewDidLoad
@@ -69,7 +71,7 @@
         
         [self.yrRecommendSwitch setOn:YES animated:YES];
         self.yrRecommendLabel.hidden = NO;
-        self.yrRecommandMark.textColor = [UIColor redColor];
+        self.yrRecommandMark.textColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
     }
     else
     {
@@ -125,8 +127,24 @@
         self.yrHalfRankLabel.hidden = YES;
     }
     
-    
     self.yrGPATextField.text = [NSString stringWithFormat:@"%@",self.dataSource.gpa];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.dataSource.code]];
+    NSError* error = nil;
+    NSArray* FetchResults = [[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+    
+    if ([FetchResults count] != 0) {
+        CandidateEntry* item = FetchResults[0];
+        if ([item.appointments count] == 0) {
+            self.checkInterviewButton.hidden = YES;
+        }
+        else
+        {
+            self.checkInterviewButton.hidden = NO;
+        }
+    }
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrScheduleButton layer] setCornerRadius:35];
@@ -179,32 +197,54 @@
     self.yrBusinessUnit1.inputAccessoryView = doneToolbar;
     self.yrBusinessUnit2.inputAccessoryView = doneToolbar;
     self.yrCommentTextView.inputAccessoryView = doneToolbar;
-}
+ }
 
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(621, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
+    if ([self.checkScheduleFlag boolValue]) {
         
-        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(548, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
-        
-        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(475, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.yrEmailButton.frame = CGRectMake(621, 20, 70, 70);
+            
+            self.yrScheduleButton.frame = CGRectMake(548, 20, 70, 70);
+            
+            self.checkInterviewButton.frame = CGRectMake(475, 20, 70, 70);
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            self.yrEmailButton.frame = CGRectMake(260, 20, 50, 50);
+            
+            self.yrScheduleButton.frame = CGRectMake(208, 20, 50, 50);
+            
+            self.checkInterviewButton.frame = CGRectMake(156, 20, 50, 50);
+        }
+        [self checkScheduleFunction];
     }
-    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    else
     {
-        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(260, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
-        
-        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(208, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
-        
-        [UIView animateWithDuration:1.0 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(156, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(621, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
+            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
+            
+            [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(548, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
+            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
+            
+            [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(475, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
+            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(260, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
+            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
+            
+            [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(208, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
+            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
+            
+            [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(156, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
+            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+        }
     }
 }
 
@@ -276,11 +316,11 @@
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-50, 0, 50, 50);
+        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-110, 10, 100, 100);
     }
     else{
         self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
-        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-50, 45, 50, 50);
+        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-55, 50, 50, 50);
     }
     //self.yrScrollView.contentSize = image.size;
     self.yrScrollView.contentSize = imageview.frame.size;
@@ -289,14 +329,35 @@
     [self.yrScrollView setMaximumZoomScale:4];
     [self.yrScrollView setMinimumZoomScale:1];
     
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.9;
+    
+    [self.view addSubview:self.grayView];
     [self.view addSubview:self.yrScrollView];
     
     [self.yrGoBackButton setHidden:YES];
     
-    [self.yrScrollViewCancelButton setTitle:@"X" forState:UIControlStateNormal];
+    [self.yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
+    [self.yrScrollViewCancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
-    self.yrScrollViewCancelButton.titleLabel.textColor = [UIColor redColor];
-    self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[self.yrScrollViewCancelButton layer] setCornerRadius:50];
+        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
+        
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [[self.yrScrollViewCancelButton layer] setCornerRadius:25];
+        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
+        
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    }
+    
+
     [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
     
     [self.view addSubview:self.yrScrollViewCancelButton];
@@ -336,6 +397,14 @@
     NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
     CandidateEntry* selected = mutableFetchResults[0];
     [[self.appDelegate emailGenerator] setSelectedCandidate:selected];
+    //reset appointments
+    [[self.appDelegate emailGenerator].selectedAppointments removeAllObjects];
+    
+    for (Appointment* ap in selected.appointments)
+    {
+        [[self.appDelegate emailGenerator].selectedAppointments addObject:ap];
+    }
+    
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.emailOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 150, 200)];
@@ -392,72 +461,13 @@
 }
 
 - (IBAction)checkSchedule:(id)sender {
-    [self removeViews];
-    int half = 0;
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        half = 150;
-    }
-    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-    {
-        half = 120;
-    }
-    
-    for (Appointment* ap in self.dataSource.appointments)
-    {
-        if (ap.interviewers == nil) {
-            NSLog(@"%@ with - TBA",ap.startTime);
-        }
-        else
-        {
-            NSLog(@"%@ with - %@",ap.startTime,ap.interviewers.name);
-        }
-    }
-    
-    self.scheduleView = [[UIView alloc] initWithFrame:CGRectMake(self.checkInterviewButton.center.x-half, self.checkInterviewButton.center.y+[self.checkInterviewButton layer].cornerRadius+5, 2*half, 200)];
-    [[self.scheduleView layer] setCornerRadius:12];
-    
-    self.scheduleTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 40, 2*half - 10, 155) style:UITableViewStylePlain];
-    [[self.scheduleTable layer] setCornerRadius:10];
-    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 2*half - 100, 20)];
-    titleLabel.text = @"Schedule Info";
-    titleLabel.textColor = [UIColor purpleColor];
-    titleLabel.textAlignment = NSTextAlignmentLeft;
-    titleLabel.font = [UIFont boldSystemFontOfSize:15];
-
-    [self.scheduleView addSubview:titleLabel];
-    [self.scheduleView addSubview:self.scheduleTable];
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        UIViewController* newController = [UIViewController new];
-        self.popOver = [[UIPopoverController alloc] initWithContentViewController:newController];
-        newController.view = self.scheduleView;
-        
-        [self.popOver setPopoverContentSize:CGSizeMake(2*half, 200)];
-        
-        [self.popOver presentPopoverFromRect:CGRectMake(self.checkInterviewButton.center.x-half, self.checkInterviewButton.center.y+[self.checkInterviewButton layer].cornerRadius+5, 2*half, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
-    }
-    else
-    {
-        self.scheduleView.backgroundColor = [UIColor purpleColor];
-        titleLabel.textColor = [UIColor whiteColor];
-        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-        self.grayView.backgroundColor = [UIColor darkGrayColor];
-        self.grayView.alpha = 0.5;
-        [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:self.grayView];
-        
-        [self.view addSubview:self.scheduleView];
-    }
-    
-    
-    self.scheduleTable.delegate = self;
-    self.scheduleTable.dataSource = self;
+    [self checkScheduleFunction];
 }
 
 - (IBAction)recommendChange:(id)sender {
     if (self.yrRecommendSwitch.isOn) {
         self.yrRecommendLabel.hidden = NO;
-        [self.yrRecommandMark setTextColor:[UIColor redColor]];
+        [self.yrRecommandMark setTextColor:[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0]];
     }
     else
     {
@@ -529,6 +539,7 @@
 {
     [self.yrScrollView removeFromSuperview];
     [self.yrScrollViewCancelButton removeFromSuperview];
+    [self.grayView removeFromSuperview];
     [self.yrGoBackButton setHidden:NO];
 }
 
@@ -589,21 +600,20 @@
 -(void)email
 {
     if ([MFMailComposeViewController canSendMail]) {
-        NSString *emailTitle = @"Letter From Yahoo!";
+        NSString *emailTitle = [NSString stringWithFormat:@"Yahoo is Interested in Speaking with You! - %@",[[self.appDelegate emailGenerator] generateEmail:@"#studentFirstName# #studentLastName#"][@"message"]];
         //NSString *messageBody = @"Message goes here!";
-        NSString *messageBody = [[self.appDelegate emailGenerator] generateEmail:@"Dear studentName,\n\n    I am thrilled to inform you that you will have an interviewDuration mins interview with one of our Engineer."];
         
-        
+        NSDictionary* result = [[self.appDelegate emailGenerator] generateEmail:[self.formList[currentSelectedEmailForm] allValues][0]];
         
         NSArray *toRecipents = [NSArray arrayWithObject:self.yrEmailTextField.text];
         
         self.yrMailViewController = [[MFMailComposeViewController alloc] init];
         self.yrMailViewController.mailComposeDelegate = self;
         [self.yrMailViewController setSubject:emailTitle];
-        [self.yrMailViewController setMessageBody:messageBody isHTML:NO];
+        [self.yrMailViewController setMessageBody:result[@"message"] isHTML:NO];
         [self.yrMailViewController setToRecipients:toRecipents];
         
-        if (! self.yrFileNameButton.isHidden) {
+        if (! self.yrFileNameButton.isHidden && [result[@"pdfFlag"] boolValue]) {
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
             NSString *documentsDirectory = [paths objectAtIndex:0];
             
@@ -936,6 +946,70 @@
     [self.grayView removeFromSuperview];
 }
 
+-(void)checkScheduleFunction
+{
+    [self removeViews];
+    int half = 0;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        half = 150;
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        half = 120;
+    }
+    
+    for (Appointment* ap in self.dataSource.appointments)
+    {
+        if (ap.interviewers == nil) {
+            NSLog(@"%@ with - TBA",ap.startTime);
+        }
+        else
+        {
+            NSLog(@"%@ with - %@",ap.startTime,ap.interviewers.name);
+        }
+    }
+    
+    self.scheduleView = [[UIView alloc] initWithFrame:CGRectMake(self.checkInterviewButton.center.x-half, self.checkInterviewButton.center.y+[self.checkInterviewButton layer].cornerRadius+5, 2*half, 200)];
+    [[self.scheduleView layer] setCornerRadius:12];
+    
+    self.scheduleTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 40, 2*half - 10, 155) style:UITableViewStylePlain];
+    [[self.scheduleTable layer] setCornerRadius:10];
+    UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 2*half - 100, 20)];
+    titleLabel.text = @"Schedule Info";
+    titleLabel.textColor = [UIColor purpleColor];
+    titleLabel.textAlignment = NSTextAlignmentLeft;
+    titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    
+    [self.scheduleView addSubview:titleLabel];
+    [self.scheduleView addSubview:self.scheduleTable];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        UIViewController* newController = [UIViewController new];
+        self.popOver = [[UIPopoverController alloc] initWithContentViewController:newController];
+        newController.view = self.scheduleView;
+        
+        [self.popOver setPopoverContentSize:CGSizeMake(2*half, 200)];
+        
+        [self.popOver presentPopoverFromRect:CGRectMake(self.checkInterviewButton.center.x-half, self.checkInterviewButton.center.y+[self.checkInterviewButton layer].cornerRadius+5, 2*half, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    }
+    else
+    {
+        self.scheduleView.backgroundColor = [UIColor purpleColor];
+        titleLabel.textColor = [UIColor whiteColor];
+        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+        self.grayView.backgroundColor = [UIColor darkGrayColor];
+        self.grayView.alpha = 0.5;
+        [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:self.grayView];
+        
+        [self.view addSubview:self.scheduleView];
+    }
+    
+    
+    self.scheduleTable.delegate = self;
+    self.scheduleTable.dataSource = self;
+}
+
 #pragma mark - UIScrollViewDelegate
 
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
@@ -1058,7 +1132,14 @@
     }
     else if (tableView == self.emailOptionTable)
     {
-        return 3;
+        self.formList = [[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey];
+        
+        if (self.formList == nil) {
+            return 0;
+        }else
+        {
+            return [self.formList count];
+        }
     }
     else
     {
@@ -1104,17 +1185,9 @@
         if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         }
-        if (indexPath.row == 0) {
-            cell.textLabel.text = @"Rejection";
-        }
-        else if (indexPath.row == 1)
-        {
-            cell.textLabel.text = @"Invitation";
-        }
-        else
-        {
-            cell.textLabel.text = @"Confirmation";
-        }
+        
+        cell.textLabel.text = [self.formList[indexPath.row] allKeys][0];
+
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
             cell.textLabel.font = [UIFont systemFontOfSize:12];
         }
@@ -1128,10 +1201,11 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tableView == self.emailOptionTable) {
-        if (indexPath.row == 0) {
+        currentSelectedEmailForm = indexPath.row;
+        //if (indexPath.row == 0) {
             //default now
             [self email];
-        }
+        //}
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }

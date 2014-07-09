@@ -45,94 +45,94 @@
 
 -(void)didReceiveDataWithNotification:(NSNotification *)notification
 {
-    MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
-    
-    NSData* yrinfoData = [[notification userInfo] objectForKey:@"data"];
-    
-    NSKeyedUnarchiver* yrunarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:yrinfoData];
-    
-    NSMutableDictionary *dic = [[yrunarchiver decodeObjectForKey:@"infoDataKey"] mutableCopy];
-    
-    [yrunarchiver finishDecoding];
-    
-    NSLog(@"message is %@",dic[@"msg"]);
-    
-    if ([dic[@"msg"] isEqualToString:@"backup"] && self.isHost)
-    {
-        if ([self isNotDuplicateData:dic[@"data"]]) {
-            CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
-            NSDictionary *dict = @{@"entry" : curr};
+    dispatch_async(dispatch_get_main_queue(), ^{
+        MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
+        
+        NSData* yrinfoData = [[notification userInfo] objectForKey:@"data"];
+        
+        NSKeyedUnarchiver* yrunarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:yrinfoData];
+        
+        NSMutableDictionary *dic = [[yrunarchiver decodeObjectForKey:@"infoDataKey"] mutableCopy];
+        
+        [yrunarchiver finishDecoding];
+        
+        NSLog(@"message is %@; I AM %@",dic[@"msg"], self);
+        
+        if ([dic[@"msg"] isEqualToString:@"backup"] && self.isHost)
+        {
+            if ([self isNotDuplicateData:dic[@"data"]]) {
+                CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+                NSDictionary *dict = @{@"entry" : curr};
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+                                                                    object:nil
+                                                                  userInfo:dict];
+            }
+            else
+            {
+                NSLog(@"duplicate code and firstName found");
+            }
+        }
+        else if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
+        {
+            if ([self isNotDuplicateData:dic[@"data"]]){
+                [self sendACKBack:peerID];
+                
+                CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+                NSDictionary *dict = @{@"entry" : curr};
+                
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+                                                                    object:nil
+                                                                  userInfo:dict];
+            }
+            else
+            {
+                [self sendACKBack:peerID];
+                NSLog(@"duplicate code and firstName found");
+            }
+        }
+        else if([dic[@"msg"] isEqualToString:@"ack"])
+        {
+            [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
+            NSDictionary *dict = @{@"recruitID": dic[@"code"]};
             
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateCodeNotification"
                                                                 object:nil
                                                               userInfo:dict];
+            
+            //        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+            //        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+            //        NSError* error = nil;
+            //        NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+            //
+            //        //reset the core data
+            //        for (CandidateEntry* backedUpCandidate in FetchResults)
+            //        {
+            //            [self.managedObjectContext deleteObject:backedUpCandidate];
+            //        }
+            //
+            //        for (CandidateEntry* backedUpCandidate in FetchResults)
+            //        {
+            //            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":backedUpCandidate.interviewer,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
+            //            NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+            //            [self sendBackUp:packet];
+            //        }
+        }
+        else if([dic[@"msg"] isEqualToString:@"nameList"])
+        {
+            NSLog(@"The receiving list is %@",dic[@"data"]);
+            self.nameList = dic[@"data"];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NameListReadyNotification"
+                                                                object:nil
+                                                              userInfo:nil];
         }
         else
         {
-            NSLog(@"duplicate code and firstName found");
+            NSLog(@"trash");
         }
-    }
-    else if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
-    {
-        if ([self isNotDuplicateData:dic[@"data"]]){
-            [self sendACKBack:peerID];
-        
-            CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
-            NSDictionary *dict = @{@"entry" : curr};
-        
-        
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
-                                                            object:nil
-                                                          userInfo:dict];
-        }
-        else
-        {
-            [self sendACKBack:peerID];
-            NSLog(@"duplicate code and firstName found");
-        }
-    }
-    else if([dic[@"msg"] isEqualToString:@"ack"])
-    {
-        [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
-        NSDictionary *dict = @{@"recruitID": dic[@"code"]};
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateCodeNotification"
-                                                            object:nil
-                                                          userInfo:dict];
-        
-        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
-        NSError* error = nil;
-        NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-        
-        //reset the core data
-        for (CandidateEntry* backedUpCandidate in FetchResults)
-        {
-            [self.managedObjectContext deleteObject:backedUpCandidate];
-        }
-        
-        for (CandidateEntry* backedUpCandidate in FetchResults)
-        {
-            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":backedUpCandidate.interviewer,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
-            NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
-            [self sendBackUp:packet];
-        }
-    }
-    else if([dic[@"msg"] isEqualToString:@"nameList"])
-    {
-        NSLog(@"The receiving list is %@",dic[@"data"]);
-        self.nameList = dic[@"data"];
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"NameListReadyNotification"
-                                                            object:nil
-                                                          userInfo:nil];
-    }
-    else
-    {
-        NSLog(@"trash");
-    }
-
+    });
 }
 
 - (BOOL)isNotDuplicateData:(NSDictionary*)infoData
@@ -161,7 +161,7 @@
     [item setLastName:infoData[@"lastName"]];
     [item setEmailAddress:infoData[@"email"]];
     [item setInterviewer:infoData[@"interviewer"]];
-    if ([infoData[@"code"] isEqualToString:@"No Connection!"]) {
+    if ([infoData[@"code"] isEqualToString:@"Offline"]) {
         [item setCode:[NSString stringWithFormat:@"%@-%d",self.yrPrefix,[self nextCode]]];
     }
     else

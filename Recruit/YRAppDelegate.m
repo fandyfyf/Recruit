@@ -12,6 +12,7 @@ NSString* const kYREmailKeyWordsKey = @"emailKeyWords";
 NSString* const kYRScheduleColumsKey = @"scheduleColums";
 NSString* const kYRScheduleStartTimeKey = @"scheduleStartTime";
 NSString* const kYRScheduleDurationKey = @"scheduleDuration";
+NSString* const kYREmailFormsKey = @"emailForms";
 
 @implementation YRAppDelegate
 
@@ -23,22 +24,29 @@ NSString* const kYRScheduleDurationKey = @"scheduleDuration";
 {
     // Override point for customization after application launch.
     self.mcManager = [YRMCManager new];
-    if([[NSUserDefaults standardUserDefaults] valueForKey:@"scheduleColums"] == nil)
+    if([[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleColumsKey] == nil)
     {
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:3] forKey:kYRScheduleColumsKey];
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:8] forKey:kYRScheduleStartTimeKey];
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:45] forKey:kYRScheduleDurationKey];
     }
-    NSArray* dic = @[@{@"studentRid" : @"studentRid"},
-                     @{@"studentName" : @"studentName"},
-                     @{@"studentEmail" : @"studentEmail"},
-                     @{@"interviewerName" : @"interviewerName"},
-                     @{@"interviewerEmail" : @"interviewerEmail"},
-                     @{@"interviewStartTime" : @"interviewStartTime"},
-                     @{@"interviewDuration" : @"interviewDuration"}
+    NSArray* dic = @[@{@"studentRid" : @"#studentRid#"},
+                     @{@"studentFirstName" : @"#studentFirstName#"},
+                     @{@"studentLastName" : @"#studentLastName#"},
+                     @{@"studentEmail" : @"#studentEmail#"},
+                     @{@"appointments" : @"#appointments#"},
+                     @{@"interviewDuration" : @"#interviewDuration#"},
+                     @{@"resume" : @"#resume#"}
                           ];
-    
     [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailKeyWordsKey];
+    
+    if ([[NSUserDefaults standardUserDefaults] valueForKey:kYREmailFormsKey] == nil) {
+        NSArray* dic = @[@{@"Invitation" : @"Hi #studentFirstName#,\n\nWe have received your resume and we are impressed with your qualifications! Yahoo is interested in speaking with you about internship opportunities for 2014.\n\nWe'd like to set up sometime for you to chat over the phone with one of the members of our hiring team.\n\nIt'd be my pleasure to assist you with setting up this initial phone interview. Please reply back to me within 48 hours, with the following information:\n\n   -   Your availability(in PST) for 2 weeks\n   -   The best phone number to reach you\n   -   Current Resume-make sure GPA is noted\n\nOnce I have your availability, I'll confirm the logistics and email you the final details. If by chance you're not interested in pursuing this opportunity please let me know so we can proceed accordingly. Please note, Yahoo is an E-verify employer.\n\nTo learn more about our campus recruiting schedule, job opportunities and what it's like to work at Yahoo follow our Facebook fan page at https://www.facebook.com/YahooUniversityRecruiting?ref=sgm\n\nI look forward to hearing back from you!\n\nBest regards,\n\nSignature"},
+                         @{@"Confirmation" : @"Hi #studentFirstName#,\n\nGreat news! Your interview with Yahoo is confirmed with the following schedule,\n\n#appointments#\nPlease let me know if you have any other questions.\n\nSignature"},
+                         @{@"Rejection" : @""}];
+        [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailFormsKey];
+    }
+    
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     self.emailGenerator = [[YREmailGenerator alloc] init];

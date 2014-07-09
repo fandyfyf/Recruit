@@ -15,11 +15,11 @@
 
 @property (strong, nonatomic) CandidateEntry* selectedCandidate;
 @property (strong, nonatomic) Interviewer* selectedInterviewer;
-@property (strong, nonatomic) Appointment* selectedAppointment;
+@property (strong, nonatomic) NSMutableArray* selectedAppointments;
 @property (strong, nonatomic) NSArray* keyWordsList;
 
 -(id)init;
 
--(NSString*)generateEmail:(NSString*)defaultForm;
+-(NSDictionary*)generateEmail:(NSString*)defaultForm;
 
 @end

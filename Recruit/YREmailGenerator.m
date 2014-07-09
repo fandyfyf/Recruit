@@ -18,52 +18,86 @@
     
     if (self) {
         _keyWordsList = [[NSUserDefaults standardUserDefaults] objectForKey:kYREmailKeyWordsKey];
+        _selectedAppointments = [NSMutableArray new];
     }
     
     return self;
 }
 
--(NSString*)generateEmail:(NSString*)defaultForm
+-(NSDictionary*) generateEmail:(NSString*)defaultForm
 {
+    NSNumber* pdfFlag = [NSNumber numberWithBool:NO];
+    
+    NSString* newDefaultForm = [defaultForm stringByReplacingOccurrencesOfString:@"#resume#" withString:@""];
+    //same means pdf doesn't exist
+    if (![newDefaultForm isEqualToString:defaultForm]) {
+        pdfFlag = [NSNumber numberWithBool:YES];
+        defaultForm = newDefaultForm;
+    }
+    
     for (NSDictionary* dic in self.keyWordsList)
     {
-        NSString* keyword = [dic allKeys][0];
+        NSString* keyword = [dic allValues][0];
         
         NSString* replacement;
-        
+
         //need to change after getting actual keywords
-        if ([keyword isEqualToString:@"studentRid"]) {
+        if ([keyword isEqualToString:@"#studentRid#"]) {
             replacement = self.selectedCandidate.code;
         }
-        else if ([keyword isEqualToString:@"studentName"])
+        else if ([keyword isEqualToString:@"#studentFirstName#"])
         {
-            replacement = [NSString stringWithFormat:@"%@ %@",self.selectedCandidate.firstName, self.selectedCandidate.lastName];
+            replacement = self.selectedCandidate.firstName;
         }
-        else if ([keyword isEqualToString:@"studentEmail"])
+        else if ([keyword isEqualToString:@"#studentLastName#"])
+        {
+            replacement = self.selectedCandidate.lastName;
+        }
+        else if ([keyword isEqualToString:@"#studentEmail#"])
         {
             replacement = self.selectedCandidate.emailAddress;
         }
-        else if ([keyword isEqualToString:@"interviewerName"])
-        {
-            replacement = self.selectedInterviewer.name;
-        }
-        else if ([keyword isEqualToString:@"interviewerEmail"])
-        {
-            replacement = self.selectedInterviewer.email;
-        }
-        else if ([keyword isEqualToString:@"interviewStartTime"])
-        {
-            replacement = self.selectedAppointment.startTime;
-        }
-        else if ([keyword isEqualToString:@"interviewDuration"])
+//        else if ([keyword isEqualToString:@"#interviewerName#"])
+//        {
+//            replacement = self.selectedInterviewer.name;
+//        }
+//        else if ([keyword isEqualToString:@"#interviewerEmail#"])
+//        {
+//            replacement = self.selectedInterviewer.email;
+//        }
+//        else if ([keyword isEqualToString:@"#interviewStartTime#"])
+//        {
+//            replacement = self.selectedAppointment.startTime;
+//        }
+        else if ([keyword isEqualToString:@"#interviewDuration#"])
         {
             replacement = [(NSNumber*)[[NSUserDefaults standardUserDefaults] objectForKey:kYRScheduleDurationKey] stringValue];
         }
+        else if ([keyword isEqualToString:@"#appointments#"])
+        {
+            //replacement is ...
+            if ([self.selectedAppointments count] > 0) {
+                replacement = @"";
+                for (Appointment* ap in self.selectedAppointments)
+                {
+                    replacement = [replacement stringByAppendingString:[NSString stringWithFormat:@"%@ with %@\n",ap.startTime,ap.interviewers.name]];
+                }
+            }
+            else
+            {
+                replacement = @" --- pending --- \n";
+            }
+        }
+        
         if (replacement != nil) {
+
             defaultForm = [defaultForm stringByReplacingOccurrencesOfString:keyword withString:replacement];
         }
     }
-    return defaultForm;
+    
+    NSDictionary* result = @{@"message" : defaultForm, @"pdfFlag" : pdfFlag};
+    
+    return result;
 }
 
 @end

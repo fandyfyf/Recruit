@@ -24,8 +24,11 @@
 -(void)removeAllInterviewerInfo;
 -(void)saveScheduleInfo;
 -(void)doneWithPad;
+-(void)doneWithInfo;
 -(void)removeTextView;
 -(void)insertString:(NSString*)insertingString;
+-(void)nextInterviewerField;
+-(void)doneWithInterviewFields;
 
 @end
 
@@ -33,6 +36,7 @@
 {
     float add_origin_y;
     float remove_origin_y;
+    int currentSelected;
 }
 
 -(void)awakeFromNib
@@ -68,6 +72,9 @@
     
     [self fetchInterviewerInfo];
     
+    self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
+    int formListCount = [self.formList count];
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrRemoveButton layer] setCornerRadius:20];
         [[self.yrRemoveButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
@@ -75,8 +82,15 @@
         [[self.yrAddButton layer] setCornerRadius:20];
         [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddButton layer] setBorderWidth:5];
-        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + 3*44 + 50, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
-        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + 3*44 + 50, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 50, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + formListCount*44 + 50, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        
+        [[self.yrRemoveFormButton layer] setCornerRadius:20];
+        [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveFormButton layer] setBorderWidth:5];
+        [[self.yrAddFormButton layer] setCornerRadius:20];
+        [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddFormButton layer] setBorderWidth:5];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -86,13 +100,42 @@
         [[self.yrAddButton layer] setCornerRadius:12.5];
         [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddButton layer] setBorderWidth:2];
-        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + 3*44 + 45, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
-        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + 3*44 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
-
+        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 45, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + formListCount*44 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        
+        [[self.yrRemoveFormButton layer] setCornerRadius:12.5];
+        [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveFormButton layer] setBorderWidth:2];
+        [[self.yrAddFormButton layer] setCornerRadius:12.5];
+        [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddFormButton layer] setBorderWidth:2];
     }
     
     add_origin_y = self.yrAddButton.frame.origin.y;
     remove_origin_y = self.yrRemoveButton.frame.origin.y;
+    
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithInfo)],
+                         nil];
+    self.emailTextField.inputAccessoryView = doneToolbar;
+    self.userNameTextField.inputAccessoryView = doneToolbar;
+    self.interviewStartTime.inputAccessoryView = doneToolbar;
+    self.interviewDuration.inputAccessoryView = doneToolbar;
+    self.interviewLocations.inputAccessoryView = doneToolbar;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    //reload every time the view is showing
+    self.interviewStartTime.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartTimeKey]];
+    self.interviewDuration.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleDurationKey]];
+    self.interviewLocations.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleColumsKey]];
 }
 
 - (void)didReceiveMemoryWarning
@@ -122,7 +165,7 @@
         self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x-214, self.view.center.y-250, 428, 300)];
         
 //        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
-//        [[self.yrCardView layer] setCornerRadius:30];
+        [[self.yrCardView layer] setCornerRadius:10];
 //        [[self.yrCardView layer] setBorderWidth:5];
         
         self.yrCardView.backgroundColor = [UIColor whiteColor];
@@ -186,7 +229,7 @@
         self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(20, 120, 280, 230)];
         
 //        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
-//        [[self.yrCardView layer] setCornerRadius:10];
+        [[self.yrCardView layer] setCornerRadius:10];
 //        [[self.yrCardView layer] setBorderWidth:5];
         
         self.yrCardView.backgroundColor = [UIColor whiteColor];
@@ -242,6 +285,28 @@
         [saveButton setTitle:@"Save" forState:UIControlStateNormal];
         [saveButton addTarget:self action:@selector(yrCardViewSave) forControlEvents:UIControlEventTouchUpInside];
     }
+    
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Next" style:UIBarButtonItemStyleDone target:self action:@selector(nextInterviewerField)],
+                         nil];
+    self.interviewerName.inputAccessoryView = doneToolbar;
+    self.interviewerEmail.inputAccessoryView = doneToolbar;
+    
+    doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithInterviewFields)],
+                         nil];
+    
+    self.interviewerCode.inputAccessoryView = doneToolbar;
+    
+    
     [self.yrCardView addSubview:cancelButton];
     [self.yrCardView addSubview:saveButton];
     [self.yrCardView addSubview:self.interviewerName];
@@ -269,6 +334,15 @@
     
     [self.emailTextField acceptSuggestion];
     [self saveScheduleInfo];
+}
+
+- (IBAction)addEmailForm:(id)sender {
+    UIAlertView* addFormAlert = [[UIAlertView alloc] initWithTitle:@"Adding an Email Form" message:@"Give it a name please." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Accept", nil];
+    [addFormAlert setAlertViewStyle:UIAlertViewStylePlainTextInput];
+    [addFormAlert show];
+}
+
+- (IBAction)removeEmailForms:(id)sender {
 }
 
 -(void)yrCardViewCancel
@@ -358,17 +432,42 @@
 
 -(void)doneWithPad
 {
+    [self saveForm];
     [self.yrEditingView resignFirstResponder];
     [self.yrEditingView removeFromSuperview];
     [self.removeFromViewButton removeFromSuperview];
     [self.yrEditingTable removeFromSuperview];
 }
 
+-(void)doneWithInfo
+{
+    [self.emailTextField resignFirstResponder];
+    [self.userNameTextField resignFirstResponder];
+    [self.interviewLocations resignFirstResponder];
+    [self.interviewDuration resignFirstResponder];
+    [self.interviewStartTime resignFirstResponder];
+    
+    [self.emailTextField acceptSuggestion];
+    [self saveScheduleInfo];
+}
+
 -(void)removeTextView
 {
+    [self saveForm];
     [self.removeFromViewButton removeFromSuperview];
     [self.yrEditingTable removeFromSuperview];
     [self.yrEditingView removeFromSuperview];
+}
+
+-(void)saveForm
+{
+    NSMutableDictionary* temp = [[self.formList objectAtIndex:currentSelected] mutableCopy];
+    [temp setObject:self.yrEditingView.text forKey:[self.formList[currentSelected] allKeys][0]];
+    
+    [self.formList replaceObjectAtIndex:currentSelected withObject:temp];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 -(void)insertString:(NSString*)insertingString
@@ -387,6 +486,22 @@
     self.yrEditingView.scrollEnabled = YES;  // turn scrolling back on.
 }
 
+-(void)nextInterviewerField
+{
+    if ([self.interviewerName isFirstResponder]) {
+        //[self.interviewerName resignFirstResponder];
+        [self.interviewerEmail becomeFirstResponder];
+    }
+    else if ([self.interviewerEmail isFirstResponder]) {
+        //[self.interviewerEmail resignFirstResponder];
+        [self.interviewerCode becomeFirstResponder];
+    }
+}
+
+-(void)doneWithInterviewFields
+{
+    [self.interviewerCode resignFirstResponder];
+}
 
 #pragma mark - AutoSuggestDelegate
 
@@ -490,7 +605,14 @@
     else
     {
         if (section == 0) {
-            return 3;
+            self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
+            if (self.formList == nil) {
+                return 0;
+            }
+            else
+            {
+                return [self.formList count];
+            }
         }
         else
         {
@@ -519,17 +641,7 @@
             if (cell == nil) {
                 cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
             }
-            if (indexPath.row == 0) {
-                cell.textLabel.text = @"Opt1";
-            }
-            else if (indexPath.row == 1)
-            {
-                cell.textLabel.text = @"Opt2";
-            }
-            else
-            {
-                cell.textLabel.text = @"Opt3";
-            }
+            cell.textLabel.text = [self.formList[indexPath.row] allKeys][0];
             return cell;
         }
         else
@@ -582,7 +694,7 @@
     if (tableView == self.yrEditingTable) {
         [self insertString:[(NSDictionary*)[self.emailKeywordArray objectAtIndex:indexPath.row] allValues][0]];
     }
-    else
+    else if(tableView == self.interviewerList)
     {
         UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
         
@@ -621,6 +733,9 @@
                 [[self.removeFromViewButton layer] setBorderWidth:4];
                 [self.removeFromViewButton addTarget:self action:@selector(removeTextView) forControlEvents:UIControlEventTouchUpInside];
                 
+                self.yrEditingView.text = [self.formList[indexPath.row] allValues][0];
+                
+                currentSelected = indexPath.row;
                 
                 [self.view addSubview:self.yrEditingView];
                 [self.view addSubview:self.yrEditingTable];
@@ -636,6 +751,56 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+//-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    return YES;
+//}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        if (tableView == self.interviewerList) {
+            if (indexPath.section == 1) {
+                NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+                [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+                [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@",[(Interviewer*)self.interviewerArray[indexPath.row] name]]];
+                
+                NSError* error = nil;
+                
+                NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+                
+                if ([[(Interviewer*)FetchResults[0] appointments] count] != 0) {
+                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat: @"Selected Interviewer has %d interviews set up",[[(Interviewer*)FetchResults[0] appointments] count]] delegate:Nil cancelButtonTitle:@"Oops" otherButtonTitles:nil, nil];
+                    [alert show];
+                }
+                else
+                {
+                    [self.interviewerArray removeObjectAtIndex:indexPath.row];
+                    [tableView reloadData];
+                    [self.managedObjectContext deleteObject:FetchResults[0]];
+                    
+                    if (![self.managedObjectContext save:&error]) {
+                        NSLog(@"ERROR -- saving coredata");
+                    }
+                }
+            }
+            else
+            {
+//                UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please confirm if you want to delete this entry." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
+//                [alert show];
+                [self.formList removeObjectAtIndex:indexPath.row];
+                [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
+                [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y-44, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+                [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y-44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+                
+                [self.interviewerList reloadData];
+            }
+        }
+    }
+}
+
 #pragma mark - UIAlertViewDelegate
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -643,6 +808,26 @@
     NSString* buttonTitle = [alertView buttonTitleAtIndex:buttonIndex];
     if ([buttonTitle isEqualToString:@"Yes"]) {
         [self removeAllInterviewerInfo];
+    }
+//    if ([buttonTitle isEqualToString:@"Confirm"]) {
+//        [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
+//        [[NSUserDefaults standardUserDefaults] synchronize];
+//    }
+    if ([buttonTitle isEqualToString:@"Accept"]) {
+        if (self.formList == nil) {
+            self.formList = [NSMutableArray new];
+        }
+        [self.formList addObject:@{[alertView textFieldAtIndex:0].text : @""}];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y+44, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y+44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        
+        [self.interviewerList reloadData];
+        
+        self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
     }
 }
 

@@ -26,6 +26,7 @@
 @property (strong, nonatomic) NSMutableArray* columLabels;
 @property (strong, nonatomic) NSMutableArray* rowLabels;
 @property (strong, nonatomic) NSMutableArray* views;
+@property (strong, nonatomic) YRTimeCardView* selectedView;
 
 @property (strong, nonatomic) UIView * cardDetailView;
 //@property (strong, nonatomic) UITableView * recommandListTable;
@@ -38,6 +39,8 @@
 @property (strong, nonatomic) NSString* passedInRid;
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+
+@property (strong, nonatomic) UIControl* grayView;
 
 @property (strong, nonatomic) NSMutableArray *yrAppointmentInfo;
 

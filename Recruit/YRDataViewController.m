@@ -23,15 +23,31 @@
 
 -(void)sortMethodSelected:(UISegmentedControl *)mySegmentedControl;
 
+-(void)checkSchedule:(UIGestureRecognizer*)tapRecognizer;
+
+-(void)showImage:(UIGestureRecognizer*)tapRecognizer;
+
+-(void)cancelScrollView;
 
 @end
 
 @implementation YRDataViewController
+{
+    BOOL checkScheduleMode;
+}
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     if ([segue.identifier isEqualToString:@"ListToDetail"]) {
         [segue.destinationViewController setValue:self.currentEntry forKey:@"dataSource"];
+        if (checkScheduleMode) {
+            [segue.destinationViewController setValue:[NSNumber numberWithBool:YES] forKey:@"checkScheduleFlag"];
+        }
+        else
+        {
+            [segue.destinationViewController setValue:[NSNumber numberWithBool:NO] forKey:@"checkScheduleFlag"];
+        }
+        checkScheduleMode = NO;
     }
 }
 
@@ -57,6 +73,16 @@
     
     [self.yrSortingSegmentControl addTarget:self action:@selector(sortMethodSelected:) forControlEvents:UIControlEventValueChanged];
     [self.yrPositionFilter addTarget:self action:@selector(sortMethodSelected:) forControlEvents:UIControlEventValueChanged];
+    
+    checkScheduleMode = NO;
+    
+    if ([self.appDelegate.mcManager.userName isEqualToString:@"kirito"]) {
+        self.yrAdministorDeleteButton.hidden = NO;
+    }
+    else
+    {
+        self.yrAdministorDeleteButton.hidden = YES;
+    }
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -148,6 +174,115 @@
     });
 }
 
+-(void)checkSchedule:(UIGestureRecognizer*)tapRecognizer
+{
+    NSLog(@"Tap");
+    CGPoint tapLocation = [tapRecognizer locationInView:self.infoDataList];
+    NSIndexPath* indexPath = [self.infoDataList indexPathForRowAtPoint:tapLocation];
+    YRinfoDataCell* tappedCell = (YRinfoDataCell*)[self.infoDataList cellForRowAtIndexPath:indexPath];
+    if ([tappedCell.yrstatusLabel.text isEqualToString:@"scheduled"]) {
+        self.currentEntry = (CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row];
+        checkScheduleMode = YES;
+        [self performSegueWithIdentifier:@"ListToDetail" sender:self];
+    }
+    else if ([tappedCell.yrstatusLabel.text isEqualToString:@"pending"])
+    {
+        NSDictionary* dic = @{@"code" : tappedCell.yrcodeLabel.text};
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SetUpInterview" object:dic];
+    }
+}
+
+-(void)showImage:(UIGestureRecognizer*)tapRecognizer
+{
+    CGPoint tapLocation = [tapRecognizer locationInView:self.infoDataList];
+    NSIndexPath* indexPath = [self.infoDataList indexPathForRowAtPoint:tapLocation];
+    YRinfoDataCell* tappedCell = (YRinfoDataCell*)[self.infoDataList cellForRowAtIndexPath:indexPath];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+    
+    NSError *error;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MMddyyyHHmm"];
+    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
+    
+    NSString* fileName = [tappedCell.yrcodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
+    
+    NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
+    
+    UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
+    
+    
+    UIImageView* imageview = [[UIImageView alloc] initWithImage:image];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    }
+    else{
+        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
+    }
+    
+    self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-110, 10, 100, 100);
+    }
+    else{
+        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
+        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-55, 50, 50, 50);
+    }
+    //self.yrScrollView.contentSize = image.size;
+    self.yrScrollView.contentSize = imageview.frame.size;
+    [self.yrScrollView addSubview:imageview];
+    [self.yrScrollView setDelegate:self];
+    [self.yrScrollView setMaximumZoomScale:4];
+    [self.yrScrollView setMinimumZoomScale:1];
+    
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.9;
+    
+    [self.view addSubview:self.grayView];
+    [self.view addSubview:self.yrScrollView];
+    
+    [self.yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
+    [self.yrScrollViewCancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[self.yrScrollViewCancelButton layer] setCornerRadius:50];
+        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
+        
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [[self.yrScrollViewCancelButton layer] setCornerRadius:25];
+        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
+        
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    }
+    
+    [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.view addSubview:self.yrScrollViewCancelButton];
+}
+
+-(void)cancelScrollView
+{
+    [self.yrScrollView removeFromSuperview];
+    [self.yrScrollViewCancelButton removeFromSuperview];
+    [self.grayView removeFromSuperview];
+}
+
+
 #pragma mark - UITableViewDataSource
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
@@ -183,11 +318,13 @@
     cell.yrcodeLabel.text = current.code;
     
     if ([current.recommand boolValue]) {
-        cell.yrcodeLabel.textColor = [UIColor redColor];
+        cell.yrcodeLabel.textColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
+        cell.yrStarView.hidden = NO;
     }
     else
     {
         cell.yrcodeLabel.textColor = [UIColor blackColor];
+        cell.yrStarView.hidden = YES;
     }
     
     cell.yrstatusLabel.text = current.status;
@@ -219,12 +356,22 @@
     }
     
     if ([current.pdf boolValue]) {
+        [cell.yrPDFIconView setHidden:NO];
         cell.yrPDFIconView.image = [UIImage imageNamed:@"document.png"];
     }
     else
     {
+        [cell.yrPDFIconView setHidden:YES];
         cell.yrPDFIconView.image = nil;
     }
+    
+    [cell.yrstatusLabel setUserInteractionEnabled:YES];
+    UITapGestureRecognizer* tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(checkSchedule:)];
+    [cell.yrstatusLabel addGestureRecognizer:tapGesture];
+    
+    [cell.yrPDFIconView setUserInteractionEnabled:YES];
+    tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showImage:)];
+    [cell.yrPDFIconView addGestureRecognizer:tapGesture];
     
     return cell;
 }
@@ -237,4 +384,31 @@
     [self performSegueWithIdentifier:@"ListToDetail" sender:self];
 }
 
+#pragma mark - UIScrollViewDelegate
+
+-(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+    return [scrollView.subviews objectAtIndex:0];
+}
+
+- (IBAction)deleteCoreData:(id)sender {
+    
+    [self.yrdataEntry removeAllObjects];
+    
+    [self.infoDataList reloadData];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+    
+    NSError* error = nil;
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    for (CandidateEntry* candidate in FetchResults) {
+        [self.managedObjectContext deleteObject:candidate];
+    }
+
+    if (![self.managedObjectContext save:&error]) {
+        NSLog(@"ERROR -- saving coredata");
+    }
+}
 @end

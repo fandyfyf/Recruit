@@ -19,4 +19,12 @@
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
+@property (strong, nonatomic) UIScrollView* yrScrollView;
+@property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
+@property (weak, nonatomic) IBOutlet UIButton *yrAdministorDeleteButton;
+@property (strong, nonatomic) UIControl* grayView;
+
+
+- (IBAction)deleteCoreData:(id)sender;
+
 @end

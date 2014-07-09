@@ -18,5 +18,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *yrRankLabel;
 @property (weak, nonatomic) IBOutlet UILabel *yrGPALabel;
 @property (weak, nonatomic) IBOutlet UILabel *yrHalfRankLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *yrStarView;
 
 @end

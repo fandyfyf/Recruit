@@ -111,7 +111,8 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     NSDictionary *dict = @{@"data": data,
                            @"peerID": peerID
                            };
-    
+    //NSLog(@"receive data once!! with %@; I AM %@",dict, self);
+    NSLog(@"I AM %@",self);
     [[NSNotificationCenter defaultCenter] postNotificationName:kYRMCManagerDidReceiveDataNotification
                                                         object:nil
                                                       userInfo:dict];

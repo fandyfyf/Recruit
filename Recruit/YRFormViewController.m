@@ -100,13 +100,13 @@
 
 - (IBAction)sendInformation:(id)sender {
     if ([self checkReady]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"NOTE" message:@"Ready to send?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Recommand", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Advocate!", nil];
         [alert show];
     }
     else
     {
         //wait until GPA is filled out
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"GPA can't be empty!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please enter GPA!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
         [alert show];
     }
 }
@@ -294,13 +294,13 @@
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];
         
-        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Recommand"]) {
+        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Advocate!"]) {
             newDic[@"recommand"] = [NSNumber numberWithBool:YES];
         }
         //change NSDictionary to NSMutableDictionary
         NSDictionary *dic = @{@"msg" : @"data", @"data" : newDic};
         
-        [(YRClientSignInViewController*)self.source setCodeLabel:@"No Connection!"];
+        [(YRClientSignInViewController*)self.source setCodeLabel:@"Offline"];
         [self.appDelegate.dataManager sendData:dic];
         
         [self refresh];
@@ -380,6 +380,32 @@
         [self.appDelegate.mcManager setUserName:current[@"name"]];
         
         [self.yrNameListView removeFromSuperview];
+        
+        
+        //send back up with the updated username
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];
+        NSError* error = nil;
+        NSArray* FetchResults = [self.appDelegate.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        for (CandidateEntry* backedUpCandidate in FetchResults)
+        {
+            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
+            NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+            [self.appDelegate.dataManager sendBackUp:packet];
+            NSLog(@"sending one entry");
+        }
+        
+        //reset the core data
+        for (CandidateEntry* backedUpCandidate in FetchResults)
+        {
+            [self.appDelegate.managedObjectContext deleteObject:backedUpCandidate];
+            NSLog(@"deleting one coredata entry");
+        }
+        
+        if (![self.appDelegate.managedObjectContext save:&error]) {
+            NSLog(@"ERROR -- saving coredata");
+        }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:@"removeNameListNotification" object:nil];
     }

@@ -22,12 +22,16 @@
 @property (strong,nonatomic) UITextField* interviewerCode;
 
 @property (strong, nonatomic) NSMutableArray* interviewerArray;
+@property (strong, nonatomic) NSMutableArray* formList;
 @property (strong, nonatomic) NSArray* emailKeywordArray;
 @property (weak, nonatomic) IBOutlet UITextField *interviewStartTime;
 @property (weak, nonatomic) IBOutlet UITextField *interviewDuration;
 @property (weak, nonatomic) IBOutlet UITextField *interviewLocations;
 @property (weak, nonatomic) IBOutlet UIButton *yrRemoveButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrAddButton;
+@property (weak, nonatomic) IBOutlet UIButton *yrAddFormButton;
+@property (weak, nonatomic) IBOutlet UIButton *yrRemoveFormButton;
+
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (strong, nonatomic) UITextView* yrEditingView;
 @property (strong, nonatomic) UITableView* yrEditingTable;
@@ -38,4 +42,6 @@
 - (IBAction)addInterviewer:(id)sender;
 - (IBAction)removeAll:(id)sender;
 - (IBAction)backgroundTapped:(id)sender;
+- (IBAction)addEmailForm:(id)sender;
+- (IBAction)removeEmailForms:(id)sender;
 @end
