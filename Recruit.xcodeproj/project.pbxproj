@@ -11,6 +11,8 @@
 		D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */; };
 		D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414D1959D838004A31E1 /* YRTimeCardView.m */; };
 		D251C65F196CA8B8003E86FD /* goldStar.png in Resources */ = {isa = PBXBuildFile; fileRef = D251C65E196CA8B8003E86FD /* goldStar.png */; };
+		D251C661196F209A003E86FD /* flag.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D251C660196F209A003E86FD /* flag.jpg */; };
+		D251C66419704035003E86FD /* YRDebriefViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C66319704035003E86FD /* YRDebriefViewController.m */; };
 		D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D25268A7194F3E6100EBE43E /* MessageUI.framework */; };
 		D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */; };
 		D25268B019507D7700EBE43E /* document.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268AF19507D7700EBE43E /* document.png */; };
@@ -78,6 +80,9 @@
 		D243414C1959D838004A31E1 /* YRTimeCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRTimeCardView.h; sourceTree = "<group>"; };
 		D243414D1959D838004A31E1 /* YRTimeCardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRTimeCardView.m; sourceTree = "<group>"; };
 		D251C65E196CA8B8003E86FD /* goldStar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = goldStar.png; sourceTree = "<group>"; };
+		D251C660196F209A003E86FD /* flag.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flag.jpg; sourceTree = "<group>"; };
+		D251C66219704035003E86FD /* YRDebriefViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRDebriefViewController.h; sourceTree = "<group>"; };
+		D251C66319704035003E86FD /* YRDebriefViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRDebriefViewController.m; sourceTree = "<group>"; };
 		D25268A7194F3E6100EBE43E /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main_iPad.storyboard; sourceTree = "<group>"; };
 		D25268AF19507D7700EBE43E /* document.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = document.png; sourceTree = "<group>"; };
@@ -225,6 +230,7 @@
 				D2B53140196C994B0019C7D7 /* camera3.png */,
 				D2D1E5761961BE2B0084D8DA /* camera.png */,
 				D2B5313E196B0B410019C7D7 /* Camera2.png */,
+				D251C660196F209A003E86FD /* flag.jpg */,
 				D2B5313C196B0AFE0019C7D7 /* Camera1.png */,
 				D2D1E57419611BC90084D8DA /* Columbia_engineering.jpg */,
 				D2D1E5721960E3370084D8DA /* email.png */,
@@ -298,6 +304,8 @@
 				D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */,
 				D2F818981946B3E4006E88FD /* YRFormViewController.h */,
 				D2F818991946B3E4006E88FD /* YRFormViewController.m */,
+				D251C66219704035003E86FD /* YRDebriefViewController.h */,
+				D251C66319704035003E86FD /* YRDebriefViewController.m */,
 			);
 			path = YRClient;
 			sourceTree = "<group>";
@@ -408,6 +416,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D2D1E57519611BC90084D8DA /* Columbia_engineering.jpg in Resources */,
+				D251C661196F209A003E86FD /* flag.jpg in Resources */,
 				D25268B019507D7700EBE43E /* document.png in Resources */,
 				D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */,
 				D2F8187319465FE5006E88FD /* Images.xcassets in Resources */,
@@ -452,6 +461,7 @@
 				D2F8189719469FC1006E88FD /* YRMCManager.m in Sources */,
 				D2F818B31948E691006E88FD /* YRDataManager.m in Sources */,
 				D2F8186719465FE5006E88FD /* main.m in Sources */,
+				D251C66419704035003E86FD /* YRDebriefViewController.m in Sources */,
 				D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */,
 				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
 				D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */,

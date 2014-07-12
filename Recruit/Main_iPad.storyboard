@@ -29,7 +29,7 @@
                                 <rect key="frame" x="214" y="388" width="340" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <segments>
-                                    <segment title="Coordinator"/>
+                                    <segment title="Recruitor"/>
                                     <segment title="Interviewer"/>
                                 </segments>
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -472,7 +472,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Coordinator: " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="AVj-9f-oIp">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Recruitor:  " lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="AVj-9f-oIp">
                                 <rect key="frame" x="32" y="40" width="241" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="36"/>
@@ -574,7 +574,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="95" sectionHeaderHeight="22" sectionFooterHeight="22" id="ryt-r5-kIO">
-                                <rect key="frame" x="0.0" y="82" width="768" height="891"/>
+                                <rect key="frame" x="0.0" y="123" width="768" height="850"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
@@ -651,7 +651,7 @@
                                                     <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="goldStar.png" id="Yvw-Bl-bE5">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flag.jpg" id="Yvw-Bl-bE5">
                                                     <rect key="frame" x="14" y="13" width="35" height="35"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
@@ -682,7 +682,7 @@
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
                             </segmentedControl>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="WRN-iJ-4hq">
-                                <rect key="frame" x="428.00000223200345" y="46" width="300" height="29"/>
+                                <rect key="frame" x="428.00000223200351" y="46" width="300" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES"/>
                                 <segments>
                                     <segment title="All"/>
@@ -702,21 +702,53 @@
                                     <action selector="deleteCoreData:" destination="9nq-bt-2BQ" eventType="touchUpInside" id="oIn-S8-hIC"/>
                                 </connections>
                             </button>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="DW1-9K-xgz">
+                                <rect key="frame" x="0.0" y="79" width="768" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem style="plain" id="wvg-5y-fg9">
+                                        <searchBar key="customView" contentMode="redraw" text="" placeholder="Recruit ID/Name" id="FLv-C6-HYm">
+                                            <rect key="frame" x="16" y="0.0" width="665" height="44"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no"/>
+                                        </searchBar>
+                                    </barButtonItem>
+                                    <barButtonItem title="Cancel" id="I8W-y1-x0A">
+                                        <connections>
+                                            <action selector="cancelSearch:" destination="9nq-bt-2BQ" id="Xgh-bS-7Zb"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Students" image="folder.png" id="RYL-PJ-qPJ"/>
+                    <toolbarItems>
+                        <barButtonItem title="Item" id="2au-r4-MzC"/>
+                    </toolbarItems>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="infoDataList" destination="ryt-r5-kIO" id="baz-lA-BwP"/>
+                        <outlet property="searchDisplayController" destination="CnC-Ci-CpQ" id="l3Z-M5-iId"/>
                         <outlet property="yrAdministorDeleteButton" destination="2KX-1X-QEt" id="EB6-L1-800"/>
                         <outlet property="yrPositionFilter" destination="WRN-iJ-4hq" id="nHr-ZY-NfV"/>
+                        <outlet property="yrSearchBar" destination="FLv-C6-HYm" id="bbr-6P-u4k"/>
                         <outlet property="yrSortingSegmentControl" destination="tFD-fV-gxp" id="Y5l-7R-qrJ"/>
                         <segue destination="Mqb-of-Yub" kind="modal" identifier="ListToDetail" id="1vB-Js-hVX"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="90J-Z7-EjG" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="CnC-Ci-CpQ">
+                    <connections>
+                        <outlet property="delegate" destination="9nq-bt-2BQ" id="FL6-qg-bWG"/>
+                        <outlet property="searchContentsController" destination="9nq-bt-2BQ" id="Rfi-EF-csm"/>
+                        <outlet property="searchResultsDataSource" destination="9nq-bt-2BQ" id="ZQA-x0-wxH"/>
+                        <outlet property="searchResultsDelegate" destination="9nq-bt-2BQ" id="E3c-Pv-SOx"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="-985" y="-290"/>
+            <point key="canvasLocation" x="-985" y="-273"/>
         </scene>
         <!--Host Detail View Controller-->
         <scene sceneID="ieQ-IL-MIJ">
@@ -1166,43 +1198,55 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="YS8-rB-RDi">
-                                <rect key="frame" x="52" y="176" width="71" height="30"/>
+                                <rect key="frame" x="549" y="72" width="71" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="rGt-vp-WuG">
-                                <rect key="frame" x="237" y="176" width="71" height="30"/>
+                                <rect key="frame" x="549" y="118" width="71" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="ZUU-jY-RlI">
-                                <rect key="frame" x="400" y="176" width="71" height="30"/>
+                                <rect key="frame" x="549" y="166" width="71" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                             </textField>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=":00 am" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3tG-ym-wkq">
-                                <rect key="frame" x="131" y="181" width="59" height="21"/>
+                                <rect key="frame" x="628" y="77" width="59" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="mins" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="m6e-xr-eBQ">
-                                <rect key="frame" x="316" y="180" width="42" height="21"/>
+                                <rect key="frame" x="628" y="122" width="42" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="rooms" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="NgF-4X-sLH">
-                                <rect key="frame" x="479" y="180" width="63" height="21"/>
+                                <rect key="frame" x="628" y="170" width="63" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="IJ7-tV-50y">
+                                <rect key="frame" x="266" y="216" width="236" height="29"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Debreif Mode OFF"/>
+                                    <segment title="Debrief Mode ON"/>
+                                </segments>
+                                <color key="tintColor" red="1" green="0.63906299470000005" blue="0.16701403349999999" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="changeDebriefStatus:" destination="UBD-64-uIi" eventType="valueChanged" id="J1b-L7-YXo"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <connections>
@@ -1219,6 +1263,7 @@
                         <outlet property="userNameTextField" destination="RJw-bD-PZT" id="hRU-JH-SYR"/>
                         <outlet property="yrAddButton" destination="f35-0u-Gxj" id="uf6-j1-ugL"/>
                         <outlet property="yrAddFormButton" destination="ABj-4s-UVz" id="PqX-I7-WF9"/>
+                        <outlet property="yrDebriefSegCtrl" destination="IJ7-tV-50y" id="ybB-Ad-jPZ"/>
                         <outlet property="yrRemoveButton" destination="xYi-mU-Q5x" id="9s1-DU-cO6"/>
                         <outlet property="yrRemoveFormButton" destination="s9g-hZ-pcN" id="uO2-Jh-X65"/>
                     </connections>
@@ -1234,9 +1279,9 @@
         <image name="clock.png" width="29" height="30"/>
         <image name="document.png" width="30" height="30"/>
         <image name="email.png" width="30" height="30"/>
+        <image name="flag.jpg" width="346" height="346"/>
         <image name="folder.png" width="30" height="30"/>
         <image name="gear.png" width="30" height="30"/>
-        <image name="goldStar.png" width="256" height="256"/>
         <image name="wifi.png" width="30" height="30"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

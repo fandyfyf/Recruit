@@ -36,6 +36,8 @@
 {
     float add_origin_y;
     float remove_origin_y;
+    float add_form_origin_y;
+    float remove_form_origin_y;
     int currentSelected;
 }
 
@@ -113,6 +115,8 @@
     
     add_origin_y = self.yrAddButton.frame.origin.y;
     remove_origin_y = self.yrRemoveButton.frame.origin.y;
+    add_form_origin_y = self.yrAddFormButton.frame.origin.y;
+    remove_form_origin_y = self.yrRemoveFormButton.frame.origin.y;
     
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
     
@@ -343,6 +347,21 @@
 }
 
 - (IBAction)removeEmailForms:(id)sender {
+}
+
+- (IBAction)changeDebriefStatus:(id)sender {
+    if (self.yrDebriefSegCtrl.selectedSegmentIndex ==1) {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Mode On?" message:@"Turn on debrief will potentially interrupt ongoing interviews." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Debrief!", nil];
+        [alert show];
+    }
+    else
+    {
+        //turn off debrief stuff
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"DebriefModeOn"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDebriefTermination];
+    }
 }
 
 -(void)yrCardViewCancel
@@ -829,6 +848,17 @@
         
         self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
     }
+    
+    if ([buttonTitle isEqualToString:@"Debrief!"]) {
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DebriefModeOn"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        //do debrief stuff
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDebriefInvitation];
+    }
+    if ([buttonTitle isEqualToString:@"Cancel"]) {
+        self.yrDebriefSegCtrl.selectedSegmentIndex = 0;
+    }
 }
 
 #pragma mark - UISrollViewDelegate
@@ -837,6 +867,30 @@
 {
     self.yrAddButton.frame = CGRectMake(self.yrAddButton.frame.origin.x, add_origin_y-scrollView.contentOffset.y, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height);
     self.yrRemoveButton.frame = CGRectMake(self.yrRemoveButton.frame.origin.x, remove_origin_y-scrollView.contentOffset.y, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height);
+    
+    self.yrAddFormButton.frame = CGRectMake(self.yrAddFormButton.frame.origin.x, add_form_origin_y-scrollView.contentOffset.y, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height);
+    
+    self.yrRemoveFormButton.frame = CGRectMake(self.yrRemoveFormButton.frame.origin.x, remove_form_origin_y-scrollView.contentOffset.y, self.yrRemoveFormButton.frame.size.width, self.yrRemoveFormButton.frame.size.height);
+    
+    if (add_form_origin_y-scrollView.contentOffset.y < self.interviewerList.frame.origin.y) {
+        self.yrAddFormButton.hidden = YES;
+        self.yrRemoveFormButton.hidden = YES;
+    }
+    else
+    {
+        self.yrAddFormButton.hidden = NO;
+        self.yrRemoveFormButton.hidden = NO;
+    }
+    
+    if (add_origin_y-scrollView.contentOffset.y < self.interviewerList.frame.origin.y) {
+        self.yrAddButton.hidden = YES;
+        self.yrRemoveButton.hidden = YES;
+    }
+    else
+    {
+        self.yrAddButton.hidden = NO;
+        self.yrRemoveButton.hidden = NO;
+    }
 }
 
 @end

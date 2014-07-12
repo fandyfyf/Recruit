@@ -18,6 +18,7 @@
 -(void)debuggerFunction;
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
 -(void)needUpdateTableNotification:(NSNotification *)notification;
+-(void)needUpdateConnectionListNotification:(NSNotification *)notification;
 -(void)doneWithPad;
 
 @end
@@ -48,6 +49,10 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:@"NeedUpdateTableNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateConnectionListNotification:) name:@"NeedUpdateConnectionListNotification" object:nil];
+    
+    
+    
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
     [self.yrtableView setDelegate:self];
     [self.yrtableView setDataSource:self];
@@ -103,19 +108,10 @@
 
 - (IBAction)signOut:(id)sender {
     NSLog(@"sign out");
-    for (NSDictionary *peerSession in [self.appDelegate mcManager].activeSessions) {
-        [[peerSession valueForKey:@"session"] disconnect];
-    }
-    [[self.appDelegate mcManager].activeSessions removeAllObjects];
     
-    [[[self.appDelegate mcManager] Nadvertiser] stopAdvertisingPeer];
-    [self.appDelegate mcManager].Nadvertiser = nil;
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Sign Out?" message:@"Signing out will affect connected interviewers!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Yes", nil];
     
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:[self.appDelegate dataManager]];
-    [self.appDelegate setDataManager:nil];
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [alert show];
 }
 
 //switch has a bug, and need to be fixed in a better way
@@ -133,6 +129,9 @@
             [[self.appDelegate dataManager] startListeningForData];
         }
         [[self.appDelegate dataManager] setHost:YES];
+        
+        //init active session && set up advertiser and advertise
+        [[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
     }
     else
     {
@@ -143,9 +142,18 @@
             [self.appDelegate.dataManager stopListeningForData];
             [self.appDelegate setDataManager:nil];
         }
+        
+        
+        for (NSDictionary *peerSession in [self.appDelegate mcManager].activeSessions) {
+            [[peerSession valueForKey:@"session"] disconnect];
+        }
+        [[self.appDelegate mcManager].activeSessions removeAllObjects];
+        [[[self.appDelegate mcManager] Nadvertiser] stopAdvertisingPeer];
+        [[self.appDelegate mcManager] setNadvertiser:nil];
+        
+        [self.yrarrayConnectedDevices removeAllObjects];
+        [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
     }
-    
-    [[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
 }
 
 - (IBAction)backgroundTapped:(id)sender {
@@ -188,7 +196,8 @@
     
     if (state != MCSessionStateConnecting) {
         if (state == MCSessionStateConnected) {
-            [self.yrarrayConnectedDevices addObject:peerDisplayName];
+            [self.yrarrayConnectedDevices addObject:@{@"displayName" : peerDisplayName, @"confirmedName" : @"connnecting..."}];
+
             //send ACK back
             [[self.appDelegate dataManager] sendACKBack:peerID];
             
@@ -196,11 +205,14 @@
         }
         else if (state == MCSessionStateNotConnected){
             if ([self.yrarrayConnectedDevices count] > 0) {
-                unsigned long indexOfPeer = [self.yrarrayConnectedDevices indexOfObject:peerDisplayName];
+                unsigned long indexOfPeer = 0;
+                for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
+                    if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerDisplayName]) {
+                        indexOfPeer = i;
+                        break;
+                    }
+                }
                 [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
-                
-                [[self.appDelegate mcManager].activeSessions removeObjectAtIndex:indexOfPeer];
-                
             }
         }
         
@@ -216,6 +228,21 @@
 -(void)needUpdateTableNotification:(NSNotification *)notification
 {
     //
+}
+
+-(void)needUpdateConnectionListNotification:(NSNotification *)notification
+{
+    NSString* displayName = [[notification userInfo] objectForKey:@"displayName"];
+    
+    for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
+        if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:displayName]) {
+            [self.yrarrayConnectedDevices replaceObjectAtIndex:i withObject:[notification userInfo]];
+        }
+        break;
+    }
+    
+    //update table here!!
+    [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 }
 
 -(void)doneWithPad
@@ -259,7 +286,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CellIdentifier"];
     }
     
-    cell.textLabel.text = [self.yrarrayConnectedDevices objectAtIndex:indexPath.row];
+    cell.textLabel.text = [self.yrarrayConnectedDevices objectAtIndex:indexPath.row][@"confirmedName"];
     
     return cell;
 }
@@ -275,5 +302,26 @@
     [self.yrPrefixTextField resignFirstResponder];
     self.yrPrefix = self.yrPrefixTextField.text;
     return YES;
+}
+
+#pragma mark - UIAlertViewDelegate
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Yes"]) {
+        for (NSDictionary *peerSession in [self.appDelegate mcManager].activeSessions) {
+            [[peerSession valueForKey:@"session"] disconnect];
+        }
+        [[self.appDelegate mcManager].activeSessions removeAllObjects];
+        
+        [[[self.appDelegate mcManager] Nadvertiser] stopAdvertisingPeer];
+        [self.appDelegate mcManager].Nadvertiser = nil;
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [[NSNotificationCenter defaultCenter] removeObserver:[self.appDelegate dataManager]];
+        [self.appDelegate setDataManager:nil];
+        
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 @end

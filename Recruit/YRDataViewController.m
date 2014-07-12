@@ -83,6 +83,8 @@
     {
         self.yrAdministorDeleteButton.hidden = YES;
     }
+    
+    self.yrSearchBar.delegate = self;
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -92,6 +94,7 @@
     [self fetchCandidates]; //updatedata before each time the view appear
     
     [self.infoDataList reloadData];
+    self.yrSearchBar.text = @"";
 }
 
 - (void)didReceiveMemoryWarning
@@ -117,9 +120,63 @@
 {
     //[self fetchCandidates];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.yrdataEntry addObject:[[notification userInfo] objectForKey:@"entry"]];
+        //[self.yrdataEntry addObject:[[notification userInfo] objectForKey:@"entry"]];
         
-        [self.infoDataList performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+        //[self fetchCandidates];
+        
+        CandidateEntry* curr = [[notification userInfo] objectForKey:@"entry"];
+        
+        if ([self.yrPositionFilter selectedSegmentIndex] == 0) {
+            [self.yrdataEntry addObject:curr];
+            
+            [self.infoDataList beginUpdates];
+            
+            
+            if ([self.yrdataEntry count] % 2 == 0) {
+                [self.infoDataList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.yrdataEntry count]-1 inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+            }
+            else
+            {
+                [self.infoDataList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.yrdataEntry count]-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
+            }
+            
+            [self.infoDataList endUpdates];
+        }
+        else if ([self.yrPositionFilter selectedSegmentIndex] == 1 && [curr.position isEqualToString:@"Intern"])
+        {
+            [self.yrdataEntry addObject:curr];
+            [self.infoDataList beginUpdates];
+            
+            
+            if ([self.yrdataEntry count] % 2 == 0) {
+                [self.infoDataList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.yrdataEntry count]-1 inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+            }
+            else
+            {
+                [self.infoDataList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.yrdataEntry count]-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
+            }
+            
+            [self.infoDataList endUpdates];
+        }
+        else if ([self.yrPositionFilter selectedSegmentIndex] == 2 && [curr.position isEqualToString:@"Full-Time"])
+        {
+            [self.yrdataEntry addObject:curr];
+            
+            [self.infoDataList beginUpdates];
+            
+            
+            if ([self.yrdataEntry count] % 2 == 0) {
+                [self.infoDataList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.yrdataEntry count]-1 inSection:0]] withRowAnimation:UITableViewRowAnimationLeft];
+            }
+            else
+            {
+                [self.infoDataList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.yrdataEntry count]-1 inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
+            }
+            
+            [self.infoDataList endUpdates];
+        }
+        
+               //[self.infoDataList performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
     });
 }
 
@@ -282,6 +339,53 @@
     [self.grayView removeFromSuperview];
 }
 
+- (IBAction)deleteCoreData:(id)sender {
+    
+    [self.yrdataEntry removeAllObjects];
+    
+    [self.infoDataList reloadData];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+    
+    NSError* error = nil;
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    for (CandidateEntry* candidate in FetchResults) {
+        [self.managedObjectContext deleteObject:candidate];
+    }
+    
+    if (![self.managedObjectContext save:&error]) {
+        NSLog(@"ERROR -- saving coredata");
+    }
+}
+
+- (IBAction)cancelSearch:(id)sender {
+    [self.yrSearchBar resignFirstResponder];
+    self.yrSearchBar.text = @"";
+    
+    //reload data without search input
+    [self.yrdataEntry removeAllObjects];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+    
+    if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
+    {
+        //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
+        [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
+    }
+    
+    if (self.yrPositionFilter.selectedSegmentIndex != 0) {
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"position = %@",[self.yrPositionFilter titleForSegmentAtIndex:self.yrPositionFilter.selectedSegmentIndex]]];
+    }
+    
+    NSError* error = nil;
+    NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
+    [self setYrdataEntry:mutableFetchResults];
+    
+    [self.infoDataList reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+}
+
 
 #pragma mark - UITableViewDataSource
 
@@ -382,6 +486,14 @@
 {
     self.currentEntry = (CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row];
     [self performSegueWithIdentifier:@"ListToDetail" sender:self];
+    
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
+        //send out broadCast with self.currentEntry
+        NSDictionary* dic = @{@"firstName":self.currentEntry.firstName,@"lastName":self.currentEntry.lastName,@"email":self.currentEntry.emailAddress,@"interviewer":self.currentEntry.interviewer,@"code":self.currentEntry.code,@"recommand":self.currentEntry.recommand,@"status":self.currentEntry.status,@"pdf":self.currentEntry.pdf,@"position":self.currentEntry.position,@"preference":self.currentEntry.preference,@"date":self.currentEntry.date,@"note":self.currentEntry.notes,@"rank":[self.currentEntry.rank stringValue],@"gpa":[self.currentEntry.gpa stringValue],@"BU1" : self.currentEntry.businessUnit1, @"BU2" : self.currentEntry.businessUnit2};
+        NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
+        
+        [self.appDelegate.dataManager broadCastData:packet];
+    }
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -391,24 +503,32 @@
     return [scrollView.subviews objectAtIndex:0];
 }
 
-- (IBAction)deleteCoreData:(id)sender {
-    
+#pragma mark - UISearchBarDelegate
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
     [self.yrdataEntry removeAllObjects];
-    
-    [self.infoDataList reloadData];
-    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
     
-    NSError* error = nil;
-    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
+    {
+        //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
+        [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
+    }
     
-    for (CandidateEntry* candidate in FetchResults) {
-        [self.managedObjectContext deleteObject:candidate];
+    if (self.yrPositionFilter.selectedSegmentIndex != 0 && ![searchText isEqualToString:@""]) {
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(code BEGINSWITH[cd] %@ || firstName CONTAINS[cd] %@ || lastName CONTAINS[cd] %@) && position = %@",searchText,searchText,searchText,[self.yrPositionFilter titleForSegmentAtIndex:self.yrPositionFilter.selectedSegmentIndex]]];
+    }
+    else if (![searchText isEqualToString:@""])
+    {
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code BEGINSWITH[cd] %@ || firstName CONTAINS[cd] %@ || lastName CONTAINS[cd] %@",searchText,searchText,searchText]];
     }
 
-    if (![self.managedObjectContext save:&error]) {
-        NSLog(@"ERROR -- saving coredata");
-    }
+    NSError* error = nil;
+    NSMutableArray* mutableFetchResults = [[self.managedObjectContext executeFetchRequest:fetchRequest error:&error] mutableCopy];
+    [self setYrdataEntry:mutableFetchResults];
+    [self.infoDataList reloadData];
 }
+
 @end

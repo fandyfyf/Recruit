@@ -147,11 +147,17 @@
     
     if (state != MCSessionStateConnecting) {
         if (state == MCSessionStateConnected) {
-            [self.yrarrayConnectedDevices addObject:peerDisplayName];
+            [self.yrarrayConnectedDevices addObject:@{@"displayName" : peerDisplayName, @"confirmedName" : @"connnecting..."}];
         }
         else if (state == MCSessionStateNotConnected){
             if ([self.yrarrayConnectedDevices count] > 0) {
-                unsigned long indexOfPeer = [self.yrarrayConnectedDevices indexOfObject:peerDisplayName];
+                unsigned long indexOfPeer = 0;
+                for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
+                    if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerDisplayName]) {
+                        indexOfPeer = i;
+                        break;
+                    }
+                }
                 [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
             }
         }
@@ -359,7 +365,7 @@
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CellIdentifier"];
         }
     
-        cell.textLabel.text = [self.yrarrayConnectedDevices objectAtIndex:indexPath.row];
+        cell.textLabel.text = [self.yrarrayConnectedDevices objectAtIndex:indexPath.row][@"confirmedName"];
     
         return cell;
     }

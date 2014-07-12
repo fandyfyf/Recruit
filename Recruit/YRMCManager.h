@@ -22,6 +22,7 @@ FOUNDATION_EXPORT NSString* const kYRMCManagerDidReceiveDataNotification;
 @property (strong, nonatomic) MCNearbyServiceBrowser *autoBrowser;
 @property (strong, nonatomic) MCNearbyServiceAdvertiser *Nadvertiser;
 @property (assign, getter = isHost) BOOL host;
+@property (assign, getter = isBrowsing) BOOL browsing;
 
 @property (nonatomic, copy) NSString* userName;
 @property (nonatomic, copy) NSString* userEmail;

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "YRAppDelegate.h"
+#import "YRDebriefViewController.h"
 
 @interface YRFormViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate, UITextViewDelegate,UITableViewDataSource,UITableViewDelegate>
 
@@ -21,6 +22,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *yrcodeLabel;
 
 @property (strong, nonatomic) UIViewController* source;
+@property (strong, nonatomic) YRDebriefViewController* debriefingViewController;
 
 @property (weak, nonatomic) IBOutlet UITextField *yrGPATextField;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionSegmentControl;

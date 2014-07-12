@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "YRAppDelegate.h"
 #import <Guile/AutoSuggestDelegate.h>
+#import "YRDebriefViewController.h"
 
 @class AutoSuggestTextField;
 
@@ -19,6 +20,7 @@
 
 @property (strong, nonatomic) NSMutableString *yrIDCode;
 @property (strong, nonatomic) NSString* clientUserName;
+@property (strong, nonatomic) YRDebriefViewController* debriefingViewController;
 @property (weak, nonatomic) IBOutlet UILabel *yrnameLabel;
 @property (weak, nonatomic) IBOutlet UIButton *yrSignOutButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrContinueButton;

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "YRAppDelegate.h"
 
-@interface YRDataViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@interface YRDataViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,UISearchBarDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *infoDataList;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrSortingSegmentControl;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionFilter;
@@ -23,8 +23,10 @@
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrAdministorDeleteButton;
 @property (strong, nonatomic) UIControl* grayView;
+@property (weak, nonatomic) IBOutlet UISearchBar *yrSearchBar;
 
 
 - (IBAction)deleteCoreData:(id)sender;
+- (IBAction)cancelSearch:(id)sender;
 
 @end

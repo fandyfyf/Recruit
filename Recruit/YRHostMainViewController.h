@@ -10,7 +10,7 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "YRAppDelegate.h"
 
-@interface YRHostMainViewController : UIViewController <MCBrowserViewControllerDelegate,UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
+@interface YRHostMainViewController : UIViewController <MCBrowserViewControllerDelegate,UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) UIViewController* source;
 @property (strong, nonatomic) NSString* hostUserName;

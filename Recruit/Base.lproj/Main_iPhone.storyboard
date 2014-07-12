@@ -193,7 +193,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </tableView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="75" sectionHeaderHeight="22" sectionFooterHeight="22" id="6bu-UF-Owe">
-                                <rect key="frame" x="0.0" y="68" width="320" height="449"/>
+                                <rect key="frame" x="0.0" y="116" width="320" height="402"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
@@ -204,7 +204,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="74"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="goldStar.png" id="7Rg-oV-OBL">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flag.jpg" id="7Rg-oV-OBL">
                                                     <rect key="frame" x="47" y="1" width="15" height="15"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
@@ -307,6 +307,24 @@
                                 </segments>
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
                             </segmentedControl>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="xyN-m5-iaP">
+                                <rect key="frame" x="0.0" y="72" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem style="plain" id="CO0-Zl-gVP">
+                                        <searchBar key="customView" contentMode="redraw" text="" placeholder="Recruit ID/Name" id="yRk-yR-2yY">
+                                            <rect key="frame" x="16" y="0.0" width="226" height="44"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no"/>
+                                        </searchBar>
+                                    </barButtonItem>
+                                    <barButtonItem title="Cancel" id="ulO-GO-6D4">
+                                        <connections>
+                                            <action selector="cancelSearch:" destination="foz-Ft-zgJ" id="3jH-qt-YLl"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -314,6 +332,7 @@
                     <connections>
                         <outlet property="infoDataList" destination="6bu-UF-Owe" id="rnT-ZP-epo"/>
                         <outlet property="yrPositionFilter" destination="hzP-EK-tJe" id="QCo-Ug-T9e"/>
+                        <outlet property="yrSearchBar" destination="yRk-yR-2yY" id="hvd-Ic-OA0"/>
                         <outlet property="yrSortingSegmentControl" destination="tDr-bm-xuo" id="cWx-bg-G0y"/>
                         <segue destination="u9p-ym-xQw" kind="modal" identifier="ListToDetail" id="Sne-F2-Tcq"/>
                     </connections>
@@ -1188,9 +1207,9 @@
         <image name="clock.png" width="29" height="30"/>
         <image name="document.png" width="30" height="30"/>
         <image name="email.png" width="30" height="30"/>
+        <image name="flag.jpg" width="346" height="346"/>
         <image name="folder.png" width="30" height="30"/>
         <image name="gear.png" width="30" height="30"/>
-        <image name="goldStar.png" width="256" height="256"/>
         <image name="wifi.png" width="30" height="30"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

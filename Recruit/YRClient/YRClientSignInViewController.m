@@ -22,6 +22,8 @@
 -(void)needUpdateCodeNotification:(NSNotification *)notification;
 -(void)popUpNameListNotification:(NSNotification*)notification;
 -(void)removeNameListNotification:(NSNotification *)notification;
+-(void)debriefingModeOnNotification:(NSNotification *)notification;
+-(void)debriefingModeOffNotification:(NSNotification *)notification;
 -(void)reconnectNotification:(NSNotification *)notification;
 -(void)removeListView;
 -(BOOL)checkReady;
@@ -54,6 +56,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:@"NeedUpdateCodeNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:@"NameListReadyNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:@"debriefModeOnNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:@"debriefModeOffNotification" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
@@ -81,6 +85,7 @@
     
     self.appDelegate.mcManager.autoBrowser.delegate = self;
     [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
+    [self.appDelegate.mcManager setBrowsing:YES];
 
     self.yrFirstNameTextField.delegate = self;
     self.yrLastNameTextField.delegate = self;
@@ -121,6 +126,12 @@
                          nil];
     
     self.yrEmailTextField.inputAccessoryView = doneToolbar;
+    
+//    //=====test=====/
+    if (self.debriefingViewController == nil) {
+        self.debriefingViewController = [YRDebriefViewController new];
+    }
+    [self.view addSubview:self.debriefingViewController.view];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -173,11 +184,17 @@
     
     if (state != MCSessionStateConnecting) {
         if (state == MCSessionStateConnected) {
-            [self.yrarrayConnectedDevices addObject:peerDisplayName];
+            [self.yrarrayConnectedDevices addObject:@{@"displayName" : peerDisplayName, @"confirmedName" : @"connnecting..."}];
         }
         else if (state == MCSessionStateNotConnected){
             if ([self.yrarrayConnectedDevices count] > 0) {
-                unsigned long indexOfPeer = [self.yrarrayConnectedDevices indexOfObject:peerDisplayName];
+                unsigned long indexOfPeer = 0;
+                for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
+                    if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerDisplayName]) {
+                        indexOfPeer = i;
+                        break;
+                    }
+                }
                 [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
             }
         }
@@ -252,6 +269,22 @@
     [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
 }
 
+-(void)debriefingModeOnNotification:(NSNotification *)notification
+{
+    if (self.debriefingViewController == nil) {
+        self.debriefingViewController = [YRDebriefViewController new];
+    }
+    [self.view addSubview:self.debriefingViewController.view];
+}
+
+-(void)debriefingModeOffNotification:(NSNotification *)notification
+{
+    //[self.debriefingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self.debriefingViewController.view removeFromSuperview];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.debriefingViewController];
+    self.debriefingViewController = nil;
+}
+
 -(void)reconnectNotification:(NSNotification *)notification
 {
     [self.appDelegate.mcManager.session disconnect];
@@ -273,6 +306,7 @@
     
     self.appDelegate.mcManager.autoBrowser.delegate = self;
     [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
+    [self.appDelegate.mcManager setBrowsing:YES];
 }
 
 -(BOOL)checkReady
@@ -318,6 +352,7 @@
     [browser invitePeer:peerID toSession:self.appDelegate.mcManager.session withContext:nil timeout:30.0];
     
     [browser stopBrowsingForPeers];
+    [self.appDelegate.mcManager setBrowsing:NO];
 }
 
 - (void)browser:(MCNearbyServiceBrowser *)browser lostPeer:(MCPeerID *)peerID
@@ -435,12 +470,17 @@
         //Interviewer* current = self.appDelegate.dataManager.nameList[indexPath.row];
         NSDictionary* current = self.appDelegate.dataManager.nameList[indexPath.row];
         
-        //[self.appDelegate.mcManager setUserName:current.name];
+        NSString* prevUserName = [self.appDelegate.mcManager.userName copy];
+        
         [self.appDelegate.mcManager setUserName:current[@"name"]];
         
         [self.yrNameListView removeFromSuperview];
         
+        NSLog(@"update %@ to %@",prevUserName,self.appDelegate.mcManager.userName);
+        
         //send out backUp here with the updated name
+        
+        [self.appDelegate.dataManager sendIdentityConfirmation:self.appDelegate.mcManager.userName];
         
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];

@@ -31,6 +31,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *yrAddButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrAddFormButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrRemoveFormButton;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *yrDebriefSegCtrl;
 
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (strong, nonatomic) UITextView* yrEditingView;
@@ -44,4 +45,5 @@
 - (IBAction)backgroundTapped:(id)sender;
 - (IBAction)addEmailForm:(id)sender;
 - (IBAction)removeEmailForms:(id)sender;
+- (IBAction)changeDebriefStatus:(id)sender;
 @end

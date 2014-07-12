@@ -20,6 +20,8 @@
 -(void)needEndSessionNotification:(NSNotification *)notification;
 -(void)popUpNameListNotification:(NSNotification*)notification;
 -(void)removeNameListNotification:(NSNotification *)notification;
+-(void)debriefingModeOnNotification:(NSNotification *)notification;
+-(void)debriefingModeOffNotification:(NSNotification *)notification;
 -(void)refresh;
 -(void)showPlatformSeg;
 -(void)doneWithPad;
@@ -41,6 +43,8 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:@"NameListReadyNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:@"debriefModeOnNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:@"debriefModeOffNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needEndSessionNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
@@ -100,7 +104,7 @@
 
 - (IBAction)sendInformation:(id)sender {
     if ([self checkReady]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Advocate!", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Flag!", nil];
         [alert show];
     }
     else
@@ -193,6 +197,22 @@
 -(void)removeNameListNotification:(NSNotification *)notification
 {
     [self.yrNameListView removeFromSuperview];
+}
+
+-(void)debriefingModeOnNotification:(NSNotification *)notification
+{
+    if (self.debriefingViewController == nil) {
+        self.debriefingViewController = [YRDebriefViewController new];
+    }
+    [self.view addSubview:self.debriefingViewController.view];
+}
+
+-(void)debriefingModeOffNotification:(NSNotification *)notification
+{
+    //[self.debriefingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self.debriefingViewController.view removeFromSuperview];
+    [[NSNotificationCenter defaultCenter] removeObserver:self.debriefingViewController];
+    self.debriefingViewController = nil;
 }
 
 -(void)refresh
@@ -294,7 +314,7 @@
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];
         
-        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Advocate!"]) {
+        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Flag!"]) {
             newDic[@"recommand"] = [NSNumber numberWithBool:YES];
         }
         //change NSDictionary to NSMutableDictionary
@@ -376,6 +396,8 @@
         //Interviewer* current = self.appDelegate.dataManager.nameList[indexPath.row];
         NSDictionary* current = self.appDelegate.dataManager.nameList[indexPath.row];
         
+        NSString* prevUserName = [self.appDelegate.mcManager.userName copy];
+        
         //[self.appDelegate.mcManager setUserName:current.name];
         [self.appDelegate.mcManager setUserName:current[@"name"]];
         
@@ -383,6 +405,9 @@
         
         
         //send back up with the updated username
+        
+        [self.appDelegate.dataManager sendIdentityConfirmation:prevUserName];
+        
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];
         NSError* error = nil;

@@ -37,7 +37,16 @@
     
     if (self) {
         _yrPrefix = prefix;
-        _counter = 0;
+        if ([[NSUserDefaults standardUserDefaults] valueForKey:@"codeIndex"] == nil) {
+            _counter = 0;
+            //initialize code Index in userdefault
+            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:_counter] forKey:@"codeIndex"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        else
+        {
+            _counter = [[[NSUserDefaults standardUserDefaults] valueForKey:@"codeIndex"] intValue];
+        }
     }
     
     return self;
@@ -81,7 +90,6 @@
                 CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
                 NSDictionary *dict = @{@"entry" : curr};
                 
-                
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
                                                                     object:nil
                                                                   userInfo:dict];
@@ -91,6 +99,46 @@
                 [self sendACKBack:peerID];
                 NSLog(@"duplicate code and firstName found");
             }
+        }
+        else if([dic[@"msg"] isEqualToString:@"broadcast"] && !self.isHost)
+        {
+            //receive debrief invitation
+            NSLog(@"receiving one broadcast entry");
+            //post notification to observers
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"receiveBroadcastNotification" object:nil userInfo:dic[@"data"]];
+        }
+        else if([dic[@"msg"] isEqualToString:@"debriefInvitation"] && !self.isHost)
+        {
+            //receive debrief invitation
+            NSLog(@"receiving debrief invitation");
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Invitation" message:@"The host is starting a debrief session and your are invited!" delegate:self cancelButtonTitle:@"Decline" otherButtonTitles:@"Accept", nil];
+            [alert show];
+            //or post notification to observers
+        }
+        else if([dic[@"msg"] isEqualToString:@"debriefTermination"] && !self.isHost)
+        {
+            //receive debrief invitation
+            NSLog(@"receiving debrief termination");
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Termination" message:@"The host is closing the session" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alert show];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"debriefModeOffNotification" object:nil];
+            //or post notification to observers
+        }
+        else if([dic[@"msg"] isEqualToString:@"identityConfirm"] && self.isHost)
+        {
+            NSLog(@"Receiving update username: %@ from %@",peerID.displayName,dic[@"data"]);
+            
+            NSDictionary* dict = @{@"displayName": peerID.displayName, @"confirmedName" : dic[@"data"]};
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateConnectionListNotification" object:nil userInfo:dict];
+            
+            //===================send to new connected user====================//
+            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
+                [self sendDebriefInvitationToPeer:peerID];
+            }
+            
         }
         else if([dic[@"msg"] isEqualToString:@"ack"])
         {
@@ -124,9 +172,44 @@
             NSLog(@"The receiving list is %@",dic[@"data"]);
             self.nameList = dic[@"data"];
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NameListReadyNotification"
+            BOOL signIn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedInAlready"] boolValue];
+            
+            if (signIn) {
+                [self sendIdentityConfirmation:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
+                
+                NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+                [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+                NSError* error = nil;
+                NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+                
+                for (CandidateEntry* backedUpCandidate in FetchResults)
+                {
+                    NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
+                    NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+                    [self sendBackUp:packet];
+                    NSLog(@"sending one entry");
+                }
+                
+                //reset the core data
+                for (CandidateEntry* backedUpCandidate in FetchResults)
+                {
+                    [self.managedObjectContext deleteObject:backedUpCandidate];
+                    NSLog(@"deleting one coredata entry");
+                }
+                
+                if (![self.managedObjectContext save:&error]) {
+                    NSLog(@"ERROR -- saving coredata");
+                }
+            }
+            else
+            {
+                [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"SignedInAlready"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"NameListReadyNotification"
                                                                 object:nil
                                                               userInfo:nil];
+            }
         }
         else
         {
@@ -179,6 +262,8 @@
     [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName]]];
     [item setRank:[NSNumber numberWithFloat:[(NSString*)infoData[@"rank"] floatValue]]];
     [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
+    [item setBusinessUnit1:@""];
+    [item setBusinessUnit2:@""];
     
     NSError *error = nil;
     if (![self.managedObjectContext save:&error]) {
@@ -234,6 +319,39 @@
         
         //save the data in local core data
         [self queuingLocalCandidate:data[@"data"]];
+        
+        //send fail, no connection, restart browsing
+        if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
+            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
+            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        }
+    }
+}
+
+-(void)broadCastData:(NSDictionary*)data
+{
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    
+    [yrarchiver encodeObject:data forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+        NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
+        
+        NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+        
+        NSError *error;
+        
+        [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+        
+        if(error){
+            NSLog(@"%@", [error localizedDescription]);
+        }
+        else
+        {
+            //
+        }
     }
 }
 
@@ -278,6 +396,123 @@
     [selectedSession sendData:dataToSend toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
     if(error){
         NSLog(@"%@", [error localizedDescription]);
+    }
+}
+
+-(void)sendIdentityConfirmation:(NSString*)updateUserName
+{
+    NSDictionary* dic = @{@"msg" : @"identityConfirm", @"data" : updateUserName};
+    
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    
+    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    NSArray * allPeers = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session.connectedPeers;
+    
+    NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+    
+    NSError *error;
+    
+    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+    
+    if(error){
+        NSLog(@"%@", [error localizedDescription]);
+    }
+    else
+    {
+        //
+    }
+}
+
+-(void)sendDebriefTermination
+{
+    NSDictionary* dic = @{@"msg" : @"debriefTermination"};
+    
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    
+    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+        NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
+        
+        NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+        
+        NSError *error;
+        
+        [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+        
+        if(error){
+            NSLog(@"%@", [error localizedDescription]);
+        }
+        else
+        {
+            //
+        }
+    }
+}
+
+-(void)sendDebriefInvitationToPeer:(MCPeerID*)peer
+{
+    NSDictionary* dic = @{@"msg" : @"debriefInvitation"};
+    
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    
+    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+
+    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+        
+        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
+            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
+            
+            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+            
+            NSError *error;
+            
+            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+            
+            if(error){
+                NSLog(@"%@", [error localizedDescription]);
+            }
+            else
+            {
+                //
+            }
+        }
+    }
+}
+
+-(void)sendDebriefInvitation
+{
+    NSDictionary* dic = @{@"msg" : @"debriefInvitation"};
+    
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    
+    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+        NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
+        
+        NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+        
+        NSError *error;
+        
+        [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+        
+        if(error){
+            NSLog(@"%@", [error localizedDescription]);
+        }
+        else
+        {
+            //
+        }
     }
 }
 
@@ -337,11 +572,26 @@
 -(int) nextCode
 {
     self.counter = self.counter + 1;
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:self.counter] forKey:@"codeIndex"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     return self.counter;
 }
 
 - (void)dealloc{
     [self stopListeningForData];
+}
+
+#pragma mark- UIAlertViewDelegate
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Accept"]) {
+        //accept the debrief mode
+        //send acknowledge back?
+        
+        //bring up new view controller to show broadcast
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"debriefModeOnNotification" object:nil];
+    }
 }
 
 @end

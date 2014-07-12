@@ -25,6 +25,7 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
         _Nadvertiser = nil;
         _userEmail = nil;
         _userName = nil;
+        _browsing = NO;
     }
     return self;
 }
@@ -50,10 +51,13 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 
 -(void)advertiseSelf:(BOOL)shouldAdvertise
 {
-    self.activeSessions = [NSMutableArray new];
     if (shouldAdvertise) {
-        //self.advertiser = [[MCAdvertiserAssistant alloc] initWithServiceType:@"files" discoveryInfo:nil session:self.session];
+        if (self.activeSessions == nil) {
+            self.activeSessions = [NSMutableArray new];
+        }
+        [self.activeSessions removeAllObjects];
         
+        //self.advertiser = [[MCAdvertiserAssistant alloc] initWithServiceType:@"files" discoveryInfo:nil session:self.session];
         
         self.Nadvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.peerID discoveryInfo:nil serviceType:@"files"];
         

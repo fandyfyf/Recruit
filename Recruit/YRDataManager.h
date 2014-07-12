@@ -10,7 +10,7 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "CandidateEntry.h"
 
-@interface YRDataManager : NSObject
+@interface YRDataManager : NSObject <UIAlertViewDelegate>
 
 
 //@property (strong, nonatomic) YRAppDelegate *appDelegate;
@@ -36,7 +36,17 @@
 
 -(void)sendData:(NSDictionary*)data;
 
+-(void)broadCastData:(NSDictionary*)data;
+
 -(void)sendNameList:(MCPeerID*)peerID;
+
+-(void)sendIdentityConfirmation:(NSString*)updateUserName;
+
+-(void)sendDebriefTermination;
+
+-(void)sendDebriefInvitationToPeer:(MCPeerID*)peer;
+
+-(void)sendDebriefInvitation;
 
 -(void)sendBackUp:(NSDictionary* )localBackUp;
 
