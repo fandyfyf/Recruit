@@ -127,11 +127,11 @@
     
     self.yrEmailTextField.inputAccessoryView = doneToolbar;
     
-//    //=====test=====/
-    if (self.debriefingViewController == nil) {
-        self.debriefingViewController = [YRDebriefViewController new];
-    }
-    [self.view addSubview:self.debriefingViewController.view];
+////    //=====test=====/
+//    if (self.debriefingViewController == nil) {
+//        self.debriefingViewController = [YRDebriefViewController new];
+//    }
+//    [self.view addSubview:self.debriefingViewController.view];
 }
 
 - (void)viewWillAppear:(BOOL)animated

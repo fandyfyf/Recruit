@@ -2,7 +2,7 @@
 //  Interviewer.h
 //  Recruit
 //
-//  Created by Yifan Fu on 6/27/14.
+//  Created by Yifan Fu on 7/14/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -16,6 +16,7 @@
 @property (nonatomic, retain) NSString * code;
 @property (nonatomic, retain) NSString * email;
 @property (nonatomic, retain) NSString * name;
+@property (nonatomic, retain) NSArray * tagList;
 @property (nonatomic, retain) NSSet *appointments;
 @end
 

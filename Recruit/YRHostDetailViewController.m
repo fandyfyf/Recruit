@@ -24,6 +24,8 @@
 -(void)cancelRankChange;
 -(void)removeViews;
 -(void)checkScheduleFunction;
+-(void)scrollLeft;
+-(void)scrollRight;
 
 @end
 
@@ -31,6 +33,8 @@
 {
     BOOL spin;
     int currentSelectedEmailForm;
+    BOOL replacingMode;
+    int showingImageIndex;
 }
 
 - (void)viewDidLoad
@@ -82,15 +86,15 @@
     if ([self.dataSource.pdf boolValue]) {
         [self.yrFileNameButton setHidden:NO];
         
-        NSDateFormatter* format = [[NSDateFormatter alloc] init];
-        [format setDateFormat:@"MMddyyyHHmm"];
-        NSString* date = [format stringFromDate:self.dataSource.date];
+//        NSDateFormatter* format = [[NSDateFormatter alloc] init];
+//        [format setDateFormat:@"MMddyyyHHmm"];
+//        NSString* date = [format stringFromDate:self.dataSource.date];
+//        
+//        NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
+//        
+//        NSString *fullPath = [fileName stringByAppendingPathExtension:@"jpg"];
         
-        NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
-        
-        NSString *fullPath = [fileName stringByAppendingPathExtension:@"jpg"];
-        
-        [self.yrFileNameButton setTitle:fullPath forState:UIControlStateNormal];
+        [self.yrFileNameButton setTitle:@"Resume" forState:UIControlStateNormal];
     }
     else
     {
@@ -181,6 +185,7 @@
         [[self.checkInterviewButton layer] setBorderWidth:2];
     }
     spin = YES;
+    replacingMode = NO;
     
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
     
@@ -282,85 +287,54 @@
 }
 
 - (IBAction)checkImage:(id)sender {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    
-    NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
-    
-    NSError *error;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
-        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-    
-    NSDateFormatter* format = [[NSDateFormatter alloc] init];
-    [format setDateFormat:@"MMddyyyHHmm"];
-    NSString* date = [format stringFromDate:self.dataSource.date];
-    
-    NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
-    
-    NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
-    
-    UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
-    
-    
-    UIImageView* imageview = [[UIImageView alloc] initWithImage:image];
-    
+    int half = 0;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-    }
-    else{
-        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
-    }
-    
-    self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-110, 10, 100, 100);
-    }
-    else{
-        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
-        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-55, 50, 50, 50);
-    }
-    //self.yrScrollView.contentSize = image.size;
-    self.yrScrollView.contentSize = imageview.frame.size;
-    [self.yrScrollView addSubview:imageview];
-    [self.yrScrollView setDelegate:self];
-    [self.yrScrollView setMaximumZoomScale:4];
-    [self.yrScrollView setMinimumZoomScale:1];
-    
-    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-    self.grayView.backgroundColor = [UIColor blackColor];
-    self.grayView.alpha = 0.9;
-    
-    [self.view addSubview:self.grayView];
-    [self.view addSubview:self.yrScrollView];
-    
-    [self.yrGoBackButton setHidden:YES];
-    
-    [self.yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
-    [self.yrScrollViewCancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [[self.yrScrollViewCancelButton layer] setCornerRadius:50];
-        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
-        
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+        half = 150;
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
-        [[self.yrScrollViewCancelButton layer] setCornerRadius:25];
-        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
-        
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        half = 120;
     }
     
-
-    [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
+    self.resumeOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrFileNameButton.center.x-half, self.yrFileNameButton.center.y+20, 2*half, 160)];
+    [[self.resumeOptionView layer] setCornerRadius:12];
     
-    [self.view addSubview:self.yrScrollViewCancelButton];
+    self.resumeOptionTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 5, 2*half - 10, 150) style:UITableViewStylePlain];
+    [[self.resumeOptionTable layer] setCornerRadius:10];
+    //        UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 2*half - 100, 20)];
+    //        titleLabel.text = @"Files";
+    //        titleLabel.textColor = [UIColor purpleColor];
+    //        titleLabel.textAlignment = NSTextAlignmentLeft;
+    //        titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    
+    //        [self.resumeOptionView addSubview:titleLabel];
+    [self.resumeOptionView addSubview:self.resumeOptionTable];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        UIViewController* newController = [UIViewController new];
+        self.popOver = [[UIPopoverController alloc] initWithContentViewController:newController];
+        newController.view = self.resumeOptionView;
+        
+        [self.popOver setPopoverContentSize:CGSizeMake(2*half, 160)];
+        
+        [self.popOver presentPopoverFromRect:CGRectMake(self.yrFileNameButton.center.x-half, self.yrFileNameButton.center.y+20, 2*half, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    }
+    else
+    {
+        self.resumeOptionView.backgroundColor = [UIColor purpleColor];
+        //            titleLabel.textColor = [UIColor whiteColor];
+        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+        self.grayView.backgroundColor = [UIColor darkGrayColor];
+        self.grayView.alpha = 0.5;
+        [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview:self.grayView];
+        
+        [self.view addSubview:self.resumeOptionView];
+    }
+    self.resumeOptionTable.delegate = self;
+    self.resumeOptionTable.dataSource = self;
+    
+    //done
 }
 
 - (IBAction)backgroundTapped:(id)sender {
@@ -478,60 +452,16 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
-    UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
+    self.chosenImage = info[UIImagePickerControllerOriginalImage];
     //self.imageView.image = chosenImage;
     //compress into Jpeg file
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(chosenImage, 1.0)];
-        //save in local resource
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Image Generated" message:@"Adding a new page or replacing an old one?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Adding New Page",@"Replacing Old Page", nil];
     
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
+    [alertView show];
     
-        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
     
-        NSError *error;
-        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
-            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
     
-        NSDateFormatter* format = [[NSDateFormatter alloc] init];
-        [format setDateFormat:@"MMddyyyHHmm"];
-        NSString* date = [format stringFromDate:self.dataSource.date];
-        
-        NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
-        
-        NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
-    
-        bool ret = [imageData writeToFile:fullPath options:0 error:&error];
-        
-        if (ret) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-                [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
-                
-                [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@ and lastName = %@",self.dataSource.code,self.dataSource.firstName,self.dataSource.lastName]];
-                
-                NSError* error = nil;
-                NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
-                
-                CandidateEntry* selected = mutableFetchResults[0];
-                
-                [selected setPdf:[NSNumber numberWithBool:YES]];
-                
-                [self.yrFileNameButton setTitle:[NSString stringWithFormat:@"%@.jpg",fileName] forState:UIControlStateNormal];
-                [self.yrFileNameButton setHidden:NO];
-                
-                if (![[self.appDelegate managedObjectContext] save:&error]) {
-                    NSLog(@"ERROR -- saving coredata");
-                }
-            });
-            
-        } else{
-            NSLog(@"Error while saving Image");
-        }
-        
-    });
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
@@ -572,7 +502,7 @@
         [selected setRecommand:[NSNumber numberWithBool:NO]];
     }
     
-    
+    self.dataSource = selected;
     if (![[self.appDelegate managedObjectContext] save:&error]) {
         NSLog(@"ERROR -- saving coredata");
     }
@@ -623,15 +553,11 @@
             if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
                 [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
             
-            NSDateFormatter* format = [[NSDateFormatter alloc] init];
-            [format setDateFormat:@"MMddyyyHHmm"];
-            NSString* date = [format stringFromDate:self.dataSource.date];
-            
-            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
-            
-            NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
-            
-            [self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"image/jpeg" fileName:[NSString stringWithFormat:@"%@.jpg",[self.yrCodeLabel text]]];
+            for (NSString* fileName in self.dataSource.fileNames) {
+                NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+                
+                [self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"image/jpeg" fileName:fileName];
+            }
         }
         // Present mail view controller on screen
         [self presentViewController:self.yrMailViewController animated:YES completion:NULL];
@@ -943,6 +869,7 @@
 {
     [self.scheduleView removeFromSuperview];
     [self.emailOptionView removeFromSuperview];
+    [self.resumeOptionView removeFromSuperview];
     [self.grayView removeFromSuperview];
 }
 
@@ -1009,6 +936,90 @@
     self.scheduleTable.delegate = self;
     self.scheduleTable.dataSource = self;
 }
+
+-(void)scrollLeft
+{
+    NSLog(@"Left");
+    if (showingImageIndex+1<[self.dataSource.fileNames count]) {
+        showingImageIndex = showingImageIndex + 1;
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        
+        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+        
+        NSError *error;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+        
+        //    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+        //    [format setDateFormat:@"MMddyyyHHmm"];
+        //    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
+        
+        NSString* fileName = self.dataSource.fileNames[showingImageIndex];
+        
+        NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+        
+        UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
+        
+        [UIView beginAnimations:@"swipe" context:nil];
+        
+        [UIView setAnimationDuration:0.7];
+        
+        [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:self.showingImageView cache:NO];
+        
+        self.showingImageView.image = image;
+        
+        [UIView commitAnimations];
+    }
+    else
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Last Page" message:@"This is the last Page" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alert show];
+    }
+}
+
+-(void)scrollRight
+{
+    NSLog(@"Right");
+    
+    if (showingImageIndex-1>=0) {
+        showingImageIndex = showingImageIndex -1;
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        
+        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+        
+        NSError *error;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+        
+        //    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+        //    [format setDateFormat:@"MMddyyyHHmm"];
+        //    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
+        
+        NSString* fileName = self.dataSource.fileNames[showingImageIndex];
+        
+        NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+        
+        UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
+        
+        [UIView beginAnimations:@"swipe" context:nil];
+        
+        [UIView setAnimationDuration:0.7];
+        
+        [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:self.showingImageView cache:NO];
+        
+        self.showingImageView.image = image;
+        
+        [UIView commitAnimations];
+    }
+    else
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"First Page" message:@"This is the first Page" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alert show];
+    }
+}
+
 
 #pragma mark - UIScrollViewDelegate
 
@@ -1141,6 +1152,10 @@
             return [self.formList count];
         }
     }
+    else if (tableView == self.resumeOptionTable)
+    {
+        return [self.dataSource.fileNames count];
+    }
     else
     {
         return 0;
@@ -1153,9 +1168,13 @@
     if (tableView == self.scheduleTable) {
         identifier = @"scheduleIdentifier";
     }
-    else
+    else if (tableView == self.emailOptionTable)
     {
         identifier = @"emailOptionIdentifier";
+    }
+    else if (tableView == self.resumeOptionTable)
+    {
+        identifier = @"resumeOptionIdentifier";
     }
     
     UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
@@ -1192,6 +1211,18 @@
             cell.textLabel.font = [UIFont systemFontOfSize:12];
         }
     }
+    else if (tableView == self.resumeOptionTable)
+    {
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+        }
+        
+        cell.textLabel.text = self.dataSource.fileNames[indexPath.row];
+        
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+            cell.textLabel.font = [UIFont systemFontOfSize:12];
+        }
+    }
     
     return cell;
 }
@@ -1207,7 +1238,267 @@
             [self email];
         //}
     }
+    else if (tableView == self.resumeOptionTable)
+    {
+        [self.popOver dismissPopoverAnimated:YES];
+        
+        [self removeViews];
+        
+        if (!replacingMode)
+        {
+            showingImageIndex = indexPath.row;
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            
+            NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+            
+            NSError *error;
+            if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+                [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+            //
+            //        NSDateFormatter* format = [[NSDateFormatter alloc] init];
+            //        [format setDateFormat:@"MMddyyyHHmm"];
+            //        NSString* date = [format stringFromDate:self.dataSource.date];
+            
+            NSString* fileName = self.dataSource.fileNames[indexPath.row];
+            
+            NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+            
+            UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
+            
+            
+            self.showingImageView = [[UIImageView alloc] initWithImage:image];
+            
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                [self.showingImageView setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+            }
+            else{
+                [self.showingImageView setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
+            }
+            
+            self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            
+            
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+                self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-110, 10, 100, 100);
+            }
+            else{
+                self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
+                self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-55, 50, 50, 50);
+            }
+            //self.yrScrollView.contentSize = image.size;
+            self.yrScrollView.contentSize = self.showingImageView.frame.size;
+            [self.yrScrollView addSubview:self.showingImageView];
+            [self.yrScrollView setDelegate:self];
+            [self.yrScrollView setMaximumZoomScale:4];
+            [self.yrScrollView setMinimumZoomScale:1];
+            
+            self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+            self.grayView.backgroundColor = [UIColor blackColor];
+            self.grayView.alpha = 0.9;
+            
+            [self.view addSubview:self.grayView];
+            [self.view addSubview:self.yrScrollView];
+            
+            [self.yrGoBackButton setHidden:YES];
+            
+            [self.yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
+            [self.yrScrollViewCancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                [[self.yrScrollViewCancelButton layer] setCornerRadius:50];
+                [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+                [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
+                
+                self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+            }
+            else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+            {
+                [[self.yrScrollViewCancelButton layer] setCornerRadius:25];
+                [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+                [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
+                
+                self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+            }
+            
+            
+            [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
+            
+            [self.view addSubview:self.yrScrollViewCancelButton];
+            
+            UIGestureRecognizer* swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollLeft)];
+            [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionLeft];
+            [self.yrScrollView addGestureRecognizer:swipe];
+            
+            swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollRight)];
+            [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionRight];
+            [self.yrScrollView addGestureRecognizer:swipe];
+            
+            swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollLeft)];
+            [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionUp];
+            [self.yrScrollView addGestureRecognizer:swipe];
+            
+            swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollRight)];
+            [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionDown];
+            [self.yrScrollView addGestureRecognizer:swipe];
+
+        }
+        else
+        {
+            replacingMode = NO;
+            NSString* fileToReplace = self.dataSource.fileNames[indexPath.row];
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(self.chosenImage, 0.2)];
+                //save in local resource
+                NSLog(@"%ul",imageData.length);
+                
+                NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                NSString *documentsDirectory = [paths objectAtIndex:0];
+                
+                NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+                
+                NSError *error;
+                if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+                    [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+                
+//                NSDateFormatter* format = [[NSDateFormatter alloc] init];
+//                [format setDateFormat:@"MMddyyyHHmm"];
+//                NSString* date = [format stringFromDate:self.dataSource.date];
+//                
+//                NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.fileNames count]+1]];
+                
+                NSString *fullPath = [dataPath stringByAppendingPathComponent:fileToReplace];
+                
+                bool ret = [imageData writeToFile:fullPath options:0 error:&error];
+                
+                if (!ret) {
+                    NSLog(@"Error while saving Image");
+                }
+            });
+        }
+    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+#pragma mark - UIAlertViewDelegate
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Adding New Page"]) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(self.chosenImage, 0.2)];
+            //save in local resource
+            
+            NSLog(@"%ul",imageData.length);
+            
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            
+            NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+            
+            NSError *error;
+            if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+                [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+            
+            NSDateFormatter* format = [[NSDateFormatter alloc] init];
+            [format setDateFormat:@"MMddyyyHHmm"];
+            NSString* date = [format stringFromDate:self.dataSource.date];
+            
+            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.fileNames count]+1]];
+            
+            NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
+            
+            bool ret = [imageData writeToFile:fullPath options:0 error:&error];
+            
+            if (ret) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+                    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+                    
+                    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@ and lastName = %@",self.dataSource.code,self.dataSource.firstName,self.dataSource.lastName]];
+                    
+                    NSError* error = nil;
+                    NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
+                    
+                    CandidateEntry* selected = mutableFetchResults[0];
+                    
+                    [selected setPdf:[NSNumber numberWithBool:YES]];
+                    
+                    [self.yrFileNameButton setTitle:@"Resume" forState:UIControlStateNormal];
+                    [self.yrFileNameButton setHidden:NO];
+                    
+                    NSMutableArray* fileNames = [selected.fileNames mutableCopy];
+                    
+                    [fileNames addObject:[NSString stringWithFormat:@"%@.jpg",fileName]];
+                    
+                    [selected setFileNames:[NSArray arrayWithArray:fileNames]];
+                    
+                    self.dataSource = selected;
+                    
+                    if (![[self.appDelegate managedObjectContext] save:&error]) {
+                        NSLog(@"ERROR -- saving coredata");
+                    }
+                });
+                
+            } else{
+                NSLog(@"Error while saving Image");
+            }
+        });
+    }
+    else if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Replacing Old Page"])
+    {
+        //pop up options
+        replacingMode = YES;
+        
+        int half = 0;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            half = 150;
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            half = 120;
+        }
+        
+        self.resumeOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrFileNameButton.center.x-half, self.yrFileNameButton.center.y+20, 2*half, 160)];
+        [[self.resumeOptionView layer] setCornerRadius:12];
+        
+        self.resumeOptionTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 5, 2*half - 10, 150) style:UITableViewStylePlain];
+        [[self.resumeOptionTable layer] setCornerRadius:10];
+//        UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 2*half - 100, 20)];
+//        titleLabel.text = @"Files";
+//        titleLabel.textColor = [UIColor purpleColor];
+//        titleLabel.textAlignment = NSTextAlignmentLeft;
+//        titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        
+//        [self.resumeOptionView addSubview:titleLabel];
+        [self.resumeOptionView addSubview:self.resumeOptionTable];
+        
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            UIViewController* newController = [UIViewController new];
+            self.popOver = [[UIPopoverController alloc] initWithContentViewController:newController];
+            newController.view = self.resumeOptionView;
+            
+            [self.popOver setPopoverContentSize:CGSizeMake(2*half, 160)];
+            
+            [self.popOver presentPopoverFromRect:CGRectMake(self.yrFileNameButton.center.x-half, self.yrFileNameButton.center.y+20, 2*half, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        }
+        else
+        {
+            self.resumeOptionView.backgroundColor = [UIColor purpleColor];
+//            titleLabel.textColor = [UIColor whiteColor];
+            self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+            self.grayView.backgroundColor = [UIColor darkGrayColor];
+            self.grayView.alpha = 0.5;
+            [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
+            [self.view addSubview:self.grayView];
+            
+            [self.view addSubview:self.resumeOptionView];
+        }
+        self.resumeOptionTable.delegate = self;
+        self.resumeOptionTable.dataSource = self;
+    }
 }
 
 @end

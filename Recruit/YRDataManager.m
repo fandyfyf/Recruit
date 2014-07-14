@@ -108,6 +108,34 @@
             
             [[NSNotificationCenter defaultCenter] postNotificationName:@"receiveBroadcastNotification" object:nil userInfo:dic[@"data"]];
         }
+        else if([dic[@"msg"] isEqualToString:@"resumeRequest"] && self.isHost)
+        {
+            NSLog(@"receiving one resume request");
+            
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            
+            NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+            
+            NSError *error;
+            if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+                [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+            
+            NSString* fileName = dic[@"data"];
+            
+            NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+            
+            NSDictionary* dic = @{@"msg" : @"resume" , @"data" : [NSData dataWithContentsOfFile:fullPath]};
+            
+            [self sendResume:dic toPeer:peerID];
+            
+        }
+        else if([dic[@"msg"] isEqualToString:@"resume"])
+        {
+            NSLog(@"receiving one resume");
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"receiveResumeNotification" object:nil userInfo:dic[@"data"]];
+        }
         else if([dic[@"msg"] isEqualToString:@"debriefInvitation"] && !self.isHost)
         {
             //receive debrief invitation
@@ -256,6 +284,7 @@
     [item setRecommand:infoData[@"recommand"]];
     [item setStatus:infoData[@"status"]];
     [item setPdf:infoData[@"pdf"]];
+    [item setFileNames:[NSArray new]];
     [item setPosition:infoData[@"position"]];
     [item setPreference:infoData[@"preference"]];
     [item setDate:infoData[@"date"]];
@@ -353,6 +382,58 @@
             //
         }
     }
+}
+
+-(void)sendDataRequestForFile:(NSString*)fileName
+{
+    NSDictionary* dic = @{@"msg" : @"resumeRequest", @"data" : fileName};
+    
+    NSMutableData* dataToSend = [NSMutableData new];
+    
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:dataToSend];
+    
+    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    NSArray * allPeers = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session.connectedPeers;
+    
+    NSError* error = nil;
+    
+    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session sendData:dataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+    if(error){
+        NSLog(@"%@", [error localizedDescription]);
+    }
+}
+
+-(void)sendResume:(NSDictionary*)data toPeer:(MCPeerID*)peer
+{
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    
+    [yrarchiver encodeObject:data forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+        
+        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
+            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
+            
+            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+            
+            NSError *error;
+            
+            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+            
+            if(error){
+                NSLog(@"%@", [error localizedDescription]);
+            }
+            else
+            {
+                //
+            }
+        }
+    }
+
 }
 
 -(void)sendNameList:(MCPeerID*)peerID

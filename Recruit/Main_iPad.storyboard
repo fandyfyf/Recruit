@@ -437,7 +437,7 @@
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" id="CNP-kh-SYs">
                                 <rect key="frame" x="70" y="531" width="627" height="280"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="1" green="0.96862751245498657" blue="0.7882353663444519" alpha="1" colorSpace="deviceRGB"/>
+                                <color key="backgroundColor" red="0.7931092219361936" green="0.80827487244897955" blue="0.80228071107506238" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>

@@ -2,7 +2,7 @@
 //  CandidateEntry.h
 //  Recruit
 //
-//  Created by Yifan Fu on 7/1/14.
+//  Created by Yifan Fu on 7/14/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -13,6 +13,8 @@
 
 @interface CandidateEntry : NSManagedObject
 
+@property (nonatomic, retain) NSString * businessUnit1;
+@property (nonatomic, retain) NSString * businessUnit2;
 @property (nonatomic, retain) NSString * code;
 @property (nonatomic, retain) NSDate * date;
 @property (nonatomic, retain) NSString * emailAddress;
@@ -27,8 +29,8 @@
 @property (nonatomic, retain) NSNumber * rank;
 @property (nonatomic, retain) NSNumber * recommand;
 @property (nonatomic, retain) NSString * status;
-@property (nonatomic, retain) NSString * businessUnit1;
-@property (nonatomic, retain) NSString * businessUnit2;
+@property (nonatomic, retain) NSArray * fileNames;
+@property (nonatomic, retain) NSArray * tagList;
 @property (nonatomic, retain) NSSet *appointments;
 @end
 

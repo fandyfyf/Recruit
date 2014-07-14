@@ -14,6 +14,7 @@
 @interface YRDataViewController ()
 
 @property (strong, nonatomic) CandidateEntry* currentEntry;
+@property (strong, nonatomic) NSArray* fileNames;
 
 -(void)needUpdateTableNotification:(NSNotification *)notification;
 
@@ -29,11 +30,16 @@
 
 -(void)cancelScrollView;
 
+-(void)scrollLeft;
+
+-(void)scrollRight;
+
 @end
 
 @implementation YRDataViewController
 {
     BOOL checkScheduleMode;
+    int showingImageIndex;
 }
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -58,6 +64,7 @@
     self.yrdataEntry = [NSMutableArray new];
     [self.infoDataList setDelegate:self];
     [self.infoDataList setDataSource:self];
+    self.fileNames = [NSArray new];
     
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     
@@ -253,7 +260,7 @@
 {
     CGPoint tapLocation = [tapRecognizer locationInView:self.infoDataList];
     NSIndexPath* indexPath = [self.infoDataList indexPathForRowAtPoint:tapLocation];
-    YRinfoDataCell* tappedCell = (YRinfoDataCell*)[self.infoDataList cellForRowAtIndexPath:indexPath];
+//    YRinfoDataCell* tappedCell = (YRinfoDataCell*)[self.infoDataList cellForRowAtIndexPath:indexPath];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -264,24 +271,28 @@
     if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
         [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
     
-    NSDateFormatter* format = [[NSDateFormatter alloc] init];
-    [format setDateFormat:@"MMddyyyHHmm"];
-    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
+//    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+//    [format setDateFormat:@"MMddyyyHHmm"];
+//    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
     
-    NSString* fileName = [tappedCell.yrcodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
     
-    NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
+    showingImageIndex = 0;
+    self.fileNames = [(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] fileNames];
+    
+    NSString* fileName = self.fileNames[showingImageIndex];
+    
+    NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
     
     UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
     
     
-    UIImageView* imageview = [[UIImageView alloc] initWithImage:image];
+    self.showingImageView = [[UIImageView alloc] initWithImage:image];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        [self.showingImageView setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     }
     else{
-        [imageview setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
+        [self.showingImageView setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
     }
     
     self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -295,8 +306,8 @@
         self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-55, 50, 50, 50);
     }
     //self.yrScrollView.contentSize = image.size;
-    self.yrScrollView.contentSize = imageview.frame.size;
-    [self.yrScrollView addSubview:imageview];
+    self.yrScrollView.contentSize = self.showingImageView.frame.size;
+    [self.yrScrollView addSubview:self.showingImageView];
     [self.yrScrollView setDelegate:self];
     [self.yrScrollView setMaximumZoomScale:4];
     [self.yrScrollView setMinimumZoomScale:1];
@@ -330,6 +341,22 @@
     [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
     
     [self.view addSubview:self.yrScrollViewCancelButton];
+    
+    UIGestureRecognizer* swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollLeft)];
+    [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionLeft];
+    [self.yrScrollView addGestureRecognizer:swipe];
+    
+    swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollRight)];
+    [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionRight];
+    [self.yrScrollView addGestureRecognizer:swipe];
+    
+    swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollLeft)];
+    [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionUp];
+    [self.yrScrollView addGestureRecognizer:swipe];
+    
+    swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(scrollRight)];
+    [(UISwipeGestureRecognizer*)swipe setDirection:UISwipeGestureRecognizerDirectionDown];
+    [self.yrScrollView addGestureRecognizer:swipe];
 }
 
 -(void)cancelScrollView
@@ -386,6 +413,88 @@
     [self.infoDataList reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
+-(void)scrollLeft
+{
+    NSLog(@"Left");
+    if (showingImageIndex+1<[self.fileNames count]) {
+        showingImageIndex = showingImageIndex + 1;
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        
+        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+        
+        NSError *error;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+        
+        //    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+        //    [format setDateFormat:@"MMddyyyHHmm"];
+        //    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
+        
+        NSString* fileName = self.fileNames[showingImageIndex];
+        
+        NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+        
+        UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
+        
+        [UIView beginAnimations:@"swipe" context:nil];
+        
+        [UIView setAnimationDuration:0.7];
+        
+        [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:self.showingImageView cache:NO];
+        
+        self.showingImageView.image = image;
+        
+        [UIView commitAnimations];
+    }
+    else
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Last Page" message:@"This is the last Page" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alert show];
+    }
+}
+
+-(void)scrollRight
+{
+    NSLog(@"Right");
+    
+    if (showingImageIndex-1>=0) {
+        showingImageIndex = showingImageIndex -1;
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        
+        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+        
+        NSError *error;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+        
+        //    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+        //    [format setDateFormat:@"MMddyyyHHmm"];
+        //    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
+        
+        NSString* fileName = self.fileNames[showingImageIndex];
+        
+        NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+        
+        UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfFile:fullPath]];
+        
+        [UIView beginAnimations:@"swipe" context:nil];
+        
+        [UIView setAnimationDuration:0.7];
+        
+        [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:self.showingImageView cache:NO];
+        
+        self.showingImageView.image = image;
+        
+        [UIView commitAnimations];
+    }
+    else
+    {
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"First Page" message:@"This is the first Page" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alert show];
+    }
+}
 
 #pragma mark - UITableViewDataSource
 
@@ -489,7 +598,7 @@
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
         //send out broadCast with self.currentEntry
-        NSDictionary* dic = @{@"firstName":self.currentEntry.firstName,@"lastName":self.currentEntry.lastName,@"email":self.currentEntry.emailAddress,@"interviewer":self.currentEntry.interviewer,@"code":self.currentEntry.code,@"recommand":self.currentEntry.recommand,@"status":self.currentEntry.status,@"pdf":self.currentEntry.pdf,@"position":self.currentEntry.position,@"preference":self.currentEntry.preference,@"date":self.currentEntry.date,@"note":self.currentEntry.notes,@"rank":[self.currentEntry.rank stringValue],@"gpa":[self.currentEntry.gpa stringValue],@"BU1" : self.currentEntry.businessUnit1, @"BU2" : self.currentEntry.businessUnit2};
+        NSDictionary* dic = @{@"firstName":self.currentEntry.firstName,@"lastName":self.currentEntry.lastName,@"email":self.currentEntry.emailAddress,@"interviewer":self.currentEntry.interviewer,@"code":self.currentEntry.code,@"recommand":self.currentEntry.recommand,@"status":self.currentEntry.status,@"pdf":self.currentEntry.pdf,@"position":self.currentEntry.position,@"preference":self.currentEntry.preference,@"date":self.currentEntry.date,@"note":self.currentEntry.notes,@"rank":[self.currentEntry.rank stringValue],@"gpa":[self.currentEntry.gpa stringValue],@"BU1" : self.currentEntry.businessUnit1, @"BU2" : self.currentEntry.businessUnit2, @"fileNames" : self.currentEntry.fileNames};
         NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
         
         [self.appDelegate.dataManager broadCastData:packet];
@@ -501,6 +610,18 @@
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
     return [scrollView.subviews objectAtIndex:0];
+}
+
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView
+{
+    NSLog(@"%f",scrollView.zoomScale);
+    if (scrollView.zoomScale == 1) {
+        //enable swipe
+    }
+    else
+    {
+        //disable swipe
+    }
 }
 
 #pragma mark - UISearchBarDelegate

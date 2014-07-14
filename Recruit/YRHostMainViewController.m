@@ -181,6 +181,7 @@
         [item setNotes:@"Note"];
         [item setRank:[NSNumber numberWithFloat:3.5]];
         [item setGpa:[NSNumber numberWithFloat:3.5]];
+        [item setFileNames:[NSArray new]];
         
         NSError *error = nil;
         if (![self.managedObjectContext save:&error]) {

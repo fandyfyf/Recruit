@@ -2,7 +2,7 @@
 //  CandidateEntry.m
 //  Recruit
 //
-//  Created by Yifan Fu on 7/1/14.
+//  Created by Yifan Fu on 7/14/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -12,6 +12,8 @@
 
 @implementation CandidateEntry
 
+@dynamic businessUnit1;
+@dynamic businessUnit2;
 @dynamic code;
 @dynamic date;
 @dynamic emailAddress;
@@ -26,8 +28,8 @@
 @dynamic rank;
 @dynamic recommand;
 @dynamic status;
-@dynamic businessUnit1;
-@dynamic businessUnit2;
+@dynamic fileNames;
+@dynamic tagList;
 @dynamic appointments;
 
 @end

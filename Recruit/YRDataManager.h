@@ -38,6 +38,10 @@
 
 -(void)broadCastData:(NSDictionary*)data;
 
+-(void)sendDataRequestForFile:(NSString*)fileName;
+
+-(void)sendResume:(NSDictionary*)data toPeer:(MCPeerID*)peer;
+
 -(void)sendNameList:(MCPeerID*)peerID;
 
 -(void)sendIdentityConfirmation:(NSString*)updateUserName;

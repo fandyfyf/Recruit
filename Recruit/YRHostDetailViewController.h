@@ -14,7 +14,7 @@
 
 @class AutoSuggestTextField;
 
-@interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate, UITableViewDataSource, UITableViewDelegate,UIGestureRecognizerDelegate>
+@interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate, UITableViewDataSource, UITableViewDelegate,UIGestureRecognizerDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) CandidateEntry *dataSource;
 @property (strong, nonatomic) NSNumber *checkScheduleFlag;
@@ -45,6 +45,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *yrGoBackButton;
 
 @property (strong, nonatomic) UIScrollView* yrScrollView;
+@property (strong, nonatomic) UIImageView* showingImageView;
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrScheduleButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrEmailButton;
@@ -56,6 +57,8 @@
 @property (strong, nonatomic) UITableView* scheduleTable;
 @property (strong, nonatomic) UIView* emailOptionView;
 @property (strong, nonatomic) UITableView* emailOptionTable;
+@property (strong, nonatomic) UIView* resumeOptionView;
+@property (strong, nonatomic) UITableView* resumeOptionTable;
 
 @property (strong, nonatomic) UIControl* grayView;
 @property (strong, nonatomic) UIButton* rankOneButton;
@@ -67,6 +70,7 @@
 @property (strong, nonatomic) UIPopoverController* popOver;
 
 @property (strong, nonatomic) MFMailComposeViewController* yrMailViewController;
+@property (strong, nonatomic) UIImage* chosenImage;
 
 - (IBAction)takeAnImage:(id)sender;
 - (IBAction)goBack:(id)sender;

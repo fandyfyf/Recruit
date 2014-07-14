@@ -13,6 +13,7 @@
         <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="emailAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fileNames" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="firstName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="gpa" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="interviewer" optional="YES" attributeType="String" syncable="YES"/>
@@ -24,12 +25,14 @@
         <attribute name="rank" optional="YES" attributeType="Float" defaultValueString="0" syncable="YES"/>
         <attribute name="recommand" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tagList" optional="YES" attributeType="Transformable" syncable="YES"/>
         <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Appointment" inverseName="candidate" inverseEntity="Appointment" syncable="YES"/>
     </entity>
     <entity name="Interviewer" representedClassName="Interviewer" syncable="YES">
         <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tagList" optional="YES" attributeType="Transformable" syncable="YES"/>
         <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Appointment" inverseName="interviewers" inverseEntity="Appointment" syncable="YES"/>
     </entity>
     <elements>

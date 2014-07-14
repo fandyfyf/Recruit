@@ -2,7 +2,7 @@
 //  Interviewer.m
 //  Recruit
 //
-//  Created by Yifan Fu on 6/27/14.
+//  Created by Yifan Fu on 7/14/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -15,6 +15,7 @@
 @dynamic code;
 @dynamic email;
 @dynamic name;
+@dynamic tagList;
 @dynamic appointments;
 
 @end

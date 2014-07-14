@@ -20,6 +20,7 @@
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
 @property (strong, nonatomic) UIScrollView* yrScrollView;
+@property (strong, nonatomic) UIImageView* showingImageView;
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrAdministorDeleteButton;
 @property (strong, nonatomic) UIControl* grayView;
