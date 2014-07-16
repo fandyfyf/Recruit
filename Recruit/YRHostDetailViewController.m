@@ -27,6 +27,8 @@
 -(void)scrollLeft;
 -(void)scrollRight;
 
+-(void)updateTagInformation:(NSNotification*)notification;
+
 @end
 
 @implementation YRHostDetailViewController
@@ -37,74 +39,27 @@
     int showingImageIndex;
 }
 
-- (void)viewDidLoad
+-(void)loadInfo
 {
-    [super viewDidLoad];
-	// Do any additional setup after loading the view.
-    self.appDelegate = (YRAppDelegate* )[[UIApplication sharedApplication] delegate];
-    
     self.yrCodeLabel.text = self.dataSource.code;
     
-    if ([self.dataSource.preference isEqualToString:@"FE"]) {
-        self.yrPreferenceTextField.text = @"Back End";
-    }
-    else if ([self.dataSource.preference isEqualToString:@"BE"])
-    {
-        self.yrPreferenceTextField.text = @"Front End";
-    }
-    else
-    {
-        self.yrPreferenceTextField.text = self.dataSource.preference;
-    }
+    self.yrPreferenceTextField.text = self.dataSource.preference;
     self.yrBusinessUnit1.text = self.dataSource.businessUnit1;
     self.yrBusinessUnit2.text = self.dataSource.businessUnit2;
-    
-    self.yrFirstNameTextField.delegate = self;
-    self.yrLastNameTextField.delegate = self;
-    self.yrEmailTextField.delegate = self;
-    self.yrEmailTextField.suggestionDelegate = self;
-    self.yrBusinessUnit1.delegate = self;
-    self.yrBusinessUnit2.delegate = self;
     
     self.yrFirstNameTextField.text = self.dataSource.firstName;
     self.yrLastNameTextField.text = self.dataSource.lastName;
     self.yrEmailTextField.text = self.dataSource.emailAddress;
-    self.yrRecommendLabel.text = self.dataSource.interviewer;
-    
-    if ([self.dataSource.recommand boolValue]) {
-        
-        [self.yrRecommendSwitch setOn:YES animated:YES];
-        self.yrRecommendLabel.hidden = NO;
-        self.yrRecommandMark.textColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
-    }
-    else
-    {
-        self.yrRecommendLabel.hidden = YES;
-        [self.yrRecommendSwitch setOn:NO animated:NO];
-    }
     
     if ([self.dataSource.pdf boolValue]) {
         [self.yrFileNameButton setHidden:NO];
-        
-//        NSDateFormatter* format = [[NSDateFormatter alloc] init];
-//        [format setDateFormat:@"MMddyyyHHmm"];
-//        NSString* date = [format stringFromDate:self.dataSource.date];
-//        
-//        NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@",date]];
-//        
-//        NSString *fullPath = [fileName stringByAppendingPathExtension:@"jpg"];
-        
         [self.yrFileNameButton setTitle:@"Resume" forState:UIControlStateNormal];
     }
     else
     {
         [self.yrFileNameButton setHidden:YES];
     }
-    
-    [self.yrCommentTextView setDelegate:self];
-    
-    [[self.yrCommentTextView layer] setCornerRadius:10];
-    
+
     [self.yrCommentTextView setText:self.dataSource.notes];
     
     if ([self.dataSource.position isEqualToString:@"Intern"]) {
@@ -114,13 +69,7 @@
     {
         self.yrPositionSegmentControl.selectedSegmentIndex = 1;
     }
-    
-    
-    UITapGestureRecognizer* tapAction = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnLabel:)];
-    tapAction.delegate = self;
-    [self.yrRankLabel setUserInteractionEnabled:YES];
-    [self.yrRankLabel addGestureRecognizer:tapAction];
-    
+
     if ([self.dataSource.rank floatValue] == 3.5) {
         self.yrHalfRankLabel.hidden = NO;
         self.yrRankLabel.text = @"3";
@@ -130,6 +79,13 @@
         self.yrRankLabel.text = [self.dataSource.rank stringValue];
         self.yrHalfRankLabel.hidden = YES;
     }
+    
+    NSString* tagList = @"";
+    for (NSString* string in self.dataSource.tagList) {
+        tagList = [tagList stringByAppendingFormat:@"%@, ",string];
+    }
+    
+    self.yrTagLabel.text = tagList;
     
     self.yrGPATextField.text = [NSString stringWithFormat:@"%@",self.dataSource.gpa];
     
@@ -149,6 +105,33 @@
             self.checkInterviewButton.hidden = NO;
         }
     }
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+	// Do any additional setup after loading the view.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTagInformation:) name:@"needUpdateTagInformationNotification" object:nil];
+    
+    self.appDelegate = (YRAppDelegate* )[[UIApplication sharedApplication] delegate];
+    
+    self.yrFirstNameTextField.delegate = self;
+    self.yrLastNameTextField.delegate = self;
+    self.yrEmailTextField.delegate = self;
+    self.yrEmailTextField.suggestionDelegate = self;
+    self.yrBusinessUnit1.delegate = self;
+    self.yrBusinessUnit2.delegate = self;
+    
+    [self.yrCommentTextView setDelegate:self];
+    [[self.yrCommentTextView layer] setCornerRadius:10];
+    
+    
+    
+    UITapGestureRecognizer* tapAction = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnLabel:)];
+    tapAction.delegate = self;
+    [self.yrRankLabel setUserInteractionEnabled:YES];
+    [self.yrRankLabel addGestureRecognizer:tapAction];
+    
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrScheduleButton layer] setCornerRadius:35];
@@ -202,6 +185,8 @@
     self.yrBusinessUnit1.inputAccessoryView = doneToolbar;
     self.yrBusinessUnit2.inputAccessoryView = doneToolbar;
     self.yrCommentTextView.inputAccessoryView = doneToolbar;
+    
+    [self loadInfo];
  }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -261,7 +246,7 @@
     }
     else
     {
-        [self.yrCommentTextView setFrame:CGRectMake(84, 610, 600, 325)];
+        [self.yrCommentTextView setFrame:CGRectMake(84, 654, 600, 281)];
         [self.YRCommentLabel setFrame:CGRectMake(304, 572, 160, 30)];
     }
 }
@@ -342,10 +327,10 @@
     [UIView setAnimationDuration:0.2];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrCommentTextView.frame = CGRectMake(84, 610, 600, 325);
+        self.yrCommentTextView.frame = CGRectMake(84, 654, 600, 281);
     }
     else{
-        self.yrCommentTextView.frame = CGRectMake(10, 417, 300, 120);
+        self.yrCommentTextView.frame = CGRectMake(10, 443, 300, 94);
     }
     [UIView commitAnimations];
     [self.yrCommentTextView resignFirstResponder];
@@ -438,17 +423,85 @@
     [self checkScheduleFunction];
 }
 
-- (IBAction)recommendChange:(id)sender {
-    if (self.yrRecommendSwitch.isOn) {
-        self.yrRecommendLabel.hidden = NO;
-        [self.yrRecommandMark setTextColor:[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0]];
-    }
-    else
-    {
-        self.yrRecommendLabel.hidden = YES;
-        [self.yrRecommandMark setTextColor:[UIColor blackColor]];
-    }
-}
+//- (IBAction)recommendChange:(id)sender {
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+//    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+//    
+//    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.dataSource.code]];
+//    
+//    NSError* error = nil;
+//    NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
+//    
+//    CandidateEntry* selected = mutableFetchResults[0];
+//    
+//    NSFetchRequest *fetchRequest_I = [[NSFetchRequest alloc] init];
+//    [fetchRequest_I setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+//    
+//    [fetchRequest_I setPredicate:[NSPredicate predicateWithFormat:@"name = %@",self.dataSource.interviewer]];
+//    
+//    NSMutableArray* mutableFetchResults_I = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest_I error:&error] mutableCopy];
+//    
+//    Interviewer* selected_I = mutableFetchResults_I[0];
+//    
+//    if (self.yrRecommendSwitch.isOn) {
+//        if (self.yrRecommendLabel.hidden) {
+//            self.yrRecommendLabel.hidden = NO;
+//            [self.yrRecommandMark setTextColor:[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0]];
+//            NSMutableArray* tagList = [selected.tagList mutableCopy];
+//            [tagList addObject:selected.interviewer];
+//            [selected setTagList:[NSArray arrayWithArray:tagList]];
+//            
+//            NSMutableArray* tagList_I = [selected_I.tagList mutableCopy];
+//            [tagList_I addObject:selected.code];
+//            [selected_I setTagList:[NSArray arrayWithArray:tagList_I]];
+//        }
+//    }
+//    else
+//    {
+//        if (!self.yrRecommendLabel.hidden) {
+//            self.yrRecommendLabel.hidden = YES;
+//            [self.yrRecommandMark setTextColor:[UIColor blackColor]];
+//            
+//            NSMutableArray* tagList = [selected.tagList mutableCopy];
+//            if ([tagList count] != 0) {
+//                int index=0;
+//                for (int i=0; i< [tagList count];i++)
+//                {
+//                    if ([[tagList objectAtIndex:i] isEqualToString:selected.interviewer]) {
+//                        index = i;
+//                    }
+//                }
+//                [tagList removeObjectAtIndex:index];
+//                [selected setTagList:[NSArray arrayWithArray:tagList]];
+//            }
+//            
+//            NSMutableArray* tagList_I = [selected_I.tagList mutableCopy];
+//            if ([tagList_I count] != 0) {
+//                int index=0;
+//                for (int i=0; i< [tagList_I count];i++)
+//                {
+//                    if ([[tagList_I objectAtIndex:i] isEqualToString:selected.code]) {
+//                        index = i;
+//                    }
+//                }
+//                [tagList_I removeObjectAtIndex:index];
+//                [selected_I setTagList:[NSArray arrayWithArray:tagList_I]];
+//            }
+//        }
+//    }
+//    
+//    self.dataSource = selected;
+//    if (![[self.appDelegate managedObjectContext] save:&error]) {
+//        NSLog(@"ERROR -- saving coredata");
+//    }
+//    
+//    NSString* tagList = @"";
+//    for (NSString* string in self.dataSource.tagList) {
+//        tagList = [tagList stringByAppendingFormat:@"%@, ",string];
+//    }
+//    
+//    self.yrTagLabel.text = tagList;
+//}
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
@@ -494,13 +547,6 @@
     [selected setBusinessUnit2:self.yrBusinessUnit2.text];
     [selected setGpa:[NSNumber numberWithFloat:[self.yrGPATextField.text floatValue]]];
     [selected setPreference:self.yrPreferenceTextField.text];
-    if (self.yrRecommendSwitch.isOn) {
-        [selected setRecommand:[NSNumber numberWithBool:YES]];
-    }
-    else
-    {
-        [selected setRecommand:[NSNumber numberWithBool:NO]];
-    }
     
     self.dataSource = selected;
     if (![[self.appDelegate managedObjectContext] save:&error]) {
@@ -766,10 +812,10 @@
     [UIView setAnimationDuration:0.2];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrCommentTextView.frame = CGRectMake(84, 610, 600, 325);
+        self.yrCommentTextView.frame = CGRectMake(84, 654, 600, 281);
     }
     else{
-        self.yrCommentTextView.frame = CGRectMake(10, 417, 300, 120);
+        self.yrCommentTextView.frame = CGRectMake(10, 443, 300, 94);
     }
     [UIView commitAnimations];
     
@@ -1017,6 +1063,22 @@
     {
         UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"First Page" message:@"This is the first Page" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
         [alert show];
+    }
+}
+
+-(void)updateTagInformation:(NSNotification*)notification
+{
+    CandidateEntry* selected = [notification object];
+    if ([selected.code isEqualToString:self.dataSource.code]) {
+        self.dataSource = [notification object];
+        
+        [self loadInfo];
+        
+        //broadcast again.
+        NSDictionary* dic = @{@"firstName":selected.firstName,@"lastName":selected.lastName,@"email":selected.emailAddress,@"interviewer":selected.interviewer,@"code":selected.code,@"status":selected.status,@"pdf":selected.pdf,@"position":selected.position,@"preference":selected.preference,@"date":selected.date,@"note":selected.notes,@"rank":[selected.rank stringValue],@"gpa":[selected.gpa stringValue],@"BU1" : selected.businessUnit1, @"BU2" : selected.businessUnit2, @"fileNames" : selected.fileNames, @"tagList" : selected.tagList};
+        NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
+        
+        [self.appDelegate.dataManager broadCastData:packet];
     }
 }
 
@@ -1466,13 +1528,7 @@
         
         self.resumeOptionTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 5, 2*half - 10, 150) style:UITableViewStylePlain];
         [[self.resumeOptionTable layer] setCornerRadius:10];
-//        UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 2*half - 100, 20)];
-//        titleLabel.text = @"Files";
-//        titleLabel.textColor = [UIColor purpleColor];
-//        titleLabel.textAlignment = NSTextAlignmentLeft;
-//        titleLabel.font = [UIFont boldSystemFontOfSize:15];
         
-//        [self.resumeOptionView addSubview:titleLabel];
         [self.resumeOptionView addSubview:self.resumeOptionTable];
         
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {

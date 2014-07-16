@@ -13,11 +13,12 @@
 
 -(void)loadData;
 -(void)refreshViewWithNewBroadCast:(NSNotification*)notification;
+-(void)fetchTagList:(NSNotification*)notification;
 -(void)showImageWithBroadCast:(NSNotification*)notification;
--(void)showControlPanel:(UIGestureRecognizer*)gestureRecognizer;
--(void)dismissControlPanel:(UIGestureRecognizer*)gestureRecognizer;
--(void)switchMode;
+-(void)searchMode;
+-(void)broadcastMode;
 -(void)cancelScrollView;
+-(void)tagCandidates;
 
 @end
 
@@ -35,6 +36,8 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewWithNewBroadCast:) name:@"receiveBroadcastNotification" object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchTagList:) name:@"receiveTagListNotification" object:nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showImageWithBroadCast:) name:@"receiveResumeNotification" object:nil];
     
     self.view = [[UIView alloc] initWithFrame:self.view.frame];
@@ -42,67 +45,205 @@
     
     self.yrPromptMessageLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-100, self.view.center.y-65, 200, 50)];
     
-    self.yrPromptMessageLabel.text = @"Loading...";
+    self.yrPromptMessageLabel.text = @"Waiting...";
     self.yrPromptMessageLabel.textColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
     self.yrPromptMessageLabel.textAlignment = NSTextAlignmentCenter;
     
     [self.view addSubview:self.yrPromptMessageLabel];
     
-    self.gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(showControlPanel:)];
-    [(UISwipeGestureRecognizer*)self.gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionUp];
+    self.gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(searchMode)];
+    [(UISwipeGestureRecognizer*)self.gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionLeft];
     [self.view addGestureRecognizer:self.gestureRecognizer];
     
-    self.gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(dismissControlPanel:)];
-    [(UISwipeGestureRecognizer*)self.gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionDown];
+    self.gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(broadcastMode)];
+    [(UISwipeGestureRecognizer*)self.gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionRight];
     [self.view addGestureRecognizer:self.gestureRecognizer];
 
+    self.searchModeView = [YRDebriefSearchModeViewController new];
+    self.searchModeView.source = self;
+    
     
     //interface builder
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
+        self.tagButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        self.tagButton.frame = CGRectMake(575, 775, 150, 150);
+        self.tagButton.backgroundColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
+        [[self.tagButton layer] setCornerRadius:75];
+        [[self.tagButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.tagButton layer] setBorderWidth:5];
+        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.tagButton setTintColor:[UIColor whiteColor]];
+        self.tagButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:40];
         
+        [self.tagButton addTarget:self action:@selector(tagCandidates) forControlEvents:UIControlEventTouchUpInside];
+        
+        self.tagButton.hidden = YES;
+        
+        
+        self.codeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 110, 100, 30)];
+        self.codeTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.codeTitleLabel.text = @"Rid: ";
+        self.codeTitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.codeTitleLabel.hidden = YES;
+        
+        self.flagView = [[UIImageView alloc] initWithFrame:CGRectMake(100, 100, 50, 50)];
+        self.flagView.image = [UIImage imageNamed:@"flag.jpg"];
+        self.flagView.hidden = YES;
+        
+        self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-100, 50, 200, 50)];
+        self.modeLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:40];
+        self.modeLabel.textAlignment = NSTextAlignmentCenter;
+        self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
+        self.modeLabel.text = @"Broadcast";
+        
+        self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.searchButton setFrame:CGRectMake(self.view.center.x-150, 950, 300, 50)];
+        self.searchButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.searchButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+        [self.searchButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
+        [self.searchButton setTitle:@"Search" forState:UIControlStateNormal];
+        [[self.searchButton layer] setCornerRadius:5];
+        [[self.searchButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
+        [[self.searchButton layer] setBorderWidth:1];
+        [self.searchButton addTarget:self action:@selector(searchMode) forControlEvents:UIControlEventTouchUpInside];
+        
+        self.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 110, 300, 30)];
+        self.codeLabel.font = [UIFont systemFontOfSize:25];
+        self.codeLabel.textAlignment = NSTextAlignmentLeft;
+        self.codeLabel.hidden = YES;
+        
+        self.positionLabel = [[UILabel alloc] initWithFrame:CGRectMake(500, 110, 200, 30)];
+        self.positionLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.positionLabel.textAlignment = NSTextAlignmentCenter;
+        self.positionLabel.hidden = YES;
+        
+        self.nameTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 160, 100, 30)];
+        self.nameTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.nameTitleLabel.text = @"Name: ";
+        self.nameTitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.nameTitleLabel.hidden = YES;
+        
+        self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 160, 300, 30)];
+        self.nameLabel.font = [UIFont systemFontOfSize:25];
+        self.nameLabel.textAlignment = NSTextAlignmentLeft;
+        self.nameLabel.hidden = YES;
+        
+        self.emailTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 220, 100, 30)];
+        self.emailTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.emailTitleLabel.text = @"Email: ";
+        self.emailTitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.emailTitleLabel.hidden = YES;
+        
+        self.emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 220, 300, 30)];
+        self.emailLabel.font = [UIFont systemFontOfSize:25];
+        self.emailLabel.textAlignment = NSTextAlignmentLeft;
+        self.emailLabel.hidden = YES;
+        
+        self.GPATitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 280, 100, 30)];
+        self.GPATitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.GPATitleLabel.text = @"GPA: ";
+        self.GPATitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.GPATitleLabel.hidden = YES;
+        
+        self.GPALabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 280, 300, 30)];
+        self.GPALabel.font = [UIFont systemFontOfSize:25];
+        self.GPALabel.textAlignment = NSTextAlignmentLeft;
+        self.emailLabel.hidden = YES;
+        
+        self.preferenceTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 340, 200, 30)];
+        self.preferenceTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.preferenceTitleLabel.text = @"Preference: ";
+        self.preferenceTitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.preferenceTitleLabel.hidden = YES;
+        
+        self.preferenceLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 340, 300, 30)];
+        self.preferenceLabel.font = [UIFont systemFontOfSize:25];
+        self.preferenceLabel.textAlignment = NSTextAlignmentLeft;
+        self.preferenceLabel.hidden = YES;
+        
+        self.noteViewTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 400, 200, 30)];
+        self.noteViewTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.noteViewTitleLabel.text = @"Notes: ";
+        self.noteViewTitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.noteViewTitleLabel.hidden = YES;
+        
+        self.noteView = [[UITextView alloc] initWithFrame:CGRectMake(40, 440, self.view.frame.size.width-80, 150)];
+        self.noteView.hidden = YES;
+        //self.noteView.userInteractionEnabled = NO;
+        self.noteView.backgroundColor = [UIColor colorWithRed:1.0 green:247.0/255.0 blue:201.0/255.0 alpha:1.0];
+        [[self.noteView layer] setCornerRadius:10];
+        [self.noteView setEditable:NO];
+        
+        self.rankLabel = [[UILabel alloc] initWithFrame:CGRectMake(550, 400, 100, 100)];
+        self.rankLabel.textAlignment = NSTextAlignmentCenter;
+        self.rankLabel.textColor = [UIColor redColor];
+        self.rankLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:100];
+        self.rankLabel.backgroundColor = [UIColor clearColor];
+        self.rankLabel.hidden = YES;
+        
+        self.rankPointFiveLabel = [[UILabel alloc] initWithFrame:CGRectMake(620, 380, 60, 60)];
+        self.rankPointFiveLabel.textAlignment = NSTextAlignmentCenter;
+        self.rankPointFiveLabel.textColor = [UIColor redColor];
+        self.rankPointFiveLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:50];
+        self.rankPointFiveLabel.backgroundColor = [UIColor clearColor];
+        self.rankPointFiveLabel.hidden = YES;
+        self.rankPointFiveLabel.text = @".5";
+        
+        self.businessUnit1TitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 600, 200, 30)];
+        self.businessUnit1TitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.businessUnit1TitleLabel.text = @"Business Unit1: ";
+        self.businessUnit1TitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.businessUnit1TitleLabel.hidden = YES;
+        
+        self.businessUnit1Label = [[UILabel alloc] initWithFrame:CGRectMake(250, 600, 250, 30)];
+        self.businessUnit1Label.font = [UIFont systemFontOfSize:25];
+        self.businessUnit1Label.textAlignment = NSTextAlignmentLeft;
+        self.businessUnit1Label.hidden = YES;
+        
+        self.businessUnit2TitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 660, 200, 30)];
+        self.businessUnit2TitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.businessUnit2TitleLabel.text = @"Business Unit2: ";
+        self.businessUnit2TitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.businessUnit2TitleLabel.hidden = YES;
+        
+        self.businessUnit2Label = [[UILabel alloc] initWithFrame:CGRectMake(250, 660, 250, 30)];
+        self.businessUnit2Label.font = [UIFont systemFontOfSize:25];
+        self.businessUnit2Label.textAlignment = NSTextAlignmentLeft;
+        self.businessUnit2Label.hidden = YES;
+        
+        self.resumeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 720, 200, 30)];
+        self.resumeTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.resumeTitleLabel.text = @"Resume: ";
+        self.resumeTitleLabel.textAlignment = NSTextAlignmentLeft;
+        self.resumeTitleLabel.hidden = YES;
+        
+        self.resumeList = [[UITableView alloc] initWithFrame:CGRectMake(40, 760, 500, 150) style:UITableViewStylePlain];
+        self.resumeList.delegate = self;
+        self.resumeList.dataSource = self;
+        self.resumeList.hidden = YES;
+        [[self.resumeList layer] setCornerRadius:10];
+        [[self.resumeList layer] setBorderColor:[[UIColor colorWithRed:202.0/255.0 green:202.0/255.0 blue:202.0/255.0 alpha:0.5] CGColor]];
+        [[self.resumeList layer] setBorderWidth:2];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
-        self.controlPanel = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height-50, self.view.frame.size.width, 80)];
-        self.controlPanel.backgroundColor = [UIColor colorWithRed:202.0/255.0 green:202.0/255.0 blue:202.0/255.0 alpha:1.0];
-        
         self.tagButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        self.tagButton.frame = CGRectMake(10, 10, 60, 60);
-        self.tagButton.backgroundColor = [UIColor clearColor];
-        [[self.tagButton layer] setCornerRadius:30];
-        [[self.tagButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
-        [[self.tagButton layer] setBorderWidth:2];
+        self.tagButton.frame = CGRectMake(230, 435, 70, 70);
+        self.tagButton.backgroundColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
+        [[self.tagButton layer] setCornerRadius:35];
+        [[self.tagButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.tagButton layer] setBorderWidth:4];
         [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
-        [self.tagButton setTitleColor:[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] forState:UIControlStateNormal];
-        self.tagButton.titleLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:15];
+        [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.tagButton setTintColor:[UIColor whiteColor]];
+        self.tagButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:15];
         
-        [self.controlPanel addSubview:self.tagButton];
+        [self.tagButton addTarget:self action:@selector(tagCandidates) forControlEvents:UIControlEventTouchUpInside];
         
-        self.switchModeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        self.switchModeButton.frame = CGRectMake(130, 10, 60, 60);
-        self.switchModeButton.backgroundColor = [UIColor clearColor];
-        [[self.switchModeButton layer] setCornerRadius:30];
-        [[self.switchModeButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
-        [[self.switchModeButton layer] setBorderWidth:2];
-        [self.switchModeButton setTitle:@"Switch" forState:UIControlStateNormal];
-        [self.switchModeButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
-        self.switchModeButton.titleLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:15];
-        [self.switchModeButton addTarget:self action:@selector(switchMode) forControlEvents:UIControlEventTouchUpInside];
+        self.tagButton.hidden = YES;
         
-        [self.controlPanel addSubview:self.switchModeButton];
-        
-        self.signOutButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        self.signOutButton.frame = CGRectMake(250, 10, 60, 60);
-        self.signOutButton.backgroundColor = [UIColor clearColor];
-        [[self.signOutButton layer] setCornerRadius:30];
-        [[self.signOutButton layer] setBorderColor:[[UIColor darkGrayColor] CGColor]];
-        [[self.signOutButton layer] setBorderWidth:2];
-        [self.signOutButton setTitle:@"Exit" forState:UIControlStateNormal];
-        [self.signOutButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
-        self.signOutButton.titleLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:15];
-        
-        [self.controlPanel addSubview:self.signOutButton];
         
         self.codeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 60, 50, 20)];
         self.codeTitleLabel.font = [UIFont boldSystemFontOfSize:15];
@@ -115,16 +256,31 @@
         self.flagView.hidden = YES;
         
         self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 30, 120, 20)];
-        self.modeLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.modeLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:15];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
-        self.modeLabel.text = @"<BROADCAST>";
-        self.Broadcast = YES;
+        self.modeLabel.text = @"Broadcast";
+        
+        self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.searchButton setFrame:CGRectMake(70, 530, 180, 30)];
+        self.searchButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.searchButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+        [self.searchButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
+        [self.searchButton setTitle:@"Search" forState:UIControlStateNormal];
+        [[self.searchButton layer] setCornerRadius:3];
+        [[self.searchButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
+        [[self.searchButton layer] setBorderWidth:1];
+        [self.searchButton addTarget:self action:@selector(searchMode) forControlEvents:UIControlEventTouchUpInside];
         
         self.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 60, 200, 20)];
         self.codeLabel.font = [UIFont systemFontOfSize:15];
         self.codeLabel.textAlignment = NSTextAlignmentLeft;
         self.codeLabel.hidden = YES;
+        
+        self.positionLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 60, 100, 20)];
+        self.positionLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.positionLabel.textAlignment = NSTextAlignmentCenter;
+        self.positionLabel.hidden = YES;
         
         self.nameTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 90, 50, 20)];
         self.nameTitleLabel.font = [UIFont boldSystemFontOfSize:15];
@@ -186,14 +342,14 @@
         self.rankLabel = [[UILabel alloc] initWithFrame:CGRectMake(210, 200, 80, 80)];
         self.rankLabel.textAlignment = NSTextAlignmentCenter;
         self.rankLabel.textColor = [UIColor redColor];
-        self.rankLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:60];
+        self.rankLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:60];
         self.rankLabel.backgroundColor = [UIColor clearColor];
         self.rankLabel.hidden = YES;
         
         self.rankPointFiveLabel = [[UILabel alloc] initWithFrame:CGRectMake(255, 200, 40, 40)];
         self.rankPointFiveLabel.textAlignment = NSTextAlignmentCenter;
         self.rankPointFiveLabel.textColor = [UIColor redColor];
-        self.rankPointFiveLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:30];
+        self.rankPointFiveLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:30];
         self.rankPointFiveLabel.backgroundColor = [UIColor clearColor];
         self.rankPointFiveLabel.hidden = YES;
         self.rankPointFiveLabel.text = @".5";
@@ -226,42 +382,49 @@
         self.resumeTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.resumeTitleLabel.hidden = YES;
         
-        self.resumeList = [[UITableView alloc] initWithFrame:CGRectMake(20, 425, 280, 88) style:UITableViewStylePlain];
+        self.resumeList = [[UITableView alloc] initWithFrame:CGRectMake(20, 425, 200, 88) style:UITableViewStylePlain];
         self.resumeList.delegate = self;
         self.resumeList.dataSource = self;
         self.resumeList.hidden = YES;
         [[self.resumeList layer] setCornerRadius:10];
         [[self.resumeList layer] setBorderColor:[[UIColor colorWithRed:202.0/255.0 green:202.0/255.0 blue:202.0/255.0 alpha:0.5] CGColor]];
         [[self.resumeList layer] setBorderWidth:2];
-        
-        [self.view addSubview:self.flagView];
-        [self.view addSubview:self.modeLabel];
-        
-        [self.view addSubview:self.codeTitleLabel];
-        [self.view addSubview:self.nameTitleLabel];
-        [self.view addSubview:self.emailTitleLabel];
-        [self.view addSubview:self.GPATitleLabel];
-        [self.view addSubview:self.preferenceTitleLabel];
-        [self.view addSubview:self.noteViewTitleLabel];
-        [self.view addSubview:self.businessUnit1TitleLabel];
-        [self.view addSubview:self.businessUnit2TitleLabel];
-        [self.view addSubview:self.resumeTitleLabel];
-        
-        [self.view addSubview:self.codeLabel];
-        [self.view addSubview:self.nameLabel];
-        [self.view addSubview:self.emailLabel];
-        [self.view addSubview:self.GPALabel];
-        [self.view addSubview:self.preferenceLabel];
-        [self.view addSubview:self.noteView];
-        [self.view addSubview:self.rankLabel];
-        [self.view addSubview:self.rankPointFiveLabel];
-        [self.view addSubview:self.businessUnit1Label];
-        [self.view addSubview:self.businessUnit2Label];
-        [self.view addSubview:self.resumeList];
-        [self.view addSubview:self.controlPanel];
     }
+    
+    [self.view addSubview:self.tagButton];
+    [self.view addSubview:self.flagView];
+    [self.view addSubview:self.modeLabel];
+    
+    [self.view addSubview:self.codeTitleLabel];
+    [self.view addSubview:self.nameTitleLabel];
+    [self.view addSubview:self.emailTitleLabel];
+    [self.view addSubview:self.GPATitleLabel];
+    [self.view addSubview:self.preferenceTitleLabel];
+    [self.view addSubview:self.noteViewTitleLabel];
+    [self.view addSubview:self.businessUnit1TitleLabel];
+    [self.view addSubview:self.businessUnit2TitleLabel];
+    [self.view addSubview:self.resumeTitleLabel];
+    
+    [self.view addSubview:self.codeLabel];
+    [self.view addSubview:self.positionLabel];
+    [self.view addSubview:self.nameLabel];
+    [self.view addSubview:self.emailLabel];
+    [self.view addSubview:self.GPALabel];
+    [self.view addSubview:self.preferenceLabel];
+    [self.view addSubview:self.noteView];
+    [self.view addSubview:self.rankLabel];
+    [self.view addSubview:self.rankPointFiveLabel];
+    [self.view addSubview:self.businessUnit1Label];
+    [self.view addSubview:self.businessUnit2Label];
+    [self.view addSubview:self.resumeList];
+    [self.view addSubview:self.searchButton];
+    
+    self.Broadcast = YES;
+    
+    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendTagListRequest:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
+    
     //-----test-----//
-//    self.currentDataEntry = @{@"firstName":@"Tom",@"lastName":@"Cruise",@"email":@"tomcruise@gmail.com",@"interviewer":@"Peter Edmonston",@"code":@"Test-1",@"recommand":[NSNumber numberWithBool:YES],@"status":@"pending",@"pdf":[NSNumber numberWithBool:NO],@"position":@"Full-Time",@"preference":@"Actor",@"date":[NSDate date],@"note":@"#note#\nHello World.\n\n\n\n\nHello World.\n",@"rank":@"3.5",@"gpa":@"3.5",@"BU1" :@"NY-MEP", @"BU2" :@"LA_MEP"};
+//    self.currentDataEntry = @{@"firstName":@"Tom",@"lastName":@"Cruise",@"email":@"tomcruise@gmail.com",@"interviewer":@"Peter Edmonston",@"code":@"Test-1",@"status":@"pending",@"pdf":[NSNumber numberWithBool:NO],@"position":@"Full-Time",@"preference":@"Actor",@"date":[NSDate date],@"note":@"#note#\nHello World.\n\n\n\n\nHello World.\n",@"rank":@"3.5",@"gpa":@"3.5",@"BU1" :@"NY-MEP", @"BU2" :@"LA_MEP"};
 //    [self loadData];
 }
 
@@ -295,13 +458,20 @@
     self.businessUnit2Label.hidden = NO;
     self.resumeTitleLabel.hidden = NO;
     self.resumeList.hidden = NO;
+    self.positionLabel.hidden = NO;
+    self.tagButton.hidden = NO;
+
+    self.flagView.hidden = YES;
+    [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
     
-    if ([self.currentDataEntry[@"recommand"] boolValue]) {
-        self.flagView.hidden = NO;
-    }
-    else
+    for (NSString* rid in self.tagList)
     {
-        self.flagView.hidden = YES;
+        if ([rid isEqualToString:self.currentDataEntry[@"code"]]) {
+            self.flagView.hidden = NO;
+            //tagged already then untag
+            [self.tagButton setTitle:@"unTag" forState:UIControlStateNormal];
+            break;
+        }
     }
     
     if ([self.currentDataEntry[@"rank"] isEqualToString:@"3.5"]) {
@@ -311,6 +481,7 @@
     else
     {
         self.rankLabel.text = self.currentDataEntry[@"rank"];
+        self.rankPointFiveLabel.hidden = YES;
     }
     
     self.codeLabel.text = self.currentDataEntry[@"code"];
@@ -321,6 +492,7 @@
     self.noteView.text = self.currentDataEntry[@"note"];
     self.businessUnit1Label.text = self.currentDataEntry[@"BU1"];
     self.businessUnit2Label.text = self.currentDataEntry[@"BU2"];
+    self.positionLabel.text = self.currentDataEntry[@"position"];
     [self.resumeList reloadData];
 }
 
@@ -329,7 +501,21 @@
     self.currentDataEntry = [notification userInfo];
     [self loadData];
     
+    for(NSString* rid in self.tagList)
+    {
+        if ([rid isEqualToString:self.currentDataEntry[@"code"]] && !self.Broadcast) {
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Attention!" message:@"A tagged candidate is being broadcasted." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alertView show];
+        }
+    }
+    
     NSLog(@"%@",self.currentDataEntry);
+}
+
+-(void)fetchTagList:(NSNotification*)notification
+{
+    self.tagList = [(NSArray*)[notification userInfo] mutableCopy];
+    self.searchModeView.tagList = self.tagList;
 }
 
 -(void)showImageWithBroadCast:(NSNotification*)notification
@@ -346,7 +532,6 @@
     }
     
     self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
@@ -393,34 +578,35 @@
     [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
     
     [self.view addSubview:self.yrScrollViewCancelButton];
+}
+
+-(void)searchMode
+{
+    NSLog(@"from right");
     
+    self.Broadcast = NO;
+    [UIView beginAnimations:@"flip" context:nil];
+    
+    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.view cache:NO];
+    [UIView setAnimationDuration:0.5];
+    
+    [self.view addSubview:self.searchModeView.view];
+    
+    [UIView commitAnimations];
 }
 
--(void)showControlPanel:(UIGestureRecognizer*)gestureRecognizer
+-(void)broadcastMode
 {
-    [UIView animateWithDuration:0.3 animations:^{
-        [self.controlPanel setFrame:CGRectMake(self.controlPanel.frame.origin.x, 439, self.controlPanel.frame.size.width, self.controlPanel.frame.size.height)];
-    }];
-}
-
--(void)dismissControlPanel:(UIGestureRecognizer*)gestureRecognizer
-{
-    [UIView animateWithDuration:0.3 animations:^{
-        [self.controlPanel setFrame:CGRectMake(self.controlPanel.frame.origin.x, 519, self.controlPanel.frame.size.width, self.controlPanel.frame.size.height)];
-    }];
-}
-
--(void)switchMode
-{
-    if (self.isBroadcast) {
-        self.Broadcast = NO;
-        self.modeLabel.text = @"<SEARCH>";
-    }
-    else
-    {
-        self.Broadcast = YES;
-        self.modeLabel.text = @"<BROADCAST>";
-    }
+    NSLog(@"from left");
+    self.Broadcast = YES;
+    [UIView beginAnimations:@"flip" context:nil];
+    
+    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
+    [UIView setAnimationDuration:0.5];
+    
+    [self.searchModeView.view removeFromSuperview];
+    
+    [UIView commitAnimations];
 }
 
 -(void)cancelScrollView
@@ -428,6 +614,33 @@
     [self.yrScrollView removeFromSuperview];
     [self.yrScrollViewCancelButton removeFromSuperview];
     [self.grayView removeFromSuperview];
+}
+
+-(void)tagCandidates
+{
+    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] tagCandidate:self.currentDataEntry[@"code"] withOption:self.tagButton.titleLabel.text from:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
+    
+    //update title make sure the same request won't happen continously
+    if ([self.tagButton.titleLabel.text isEqualToString:@"Tag"]) {
+        [self.tagButton setTitle:@"unTag" forState:UIControlStateNormal];
+        [self.tagList addObject:self.currentDataEntry[@"code"]];
+    }
+    else
+    {
+        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        if ([self.tagList count] != 0) {
+            int index = -1;
+            for (int i = 0; i<[self.tagList count]; i++) {
+                if ([[self.tagList objectAtIndex:i] isEqualToString:self.currentDataEntry[@"code"]]) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index >=0) {
+                [self.tagList removeObjectAtIndex:index];
+            }
+        }
+    }
 }
 
 #pragma mark - UITableViewDataSource

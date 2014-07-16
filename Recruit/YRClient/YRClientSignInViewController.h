@@ -30,6 +30,7 @@
 @property (weak, nonatomic) IBOutlet AutoSuggestTextField *yrEmailTextField;
 @property (strong, nonatomic) UIView * yrNameListView;
 @property (strong, nonatomic) UITableView *yrNameList;
+@property (strong, nonatomic) UIView * grayView;
 
 - (IBAction)continueGo:(id)sender;
 - (IBAction)backgroundTapped:(id)sender;

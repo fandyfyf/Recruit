@@ -104,7 +104,7 @@
 
 - (IBAction)sendInformation:(id)sender {
     if ([self checkReady]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Flag!", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Tag!", nil];
         [alert show];
     }
     else
@@ -305,17 +305,29 @@
         if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 3) {
             preference = [NSString stringWithFormat:@"%@ - %@",[self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex],[self.yrPlatformSegCtrl titleForSegmentAtIndex:self.yrPlatformSegCtrl.selectedSegmentIndex]];
         }
+        else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 0)
+        {
+            preference = @"Front End";
+        }
+        else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 1)
+        {
+            preference = @"Back End";
+        }
+        else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 2)
+        {
+            preference = @"Service Engineering";
+        }
         else
         {
             preference = [self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex];
         }
-        NSDictionary *dataDic = @{@"firstName" : [[(YRClientSignInViewController*)self.source yrFirstNameTextField] text], @"lastName" : [[(YRClientSignInViewController*)self.source yrLastNameTextField] text], @"email" : [[(YRClientSignInViewController*)self.source yrEmailTextField] text], @"code" : self.yrcodeLabel.text, @"recommand" : [NSNumber numberWithBool:NO], @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : preference, @"position" : [self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex], @"date" : [NSDate date], @"note" : [self.yrNoteTextView text], @"gpa" : self.yrGPATextField.text, @"rank" : [self.yrRankingSegmentControl titleForSegmentAtIndex:self.yrRankingSegmentControl.selectedSegmentIndex], @"interviewer" : self.appDelegate.mcManager.userName};
+        NSDictionary *dataDic = @{@"firstName" : [[(YRClientSignInViewController*)self.source yrFirstNameTextField] text], @"lastName" : [[(YRClientSignInViewController*)self.source yrLastNameTextField] text], @"email" : [[(YRClientSignInViewController*)self.source yrEmailTextField] text], @"code" : self.yrcodeLabel.text,  @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : preference, @"position" : [self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex], @"date" : [NSDate date], @"note" : [self.yrNoteTextView text], @"gpa" : self.yrGPATextField.text, @"rank" : [self.yrRankingSegmentControl titleForSegmentAtIndex:self.yrRankingSegmentControl.selectedSegmentIndex], @"interviewer" : self.appDelegate.mcManager.userName, @"tagList" : [NSArray new]};
         
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];
         
-        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Flag!"]) {
-            newDic[@"recommand"] = [NSNumber numberWithBool:YES];
+        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Tag!"]) {
+            newDic[@"tagList"] = @[self.appDelegate.mcManager.userName];
         }
         //change NSDictionary to NSMutableDictionary
         NSDictionary *dic = @{@"msg" : @"data", @"data" : newDic};
@@ -415,7 +427,7 @@
         
         for (CandidateEntry* backedUpCandidate in FetchResults)
         {
-            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
+            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":backedUpCandidate.tagList};
             NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
             [self.appDelegate.dataManager sendBackUp:packet];
             NSLog(@"sending one entry");

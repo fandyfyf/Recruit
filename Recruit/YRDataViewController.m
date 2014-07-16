@@ -20,6 +20,8 @@
 
 -(void)setUpInterviewNotification:(NSNotification *)notification;
 
+-(void)updateTagInformation:(NSNotification*)notification;
+
 -(void)fetchCandidates;
 
 -(void)sortMethodSelected:(UISegmentedControl *)mySegmentedControl;
@@ -71,6 +73,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:@"NeedUpdateTableNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setUpInterviewNotification:) name:@"SetUpInterview" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTagInformation:) name:@"needUpdateTagInformationNotification" object:nil];
     
     self.yrPrefix = [(YRHostMainViewController*)self.tabBarController.viewControllers[0] yrPrefix];
     
@@ -125,13 +128,11 @@
 
 -(void)needUpdateTableNotification:(NSNotification *)notification
 {
-    //[self fetchCandidates];
     dispatch_async(dispatch_get_main_queue(), ^{
-        //[self.yrdataEntry addObject:[[notification userInfo] objectForKey:@"entry"]];
-        
-        //[self fetchCandidates];
         
         CandidateEntry* curr = [[notification userInfo] objectForKey:@"entry"];
+        
+        NSLog(@"%@",curr);
         
         if ([self.yrPositionFilter selectedSegmentIndex] == 0) {
             [self.yrdataEntry addObject:curr];
@@ -182,14 +183,19 @@
             
             [self.infoDataList endUpdates];
         }
-        
-               //[self.infoDataList performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
     });
 }
 
 -(void)setUpInterviewNotification:(NSNotification *)notification
 {
     [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:3]];
+}
+
+-(void)updateTagInformation:(NSNotification*)notification
+{
+    //update flag...
+    [self fetchCandidates];
+    [self.infoDataList reloadData];
 }
 
 -(void)fetchCandidates
@@ -200,7 +206,6 @@
     
     if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
     {
-        //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
         [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
     }
     
@@ -223,7 +228,6 @@
         
         if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
         {
-            //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
             [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
         }
         
@@ -270,11 +274,6 @@
     NSError *error;
     if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
         [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-    
-//    NSDateFormatter* format = [[NSDateFormatter alloc] init];
-//    [format setDateFormat:@"MMddyyyHHmm"];
-//    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
-    
     
     showingImageIndex = 0;
     self.fileNames = [(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] fileNames];
@@ -398,7 +397,6 @@
     
     if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
     {
-        //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
         [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
     }
     
@@ -426,10 +424,6 @@
         NSError *error;
         if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
             [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-        
-        //    NSDateFormatter* format = [[NSDateFormatter alloc] init];
-        //    [format setDateFormat:@"MMddyyyHHmm"];
-        //    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
         
         NSString* fileName = self.fileNames[showingImageIndex];
         
@@ -468,10 +462,6 @@
         NSError *error;
         if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
             [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-        
-        //    NSDateFormatter* format = [[NSDateFormatter alloc] init];
-        //    [format setDateFormat:@"MMddyyyHHmm"];
-        //    NSString* date = [format stringFromDate:[(CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row] date]];
         
         NSString* fileName = self.fileNames[showingImageIndex];
         
@@ -530,7 +520,7 @@
     cell.yrinterviewerLabel.text = current.interviewer;
     cell.yrcodeLabel.text = current.code;
     
-    if ([current.recommand boolValue]) {
+    if ([current.tagList count] != 0) {
         cell.yrcodeLabel.textColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
         cell.yrStarView.hidden = NO;
     }
@@ -598,7 +588,7 @@
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
         //send out broadCast with self.currentEntry
-        NSDictionary* dic = @{@"firstName":self.currentEntry.firstName,@"lastName":self.currentEntry.lastName,@"email":self.currentEntry.emailAddress,@"interviewer":self.currentEntry.interviewer,@"code":self.currentEntry.code,@"recommand":self.currentEntry.recommand,@"status":self.currentEntry.status,@"pdf":self.currentEntry.pdf,@"position":self.currentEntry.position,@"preference":self.currentEntry.preference,@"date":self.currentEntry.date,@"note":self.currentEntry.notes,@"rank":[self.currentEntry.rank stringValue],@"gpa":[self.currentEntry.gpa stringValue],@"BU1" : self.currentEntry.businessUnit1, @"BU2" : self.currentEntry.businessUnit2, @"fileNames" : self.currentEntry.fileNames};
+        NSDictionary* dic = @{@"firstName":self.currentEntry.firstName,@"lastName":self.currentEntry.lastName,@"email":self.currentEntry.emailAddress,@"interviewer":self.currentEntry.interviewer,@"code":self.currentEntry.code,@"status":self.currentEntry.status,@"pdf":self.currentEntry.pdf,@"position":self.currentEntry.position,@"preference":self.currentEntry.preference,@"date":self.currentEntry.date,@"note":self.currentEntry.notes,@"rank":[self.currentEntry.rank stringValue],@"gpa":[self.currentEntry.gpa stringValue],@"BU1" : self.currentEntry.businessUnit1, @"BU2" : self.currentEntry.businessUnit2, @"fileNames" : self.currentEntry.fileNames, @"tagList" : self.currentEntry.tagList};
         NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
         
         [self.appDelegate.dataManager broadCastData:packet];
@@ -634,7 +624,6 @@
     
     if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
     {
-        //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"recommand = %@",[NSNumber numberWithBool:YES]]];
         [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"rank" ascending:NO]]];
     }
     

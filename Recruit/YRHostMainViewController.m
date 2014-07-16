@@ -171,8 +171,6 @@
         [item setInterviewer:@"edgeOfTomorrow"];
         [item setCode:@"Test-1"];
         
-        
-        [item setRecommand:[NSNumber numberWithBool:YES]];
         [item setStatus:@"pending"];
         [item setPdf:[NSNumber numberWithBool:NO]];
         [item setPosition:@"Intern"];
@@ -182,6 +180,7 @@
         [item setRank:[NSNumber numberWithFloat:3.5]];
         [item setGpa:[NSNumber numberWithFloat:3.5]];
         [item setFileNames:[NSArray new]];
+        [item setTagList:[NSArray new]];
         
         NSError *error = nil;
         if (![self.managedObjectContext save:&error]) {
@@ -238,8 +237,8 @@
     for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
         if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:displayName]) {
             [self.yrarrayConnectedDevices replaceObjectAtIndex:i withObject:[notification userInfo]];
+            break;
         }
-        break;
     }
     
     //update table here!!

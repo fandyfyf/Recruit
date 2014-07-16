@@ -20,6 +20,8 @@
 @property (assign, getter = isHost) BOOL host;
 @property (strong,nonatomic) NSMutableArray* nameList;
 
+@property (assign) int debug_counter;
+
 -(id) init;
 
 -(id) initWithPrefix:(NSString*)prefix;
@@ -31,6 +33,10 @@
 -(CandidateEntry*)saveCandidate:(NSDictionary *)infoData;
 
 -(CandidateEntry*)queuingLocalCandidate:(NSDictionary *)infoData;
+
+-(NSError*)sendToHostWithData:(NSDictionary*)data;
+
+-(void)sendToALLClientsWithData:(NSDictionary*)data;
 
 -(void)sendACKBack:(MCPeerID*)peerID;
 
@@ -52,6 +58,16 @@
 
 -(void)sendDebriefInvitation;
 
+-(void)sendSearchQuery:(NSDictionary*)dic;
+
+-(void)sendSearchResult:(NSArray*)array toPeer:(MCPeerID*)peer;
+
+-(void)sendTagListRequest:(NSString*)interviewerName;
+
+-(void)sendTagList:(NSDictionary*)data toPeer:(MCPeerID*)peer;
+
+-(void)tagCandidate:(NSString*)ID withOption:(NSString*)option from:(NSString*)interviewer;
+
 -(void)sendBackUp:(NSDictionary* )localBackUp;
 
 -(int) nextCode;
@@ -60,6 +76,7 @@
 
 - (void)stopListeningForData;
 
-
+//debug mode function//
+-(void)debugSenderActiveWithCode:(NSString*)rid;
 
 @end

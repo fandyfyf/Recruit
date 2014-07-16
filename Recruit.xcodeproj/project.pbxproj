@@ -13,8 +13,13 @@
 		D251C65F196CA8B8003E86FD /* goldStar.png in Resources */ = {isa = PBXBuildFile; fileRef = D251C65E196CA8B8003E86FD /* goldStar.png */; };
 		D251C661196F209A003E86FD /* flag.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D251C660196F209A003E86FD /* flag.jpg */; };
 		D251C66419704035003E86FD /* YRDebriefViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C66319704035003E86FD /* YRDebriefViewController.m */; };
-		D251C66A197484DF003E86FD /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C669197484DF003E86FD /* CandidateEntry.m */; };
 		D251C66D197484E0003E86FD /* Interviewer.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C66C197484E0003E86FD /* Interviewer.m */; };
+		D251C66F19756B82003E86FD /* yahoo.png in Resources */ = {isa = PBXBuildFile; fileRef = D251C66E19756B82003E86FD /* yahoo.png */; };
+		D251C67119756C61003E86FD /* tag.ico in Resources */ = {isa = PBXBuildFile; fileRef = D251C67019756C61003E86FD /* tag.ico */; };
+		D251C6741975CFC1003E86FD /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C6731975CFC1003E86FD /* CandidateEntry.m */; };
+		D251C67719761610003E86FD /* YRDebriefSearchModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C67619761610003E86FD /* YRDebriefSearchModeViewController.m */; };
+		D251C67D1976DA1B003E86FD /* YRSearchResultCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C67C1976DA1B003E86FD /* YRSearchResultCell.m */; };
+		D251C6801976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C67F1976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m */; };
 		D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D25268A7194F3E6100EBE43E /* MessageUI.framework */; };
 		D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */; };
 		D25268B019507D7700EBE43E /* document.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268AF19507D7700EBE43E /* document.png */; };
@@ -83,10 +88,18 @@
 		D251C660196F209A003E86FD /* flag.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = flag.jpg; sourceTree = "<group>"; };
 		D251C66219704035003E86FD /* YRDebriefViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRDebriefViewController.h; sourceTree = "<group>"; };
 		D251C66319704035003E86FD /* YRDebriefViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRDebriefViewController.m; sourceTree = "<group>"; };
-		D251C668197484DF003E86FD /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
-		D251C669197484DF003E86FD /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
 		D251C66B197484E0003E86FD /* Interviewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interviewer.h; sourceTree = "<group>"; };
 		D251C66C197484E0003E86FD /* Interviewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Interviewer.m; sourceTree = "<group>"; };
+		D251C66E19756B82003E86FD /* yahoo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = yahoo.png; sourceTree = "<group>"; };
+		D251C67019756C61003E86FD /* tag.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = tag.ico; sourceTree = "<group>"; };
+		D251C6721975CFC1003E86FD /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
+		D251C6731975CFC1003E86FD /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
+		D251C67519761610003E86FD /* YRDebriefSearchModeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRDebriefSearchModeViewController.h; sourceTree = "<group>"; };
+		D251C67619761610003E86FD /* YRDebriefSearchModeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRDebriefSearchModeViewController.m; sourceTree = "<group>"; };
+		D251C67B1976DA1B003E86FD /* YRSearchResultCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRSearchResultCell.h; sourceTree = "<group>"; };
+		D251C67C1976DA1B003E86FD /* YRSearchResultCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRSearchResultCell.m; sourceTree = "<group>"; };
+		D251C67E1976E41A003E86FD /* YRDebriefSearchModeDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRDebriefSearchModeDetailViewController.h; sourceTree = "<group>"; };
+		D251C67F1976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRDebriefSearchModeDetailViewController.m; sourceTree = "<group>"; };
 		D25268A7194F3E6100EBE43E /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		D25268AA194F5CBC00EBE43E /* Main_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main_iPad.storyboard; sourceTree = "<group>"; };
 		D25268AF19507D7700EBE43E /* document.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = document.png; sourceTree = "<group>"; };
@@ -239,14 +252,16 @@
 				D25268B319507DE400EBE43E /* wifi.png */,
 				D25268B119507D8D00EBE43E /* folder.png */,
 				D25268AF19507D7700EBE43E /* document.png */,
+				D251C66E19756B82003E86FD /* yahoo.png */,
+				D251C67019756C61003E86FD /* tag.ico */,
 				D25268A9194F4B4B00EBE43E /* iPad */,
 				D2F818A119478777006E88FD /* YRClient */,
 				D2F818A219478777006E88FD /* YRHost */,
 				D2F8186919465FE5006E88FD /* YRAppDelegate.h */,
 				D2F8186A19465FE5006E88FD /* YRAppDelegate.m */,
+				D251C6721975CFC1003E86FD /* CandidateEntry.h */,
+				D251C6731975CFC1003E86FD /* CandidateEntry.m */,
 				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
-				D251C668197484DF003E86FD /* CandidateEntry.h */,
-				D251C669197484DF003E86FD /* CandidateEntry.m */,
 				D251C66B197484E0003E86FD /* Interviewer.h */,
 				D251C66C197484E0003E86FD /* Interviewer.m */,
 				D2BB4210195DC7E8002ECCC9 /* Appointment.h */,
@@ -306,6 +321,12 @@
 				D2F818991946B3E4006E88FD /* YRFormViewController.m */,
 				D251C66219704035003E86FD /* YRDebriefViewController.h */,
 				D251C66319704035003E86FD /* YRDebriefViewController.m */,
+				D251C67519761610003E86FD /* YRDebriefSearchModeViewController.h */,
+				D251C67619761610003E86FD /* YRDebriefSearchModeViewController.m */,
+				D251C67E1976E41A003E86FD /* YRDebriefSearchModeDetailViewController.h */,
+				D251C67F1976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m */,
+				D251C67B1976DA1B003E86FD /* YRSearchResultCell.h */,
+				D251C67C1976DA1B003E86FD /* YRSearchResultCell.m */,
 			);
 			path = YRClient;
 			sourceTree = "<group>";
@@ -424,8 +445,10 @@
 				D25268B419507DE400EBE43E /* wifi.png in Resources */,
 				D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */,
 				D2F8186519465FE5006E88FD /* InfoPlist.strings in Resources */,
+				D251C66F19756B82003E86FD /* yahoo.png in Resources */,
 				D2F8186E19465FE5006E88FD /* Main_iPhone.storyboard in Resources */,
 				D2D1E5731960E3370084D8DA /* email.png in Resources */,
+				D251C67119756C61003E86FD /* tag.ico in Resources */,
 				D2B53141196C994B0019C7D7 /* camera3.png in Resources */,
 				D251C65F196CA8B8003E86FD /* goldStar.png in Resources */,
 				D2B5313D196B0AFE0019C7D7 /* Camera1.png in Resources */,
@@ -451,6 +474,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D251C67D1976DA1B003E86FD /* YRSearchResultCell.m in Sources */,
 				D2F818A519489B5E006E88FD /* Recruit.xcdatamodeld in Sources */,
 				D2BB4212195DC7E8002ECCC9 /* Appointment.m in Sources */,
 				D2F818A019476113006E88FD /* YRinfoDataCell.m in Sources */,
@@ -463,6 +487,7 @@
 				D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */,
 				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
 				D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */,
+				D251C67719761610003E86FD /* YRDebriefSearchModeViewController.m in Sources */,
 				D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */,
 				D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */,
 				D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */,
@@ -472,8 +497,9 @@
 				D251C66D197484E0003E86FD /* Interviewer.m in Sources */,
 				D2D1E57D19633D4A0084D8DA /* YREmailGenerator.m in Sources */,
 				D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */,
-				D251C66A197484DF003E86FD /* CandidateEntry.m in Sources */,
+				D251C6741975CFC1003E86FD /* CandidateEntry.m in Sources */,
 				D2F8189A1946B3E4006E88FD /* YRFormViewController.m in Sources */,
+				D251C6801976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

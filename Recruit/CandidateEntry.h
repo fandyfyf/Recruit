@@ -2,7 +2,7 @@
 //  CandidateEntry.h
 //  Recruit
 //
-//  Created by Yifan Fu on 7/14/14.
+//  Created by Yifan Fu on 7/15/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -27,7 +27,6 @@
 @property (nonatomic, retain) NSString * position;
 @property (nonatomic, retain) NSString * preference;
 @property (nonatomic, retain) NSNumber * rank;
-@property (nonatomic, retain) NSNumber * recommand;
 @property (nonatomic, retain) NSString * status;
 @property (nonatomic, retain) NSArray * fileNames;
 @property (nonatomic, retain) NSArray * tagList;

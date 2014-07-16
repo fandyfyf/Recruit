@@ -385,6 +385,7 @@
         item.name = self.interviewerName.text;
         item.email = self.interviewerEmail.text;
         item.code = self.interviewerCode.text;
+        item.tagList = [NSArray new];
         
         NSError *error = nil;
         if (![self.managedObjectContext save:&error]) {

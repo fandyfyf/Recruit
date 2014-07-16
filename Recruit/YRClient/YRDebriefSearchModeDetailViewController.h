@@ -1,26 +1,22 @@
 //
-//  YRDebriefViewController.h
+//  YRDebriefSearchModeDetailViewController.h
 //  Recruit
 //
-//  Created by Yifan Fu on 7/11/14.
+//  Created by Yifan Fu on 7/16/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-#import "YRDebriefSearchModeViewController.h"
 
-@interface YRDebriefViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface YRDebriefSearchModeDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (strong, nonatomic) NSDictionary* currentDataEntry;
 @property (strong, nonatomic) NSMutableArray* tagList;
-@property (strong, nonatomic) UILabel* yrPromptMessageLabel;
 
 @property (strong, nonatomic) UIButton* tagButton;
-@property (strong, nonatomic) UIGestureRecognizer* gestureRecognizer;
 
 @property (strong, nonatomic) UIImageView* flagView;
 @property (strong, nonatomic) UILabel* modeLabel;
-@property (assign, getter = isBroadcast) BOOL Broadcast;
 
 @property (strong, nonatomic) UILabel* codeLabel;
 @property (strong, nonatomic) UILabel* nameLabel;
@@ -56,8 +52,11 @@
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
 @property (strong, nonatomic) UIControl* grayView;
 
-@property (strong, nonatomic) YRDebriefSearchModeViewController* searchModeView;
-@property (strong, nonatomic) UIButton* searchButton;
+@property (strong, nonatomic) UIButton* backButton;
 
+-(void)loadData;
+
+-(void)cancelScrollView;
+-(void)tagCandidates;
 
 @end

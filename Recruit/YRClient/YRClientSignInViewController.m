@@ -127,11 +127,17 @@
     
     self.yrEmailTextField.inputAccessoryView = doneToolbar;
     
-////    //=====test=====/
+//    //=====test=====/
 //    if (self.debriefingViewController == nil) {
 //        self.debriefingViewController = [YRDebriefViewController new];
 //    }
+//    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+//    self.grayView.backgroundColor = [UIColor blackColor];
+//    self.grayView.alpha = 0.9;
+//    
+//    [self.view addSubview:self.grayView];
 //    [self.view addSubview:self.debriefingViewController.view];
+//===========test===========//
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -274,12 +280,18 @@
     if (self.debriefingViewController == nil) {
         self.debriefingViewController = [YRDebriefViewController new];
     }
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.9;
+    
+    [self.view addSubview:self.grayView];
     [self.view addSubview:self.debriefingViewController.view];
 }
 
 -(void)debriefingModeOffNotification:(NSNotification *)notification
 {
     //[self.debriefingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self.grayView removeFromSuperview];
     [self.debriefingViewController.view removeFromSuperview];
     [[NSNotificationCenter defaultCenter] removeObserver:self.debriefingViewController];
     self.debriefingViewController = nil;
@@ -489,7 +501,7 @@
         
         for (CandidateEntry* backedUpCandidate in FetchResults)
         {
-            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"recommand":backedUpCandidate.recommand,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue]};
+            NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":[backedUpCandidate tagList]};
             NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
             [self.appDelegate.dataManager sendBackUp:packet];
             NSLog(@"sending one entry");

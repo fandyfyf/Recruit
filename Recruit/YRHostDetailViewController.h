@@ -36,10 +36,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *yrHalfRankLabel;
 
 @property (weak, nonatomic) IBOutlet UITextField *yrPreferenceTextField;
+@property (weak, nonatomic) IBOutlet UILabel *yrTagLabel;
 
-@property (weak, nonatomic) IBOutlet UILabel *yrRecommandMark;
-@property (weak, nonatomic) IBOutlet UISwitch *yrRecommendSwitch;
-@property (weak, nonatomic) IBOutlet UILabel *yrRecommendLabel;
 @property (weak, nonatomic) IBOutlet UIButton *yrSnapshotButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrFileNameButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrGoBackButton;
@@ -79,6 +77,5 @@
 - (IBAction)emailCandidate:(id)sender;
 - (IBAction)scheduleInterview:(id)sender;
 - (IBAction)checkSchedule:(id)sender;
-- (IBAction)recommendChange:(id)sender;
 
 @end
