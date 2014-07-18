@@ -35,4 +35,7 @@
 @property (strong, nonatomic) UIButton* broadcastButton;
 @property (strong, nonatomic) UIViewController* source;
 
+@property (strong, nonatomic) UIActivityIndicatorView* activityIndicator;
+@property (strong, nonatomic) UIView* grayView;
+
 @end

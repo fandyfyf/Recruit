@@ -114,12 +114,65 @@
     [alert show];
 }
 
-//switch has a bug, and need to be fixed in a better way
-- (IBAction)toggleVisibility:(id)sender {
+////switch has a bug, and need to be fixed in a better way
+//- (IBAction)toggleVisibility:(id)sender {
+//    [self.yrPrefixTextField resignFirstResponder];
+//    self.yrPrefix = self.yrPrefixTextField.text;
+//    
+//    if (self.yrVisibilityControl.isOn) {
+//        if (self.yrPrefixTextField.isEnabled) {
+//            [self.yrPrefixTextField setEnabled:NO];
+//        }
+//        self.appDelegate.dataManager = nil;
+//        if ([self.appDelegate dataManager] == nil) {
+//            [self.appDelegate setDataManager:[[YRDataManager alloc] initWithPrefix:self.yrPrefix]];
+//            [[self.appDelegate dataManager] startListeningForData];
+//        }
+//        [[self.appDelegate dataManager] setHost:YES];
+//        
+//        //init active session && set up advertiser and advertise
+//        [[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
+//    }
+//    else
+//    {
+//        if (!self.yrPrefixTextField.isEnabled) {
+//            [self.yrPrefixTextField setEnabled:YES];
+//        }
+//        if (self.appDelegate.dataManager != nil) {
+//            [self.appDelegate.dataManager stopListeningForData];
+//            [self.appDelegate setDataManager:nil];
+//        }
+//        
+//        
+//        for (NSDictionary *peerSession in [self.appDelegate mcManager].activeSessions) {
+//            [[peerSession valueForKey:@"session"] disconnect];
+//        }
+//        [[self.appDelegate mcManager].activeSessions removeAllObjects];
+//        [[[self.appDelegate mcManager] Nadvertiser] stopAdvertisingPeer];
+//        [[self.appDelegate mcManager] setNadvertiser:nil];
+//        
+//        [self.yrarrayConnectedDevices removeAllObjects];
+//        [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+//    }
+//}
+
+- (IBAction)backgroundTapped:(id)sender {
+    [self.yrPrefixTextField resignFirstResponder];
+    self.yrPrefix = self.yrPrefixTextField.text;
+}
+
+- (IBAction)onOffSwitch:(id)sender {
     [self.yrPrefixTextField resignFirstResponder];
     self.yrPrefix = self.yrPrefixTextField.text;
     
-    if (self.yrVisibilityControl.isOn) {
+    //set the event code in the user default
+    
+    [[NSUserDefaults standardUserDefaults] setValue:self.yrPrefix forKey:@"eventCode"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    
+    if (self.yrOnOffControl.selectedSegmentIndex == 1) {
+        NSLog(@"On");
         if (self.yrPrefixTextField.isEnabled) {
             [self.yrPrefixTextField setEnabled:NO];
         }
@@ -131,10 +184,11 @@
         [[self.appDelegate dataManager] setHost:YES];
         
         //init active session && set up advertiser and advertise
-        [[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
+        [[self.appDelegate mcManager] advertiseSelf:YES];
     }
     else
     {
+        NSLog(@"Off");
         if (!self.yrPrefixTextField.isEnabled) {
             [self.yrPrefixTextField setEnabled:YES];
         }
@@ -154,11 +208,6 @@
         [self.yrarrayConnectedDevices removeAllObjects];
         [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
     }
-}
-
-- (IBAction)backgroundTapped:(id)sender {
-    [self.yrPrefixTextField resignFirstResponder];
-    self.yrPrefix = self.yrPrefixTextField.text;
 }
 
 -(void)debuggerFunction

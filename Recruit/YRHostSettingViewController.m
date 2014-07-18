@@ -84,8 +84,10 @@
         [[self.yrAddButton layer] setCornerRadius:20];
         [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddButton layer] setBorderWidth:5];
-        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 50, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        
+        //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 50, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
         [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + formListCount*44 + 50, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        self.yrRemoveButton.hidden = YES;
         
         [[self.yrRemoveFormButton layer] setCornerRadius:20];
         [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
@@ -102,8 +104,9 @@
         [[self.yrAddButton layer] setCornerRadius:12.5];
         [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddButton layer] setBorderWidth:2];
-        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 45, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 45, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
         [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + formListCount*44 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        self.yrRemoveButton.hidden = YES;
         
         [[self.yrRemoveFormButton layer] setCornerRadius:12.5];
         [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
@@ -168,9 +171,7 @@
         //rotation needs update setting 
         self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x-214, self.view.center.y-250, 428, 300)];
         
-//        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
         [[self.yrCardView layer] setCornerRadius:10];
-//        [[self.yrCardView layer] setBorderWidth:5];
         
         self.yrCardView.backgroundColor = [UIColor whiteColor];
         
@@ -219,22 +220,19 @@
         cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         cancelButton.frame = CGRectMake(40, 250, 100, 40);
         [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-        cancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:22];
+        cancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 22];
         [cancelButton addTarget:self action:@selector(yrCardViewCancel) forControlEvents:UIControlEventTouchUpInside];
         
         saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         saveButton.frame = CGRectMake(308, 250, 100, 40);
         [saveButton setTitle:@"Save" forState:UIControlStateNormal];
-        saveButton.titleLabel.font = [UIFont boldSystemFontOfSize:22];
+        saveButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 22];
         [saveButton addTarget:self action:@selector(yrCardViewSave) forControlEvents:UIControlEventTouchUpInside];
     }
     else
     {
         self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(20, 120, 280, 230)];
-        
-//        [[self.yrCardView layer] setBorderColor:[[UIColor grayColor] CGColor]];
         [[self.yrCardView layer] setCornerRadius:10];
-//        [[self.yrCardView layer] setBorderWidth:5];
         
         self.yrCardView.backgroundColor = [UIColor whiteColor];
         
@@ -391,6 +389,33 @@
         if (![self.managedObjectContext save:&error]) {
             NSLog(@"ERROR -- saving coredata");
         }
+        
+        //save the event code list in the user default
+        NSMutableArray* eventCodeList = [[[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"] mutableCopy];
+        if (eventCodeList == nil) {
+            //if the list is empty then add the code now
+            eventCodeList = [NSMutableArray new];
+            [eventCodeList addObject:item.code];
+        }
+        else
+        {
+            BOOL exist = NO;
+            for (NSString* code in eventCodeList) {
+                if ([code isEqualToString:item.code]) {
+                    exist = YES;
+                    break;
+                }
+            }
+            if (!exit) {
+                //insert
+                [eventCodeList addObject:item.code];
+            }
+        }
+        //update the event code list
+        [[NSUserDefaults standardUserDefaults] setObject:eventCodeList forKey:@"eventCodeList"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        
         
         [self.interviewerArray addObject:item];
         
@@ -650,7 +675,13 @@
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         }
         cell.textLabel.text = [(NSDictionary*)[self.emailKeywordArray objectAtIndex:indexPath.row] allKeys][0];
-        cell.textLabel.font = [UIFont fontWithName:@"Iowan Old Style" size:15];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size: 10];
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+        {
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
+        }
         return cell;
     }
     else
@@ -751,20 +782,44 @@
                 [[self.removeFromViewButton layer] setCornerRadius:20];
                 [[self.removeFromViewButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
                 [[self.removeFromViewButton layer] setBorderWidth:4];
-                [self.removeFromViewButton addTarget:self action:@selector(removeTextView) forControlEvents:UIControlEventTouchUpInside];
-                
-                self.yrEditingView.text = [self.formList[indexPath.row] allValues][0];
-                
-                currentSelected = indexPath.row;
-                
-                [self.view addSubview:self.yrEditingView];
-                [self.view addSubview:self.yrEditingTable];
-                [self.view addSubview:self.removeFromViewButton];
             }
             else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
             {
+                //bring up text view
+                self.yrEditingView = [[UITextView alloc] initWithFrame:CGRectMake(self.view.center.x-160, self.view.center.y-256, 220, 274)];
+                self.yrEditingView.delegate = self;
+                self.yrEditingView.keyboardType = UIKeyboardTypeDefault;
+                self.yrEditingView.inputAccessoryView = doneToolbar;
+                [self.yrEditingView setBackgroundColor:[UIColor colorWithRed:1.0 green:247.0/255.0 blue:201.0/255.0 alpha:1]];
+                [[self.yrEditingView layer] setCornerRadius:10];
                 
+                self.yrEditingTable = [[UITableView alloc] initWithFrame:CGRectMake(self.view.center.x+60, self.view.center.y-256, 100, 274) style:UITableViewStyleGrouped];
+                self.emailKeywordArray = [[NSUserDefaults standardUserDefaults] arrayForKey:kYREmailKeyWordsKey];
+                self.yrEditingTable.delegate = self;
+                self.yrEditingTable.dataSource = self;
+                [[self.yrEditingTable layer] setCornerRadius:10];
+                //[self.yrEditingTable setSeparatorInset:UIEdgeInsetsZero];
+                
+                self.removeFromViewButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+                [self.removeFromViewButton setFrame:CGRectMake(220-20, self.view.center.y-256-20, 40, 40)];
+                self.removeFromViewButton.backgroundColor = [UIColor redColor];
+                [self.removeFromViewButton setTitle:@"X" forState:UIControlStateNormal];
+                [self.removeFromViewButton.titleLabel setFont:[UIFont boldSystemFontOfSize:30]];
+                self.removeFromViewButton.titleLabel.textColor = [UIColor whiteColor];
+                [self.removeFromViewButton setTintColor:[UIColor whiteColor]];
+                [[self.removeFromViewButton layer] setCornerRadius:20];
+                [[self.removeFromViewButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+                [[self.removeFromViewButton layer] setBorderWidth:4];
+
             }
+            
+            [self.removeFromViewButton addTarget:self action:@selector(removeTextView) forControlEvents:UIControlEventTouchUpInside];
+            
+            self.yrEditingView.text = [self.formList[indexPath.row] allValues][0];
+            currentSelected = indexPath.row;
+            [self.view addSubview:self.yrEditingView];
+            [self.view addSubview:self.yrEditingTable];
+            [self.view addSubview:self.removeFromViewButton];
             [self.yrEditingView becomeFirstResponder];
         }
     }
@@ -783,7 +838,7 @@
             if (indexPath.section == 1) {
                 NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
                 [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-                [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@",[(Interviewer*)self.interviewerArray[indexPath.row] name]]];
+                [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",[(Interviewer*)self.interviewerArray[indexPath.row] name],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
                 
                 NSError* error = nil;
                 
@@ -813,7 +868,7 @@
                 [[NSUserDefaults standardUserDefaults] synchronize];
                 
                 [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y-44, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
-                [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y-44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+                //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y-44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
                 
                 [self.interviewerList reloadData];
             }
@@ -843,7 +898,7 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y+44, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
-        [self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y+44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y+44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
         
         [self.interviewerList reloadData];
         
@@ -867,30 +922,30 @@
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     self.yrAddButton.frame = CGRectMake(self.yrAddButton.frame.origin.x, add_origin_y-scrollView.contentOffset.y, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height);
-    self.yrRemoveButton.frame = CGRectMake(self.yrRemoveButton.frame.origin.x, remove_origin_y-scrollView.contentOffset.y, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height);
+    //self.yrRemoveButton.frame = CGRectMake(self.yrRemoveButton.frame.origin.x, remove_origin_y-scrollView.contentOffset.y, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height);
     
     self.yrAddFormButton.frame = CGRectMake(self.yrAddFormButton.frame.origin.x, add_form_origin_y-scrollView.contentOffset.y, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height);
     
-    self.yrRemoveFormButton.frame = CGRectMake(self.yrRemoveFormButton.frame.origin.x, remove_form_origin_y-scrollView.contentOffset.y, self.yrRemoveFormButton.frame.size.width, self.yrRemoveFormButton.frame.size.height);
+    //self.yrRemoveFormButton.frame = CGRectMake(self.yrRemoveFormButton.frame.origin.x, remove_form_origin_y-scrollView.contentOffset.y, self.yrRemoveFormButton.frame.size.width, self.yrRemoveFormButton.frame.size.height);
     
     if (add_form_origin_y-scrollView.contentOffset.y < self.interviewerList.frame.origin.y) {
         self.yrAddFormButton.hidden = YES;
-        self.yrRemoveFormButton.hidden = YES;
+        //self.yrRemoveFormButton.hidden = YES;
     }
     else
     {
         self.yrAddFormButton.hidden = NO;
-        self.yrRemoveFormButton.hidden = NO;
+        //self.yrRemoveFormButton.hidden = NO;
     }
     
     if (add_origin_y-scrollView.contentOffset.y < self.interviewerList.frame.origin.y) {
         self.yrAddButton.hidden = YES;
-        self.yrRemoveButton.hidden = YES;
+        //self.yrRemoveButton.hidden = YES;
     }
     else
     {
         self.yrAddButton.hidden = NO;
-        self.yrRemoveButton.hidden = NO;
+        //self.yrRemoveButton.hidden = NO;
     }
 }
 

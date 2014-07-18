@@ -52,8 +52,9 @@
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     self.managedObjectContext = [self.appDelegate managedObjectContext];
     
-    self.yrSchedulingController = [YRSchedulingViewController new];
-    self.yrSchedulingController.managedObjectContext = self.managedObjectContext;
+//    self.yrSchedulingController = [YRSchedulingViewController new];
+//    self.yrSchedulingController.source = self;
+//    self.yrSchedulingController.managedObjectContext = self.managedObjectContext;
     
     self.columLabels = [NSMutableArray new];
     self.rowLabels = [NSMutableArray new];
@@ -89,6 +90,7 @@
     self.yrTimeCardScrollView = nil;
     self.yrTimeLabelScrollView = nil;
     self.yrPlaceOrNameScrollView = nil;
+    self.yrSchedulingController = nil;
     dataIsReady = NO;
 }
 
@@ -153,9 +155,9 @@
         
         [nameLabel setText:[NSString stringWithFormat:@"Room %d",i+1]];
         nameLabel.textColor = [UIColor whiteColor];
-        nameLabel.font = [UIFont boldSystemFontOfSize:20];
+        nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            nameLabel.font = [UIFont boldSystemFontOfSize:25];
+            nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         }
         
         nameLabel.textAlignment = NSTextAlignmentCenter;
@@ -184,10 +186,10 @@
             min = min%60;
         }
         timeLabel.textColor = [UIColor whiteColor];
-        timeLabel.font = [UIFont boldSystemFontOfSize:15];
+        timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         timeLabel.textAlignment = NSTextAlignmentLeft;
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            timeLabel.font = [UIFont boldSystemFontOfSize:25];
+            timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
             timeLabel.textAlignment = NSTextAlignmentCenter;
         }
         
@@ -265,20 +267,23 @@
     int index_x = touchLocation.x / ([self.cardWidth intValue]+5);
     int index_y = touchLocation.y / ([self.cardHeight intValue]+5);
     
+    self.yrSchedulingController = [YRSchedulingViewController new];
+    self.yrSchedulingController.source = self;
+    self.yrSchedulingController.managedObjectContext = self.managedObjectContext;
+    [self.yrSchedulingController setDataReady:dataIsReady];
+    
     YRTimeCardView* targeView = (YRTimeCardView*)[self.views objectAtIndex:index_y* [self.yrColumNumber intValue] + index_x];
     
     
     if (!dataIsReady) {
         self.yrSchedulingController.yrTriggeringView = targeView;
         
-        [UIView beginAnimations:@"pop" context:Nil];
+        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+        [self.grayView setBackgroundColor:[UIColor darkGrayColor]];
+        self.grayView.alpha = 0.5;
         
-        [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
-        [UIView setAnimationDuration:0.5];
-        
+        [self.view addSubview:self.grayView];
         [self.view addSubview:self.yrSchedulingController.view];
-        
-        [UIView commitAnimations];
     }
     else
     {
@@ -332,14 +337,13 @@
                     self.yrSchedulingController.yrTriggeringView = targeView;
                     self.yrSchedulingController.yrTriggeringView.candidateLock = YES;
                     
-                    [UIView beginAnimations:@"pop" context:Nil];
+                    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+                    [self.grayView setBackgroundColor:[UIColor darkGrayColor]];
+                    self.grayView.alpha = 0.5;
                     
-                    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
-                    [UIView setAnimationDuration:0.5];
-                    
+                    [self.view addSubview:self.grayView];
                     [self.view addSubview:self.yrSchedulingController.view];
-                    
-                    [UIView commitAnimations];
+
                     
                     dataIsReady = NO;
                     self.yrSchedulingController.yrTriggeringView.candidateLock = NO;
@@ -441,6 +445,10 @@
 {
     dataIsReady = YES;
     self.passedInRid = notification.object[@"code"];
+    self.passedInName = notification.object[@"name"];
+    
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Please select a slot!" message:[NSString stringWithFormat:@"Please select a slot for\n %@.",self.passedInName] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+    [alertView show];
 }
 
 -(void)reloadSchedule
@@ -456,6 +464,7 @@
         self.yrTimeCardScrollView = nil;
         self.yrTimeLabelScrollView = nil;
         self.yrPlaceOrNameScrollView = nil;
+        self.yrSchedulingController = nil;
         
         [self.views removeAllObjects];
         [self.yrAppointmentInfo removeAllObjects];
@@ -509,7 +518,7 @@
     
     NSFetchRequest *fetchRequestI = [[NSFetchRequest alloc] init];
     [fetchRequestI setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-    [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@",self.selectedView.interviewerNameLabel.text]];
+    [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",self.selectedView.interviewerNameLabel.text,[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
     
     NSArray* interviewer = [self.managedObjectContext executeFetchRequest:fetchRequestI error:&error];
     

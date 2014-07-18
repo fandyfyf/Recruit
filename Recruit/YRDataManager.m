@@ -153,7 +153,7 @@
             
             NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@",dic[@"data"]]];
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",dic[@"data"],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
             
             NSError* error = nil;
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -188,8 +188,7 @@
             
             NSFetchRequest *fetchRequest_I = [[NSFetchRequest alloc] init];
             [fetchRequest_I setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest_I setPredicate:[NSPredicate predicateWithFormat:@"name = %@",dic[@"viewer"]]];
-            
+            [fetchRequest_I setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",dic[@"viewer"],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
             NSArray* FetchResults_I = [self.managedObjectContext executeFetchRequest:fetchRequest_I error:&error];
             
             if ([FetchResults count] != 0 && [FetchResults_I count] != 0) {
@@ -231,7 +230,7 @@
             
             NSFetchRequest *fetchRequest_I = [[NSFetchRequest alloc] init];
             [fetchRequest_I setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest_I setPredicate:[NSPredicate predicateWithFormat:@"name = %@",dic[@"viewer"]]];
+            [fetchRequest_I setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",dic[@"viewer"],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
             
             NSArray* FetchResults_I = [self.managedObjectContext executeFetchRequest:fetchRequest_I error:&error];
             
@@ -342,7 +341,7 @@
                                                                 object:nil
                                                               userInfo:dict];
             //==================================debug========================================//
-            [self debugSenderActiveWithCode:dic[@"code"]];
+            //[self debugSenderActiveWithCode:dic[@"code"]];
             //===============================================================================//
         }
         else if([dic[@"msg"] isEqualToString:@"nameList"])
@@ -450,7 +449,7 @@
         
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@",infoData[@"interviewer"]]];
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",infoData[@"interviewer"],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
         
         NSError* error = nil;
         NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -867,7 +866,7 @@
     if (self.debug_counter > 0) {
         self.debug_counter = self.debug_counter - 1;
         //send entry here;
-        NSDictionary *dataDic = @{@"firstName" :[NSString stringWithFormat:@"%@first",rid], @"lastName" : [NSString stringWithFormat:@"%@last",rid], @"email" : [NSString stringWithFormat:@"%@email",rid], @"code" : rid,  @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : @"debugger", @"position" : @"Full-Time", @"date" : [NSDate date], @"note" : @"#empty#", @"gpa" : @"3.5", @"rank" : @"3", @"interviewer" : [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName, @"tagList" : [NSArray new]};
+        NSDictionary *dataDic = @{@"firstName" :[NSString stringWithFormat:@"%@first",rid], @"lastName" : [NSString stringWithFormat:@"%@last",rid], @"email" : [NSString stringWithFormat:@"%@email",rid], @"code" : rid,  @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : @"Mobile - iOS", @"position" : @"Full-Time", @"date" : [NSDate date], @"note" : @"#empty#", @"gpa" : @"3.5", @"rank" : @"3", @"interviewer" : [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName, @"tagList" : [NSArray new]};
         
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];

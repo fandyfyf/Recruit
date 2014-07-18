@@ -20,6 +20,9 @@
 -(void)cancelScrollView;
 -(void)tagCandidates;
 
+-(void)showBusy;
+-(void)dismissBusy;
+
 @end
 
 @implementation YRDebriefViewController
@@ -75,7 +78,7 @@
         [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
         [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [self.tagButton setTintColor:[UIColor whiteColor]];
-        self.tagButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:40];
+        self.tagButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
         
         [self.tagButton addTarget:self action:@selector(tagCandidates) forControlEvents:UIControlEventTouchUpInside];
         
@@ -83,7 +86,7 @@
         
         
         self.codeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 110, 100, 30)];
-        self.codeTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.codeTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.codeTitleLabel.text = @"Rid: ";
         self.codeTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.codeTitleLabel.hidden = YES;
@@ -93,14 +96,14 @@
         self.flagView.hidden = YES;
         
         self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-100, 50, 200, 50)];
-        self.modeLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:40];
+        self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         self.modeLabel.text = @"Broadcast";
         
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.searchButton setFrame:CGRectMake(self.view.center.x-150, 950, 300, 50)];
-        self.searchButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.searchButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.searchButton.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self.searchButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
         [self.searchButton setTitle:@"Search" forState:UIControlStateNormal];
@@ -110,61 +113,61 @@
         [self.searchButton addTarget:self action:@selector(searchMode) forControlEvents:UIControlEventTouchUpInside];
         
         self.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 110, 300, 30)];
-        self.codeLabel.font = [UIFont systemFontOfSize:25];
+        self.codeLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
         self.codeLabel.textAlignment = NSTextAlignmentLeft;
         self.codeLabel.hidden = YES;
         
         self.positionLabel = [[UILabel alloc] initWithFrame:CGRectMake(500, 110, 200, 30)];
-        self.positionLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.positionLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.positionLabel.textAlignment = NSTextAlignmentCenter;
         self.positionLabel.hidden = YES;
         
         self.nameTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 160, 100, 30)];
-        self.nameTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.nameTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.nameTitleLabel.text = @"Name: ";
         self.nameTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.nameTitleLabel.hidden = YES;
         
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 160, 300, 30)];
-        self.nameLabel.font = [UIFont systemFontOfSize:25];
+        self.nameLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
         self.nameLabel.textAlignment = NSTextAlignmentLeft;
         self.nameLabel.hidden = YES;
         
         self.emailTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 220, 100, 30)];
-        self.emailTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.emailTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.emailTitleLabel.text = @"Email: ";
         self.emailTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.emailTitleLabel.hidden = YES;
         
         self.emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 220, 300, 30)];
-        self.emailLabel.font = [UIFont systemFontOfSize:25];
+        self.emailLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
         self.emailLabel.textAlignment = NSTextAlignmentLeft;
         self.emailLabel.hidden = YES;
         
         self.GPATitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 280, 100, 30)];
-        self.GPATitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.GPATitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.GPATitleLabel.text = @"GPA: ";
         self.GPATitleLabel.textAlignment = NSTextAlignmentLeft;
         self.GPATitleLabel.hidden = YES;
         
         self.GPALabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 280, 300, 30)];
-        self.GPALabel.font = [UIFont systemFontOfSize:25];
+        self.GPALabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
         self.GPALabel.textAlignment = NSTextAlignmentLeft;
         self.emailLabel.hidden = YES;
         
         self.preferenceTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 340, 200, 30)];
-        self.preferenceTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.preferenceTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.preferenceTitleLabel.text = @"Preference: ";
         self.preferenceTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.preferenceTitleLabel.hidden = YES;
         
         self.preferenceLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 340, 300, 30)];
-        self.preferenceLabel.font = [UIFont systemFontOfSize:25];
+        self.preferenceLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
         self.preferenceLabel.textAlignment = NSTextAlignmentLeft;
         self.preferenceLabel.hidden = YES;
         
         self.noteViewTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 400, 200, 30)];
-        self.noteViewTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.noteViewTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.noteViewTitleLabel.text = @"Notes: ";
         self.noteViewTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.noteViewTitleLabel.hidden = YES;
@@ -192,29 +195,29 @@
         self.rankPointFiveLabel.text = @".5";
         
         self.businessUnit1TitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 600, 200, 30)];
-        self.businessUnit1TitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.businessUnit1TitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.businessUnit1TitleLabel.text = @"Business Unit1: ";
         self.businessUnit1TitleLabel.textAlignment = NSTextAlignmentLeft;
         self.businessUnit1TitleLabel.hidden = YES;
         
         self.businessUnit1Label = [[UILabel alloc] initWithFrame:CGRectMake(250, 600, 250, 30)];
-        self.businessUnit1Label.font = [UIFont systemFontOfSize:25];
+        self.businessUnit1Label.font = [UIFont fontWithName:@"Helvetica" size: 25];
         self.businessUnit1Label.textAlignment = NSTextAlignmentLeft;
         self.businessUnit1Label.hidden = YES;
         
         self.businessUnit2TitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 660, 200, 30)];
-        self.businessUnit2TitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.businessUnit2TitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.businessUnit2TitleLabel.text = @"Business Unit2: ";
         self.businessUnit2TitleLabel.textAlignment = NSTextAlignmentLeft;
         self.businessUnit2TitleLabel.hidden = YES;
         
         self.businessUnit2Label = [[UILabel alloc] initWithFrame:CGRectMake(250, 660, 250, 30)];
-        self.businessUnit2Label.font = [UIFont systemFontOfSize:25];
+        self.businessUnit2Label.font = [UIFont fontWithName:@"Helvetica" size: 25];
         self.businessUnit2Label.textAlignment = NSTextAlignmentLeft;
         self.businessUnit2Label.hidden = YES;
         
         self.resumeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 720, 200, 30)];
-        self.resumeTitleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.resumeTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.resumeTitleLabel.text = @"Resume: ";
         self.resumeTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.resumeTitleLabel.hidden = YES;
@@ -238,7 +241,7 @@
         [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
         [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [self.tagButton setTintColor:[UIColor whiteColor]];
-        self.tagButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:15];
+        self.tagButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         
         [self.tagButton addTarget:self action:@selector(tagCandidates) forControlEvents:UIControlEventTouchUpInside];
         
@@ -246,7 +249,7 @@
         
         
         self.codeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 60, 50, 20)];
-        self.codeTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.codeTitleLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.codeTitleLabel.text = @"Rid: ";
         self.codeTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.codeTitleLabel.hidden = YES;
@@ -256,78 +259,78 @@
         self.flagView.hidden = YES;
         
         self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 30, 120, 20)];
-        self.modeLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:15];
+        self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         self.modeLabel.text = @"Broadcast";
         
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.searchButton setFrame:CGRectMake(70, 530, 180, 30)];
-        self.searchButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.searchButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.searchButton.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self.searchButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
         [self.searchButton setTitle:@"Search" forState:UIControlStateNormal];
-        [[self.searchButton layer] setCornerRadius:3];
+        [[self.searchButton layer] setCornerRadius:5];
         [[self.searchButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
         [[self.searchButton layer] setBorderWidth:1];
         [self.searchButton addTarget:self action:@selector(searchMode) forControlEvents:UIControlEventTouchUpInside];
         
         self.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 60, 200, 20)];
-        self.codeLabel.font = [UIFont systemFontOfSize:15];
+        self.codeLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.codeLabel.textAlignment = NSTextAlignmentLeft;
         self.codeLabel.hidden = YES;
         
         self.positionLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 60, 100, 20)];
-        self.positionLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.positionLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.positionLabel.textAlignment = NSTextAlignmentCenter;
         self.positionLabel.hidden = YES;
         
         self.nameTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 90, 50, 20)];
-        self.nameTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.nameTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.nameTitleLabel.text = @"Name: ";
         self.nameTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.nameTitleLabel.hidden = YES;
         
         self.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 90, 200, 20)];
-        self.nameLabel.font = [UIFont systemFontOfSize:15];
+        self.nameLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.nameLabel.textAlignment = NSTextAlignmentLeft;
         self.nameLabel.hidden = YES;
         
         self.emailTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 120, 50, 20)];
-        self.emailTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.emailTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.emailTitleLabel.text = @"Email: ";
         self.emailTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.emailTitleLabel.hidden = YES;
         
         self.emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 120, 200, 20)];
-        self.emailLabel.font = [UIFont systemFontOfSize:15];
+        self.emailLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.emailLabel.textAlignment = NSTextAlignmentLeft;
         self.emailLabel.hidden = YES;
         
         self.GPATitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 150, 50, 20)];
-        self.GPATitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.GPATitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.GPATitleLabel.text = @"GPA: ";
         self.GPATitleLabel.textAlignment = NSTextAlignmentLeft;
         self.GPATitleLabel.hidden = YES;
         
         self.GPALabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 150, 200, 20)];
-        self.GPALabel.font = [UIFont systemFontOfSize:15];
+        self.GPALabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.GPALabel.textAlignment = NSTextAlignmentLeft;
         self.emailLabel.hidden = YES;
         
         self.preferenceTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 180, 100, 20)];
-        self.preferenceTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.preferenceTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.preferenceTitleLabel.text = @"Preference: ";
         self.preferenceTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.preferenceTitleLabel.hidden = YES;
         
         self.preferenceLabel = [[UILabel alloc] initWithFrame:CGRectMake(110, 180, 200, 20)];
-        self.preferenceLabel.font = [UIFont systemFontOfSize:15];
+        self.preferenceLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.preferenceLabel.textAlignment = NSTextAlignmentLeft;
         self.preferenceLabel.hidden = YES;
         
         self.noteViewTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 210, 100, 20)];
-        self.noteViewTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.noteViewTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.noteViewTitleLabel.text = @"Notes: ";
         self.noteViewTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.noteViewTitleLabel.hidden = YES;
@@ -355,29 +358,29 @@
         self.rankPointFiveLabel.text = @".5";
         
         self.businessUnit1TitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 340, 130, 20)];
-        self.businessUnit1TitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.businessUnit1TitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.businessUnit1TitleLabel.text = @"Business Unit1: ";
         self.businessUnit1TitleLabel.textAlignment = NSTextAlignmentLeft;
         self.businessUnit1TitleLabel.hidden = YES;
         
         self.businessUnit1Label = [[UILabel alloc] initWithFrame:CGRectMake(150, 340, 150, 20)];
-        self.businessUnit1Label.font = [UIFont systemFontOfSize:15];
+        self.businessUnit1Label.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.businessUnit1Label.textAlignment = NSTextAlignmentLeft;
         self.businessUnit1Label.hidden = YES;
         
         self.businessUnit2TitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 370, 130, 20)];
-        self.businessUnit2TitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.businessUnit2TitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.businessUnit2TitleLabel.text = @"Business Unit2: ";
         self.businessUnit2TitleLabel.textAlignment = NSTextAlignmentLeft;
         self.businessUnit2TitleLabel.hidden = YES;
         
         self.businessUnit2Label = [[UILabel alloc] initWithFrame:CGRectMake(150, 370, 150, 20)];
-        self.businessUnit2Label.font = [UIFont systemFontOfSize:15];
+        self.businessUnit2Label.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.businessUnit2Label.textAlignment = NSTextAlignmentLeft;
         self.businessUnit2Label.hidden = YES;
         
         self.resumeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 400, 100, 20)];
-        self.resumeTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.resumeTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.resumeTitleLabel.text = @"Resume: ";
         self.resumeTitleLabel.textAlignment = NSTextAlignmentLeft;
         self.resumeTitleLabel.hidden = YES;
@@ -498,13 +501,14 @@
 
 -(void)refreshViewWithNewBroadCast:(NSNotification*)notification
 {
+    NSString* prevRid = self.currentDataEntry[@"code"];
     self.currentDataEntry = [notification userInfo];
     [self loadData];
     
     for(NSString* rid in self.tagList)
     {
-        if ([rid isEqualToString:self.currentDataEntry[@"code"]] && !self.Broadcast) {
-            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Attention!" message:@"A tagged candidate is being broadcasted." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        if ([rid isEqualToString:self.currentDataEntry[@"code"]] && !self.Broadcast && ![prevRid isEqualToString:self.currentDataEntry[@"code"]]) {
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Attention!" message:@"A tagged candidate is being broadcasted." delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:@"Show me", nil];
             [alertView show];
         }
     }
@@ -548,11 +552,11 @@
     [self.yrScrollView setMaximumZoomScale:4];
     [self.yrScrollView setMinimumZoomScale:1];
     
-    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-    self.grayView.backgroundColor = [UIColor blackColor];
-    self.grayView.alpha = 0.9;
-    
-    [self.view addSubview:self.grayView];
+//    self.grayView = [[UIView alloc] initWithFrame:self.view.frame];
+//    self.grayView.backgroundColor = [UIColor blackColor];
+//    self.grayView.alpha = 0.9;
+//    
+//    [self.view addSubview:self.grayView];
     [self.view addSubview:self.yrScrollView];
     
     [self.yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
@@ -563,7 +567,7 @@
         [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
         
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -571,7 +575,7 @@
         [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
         
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
     }
     
     
@@ -611,9 +615,10 @@
 
 -(void)cancelScrollView
 {
+    [self dismissBusy];
     [self.yrScrollView removeFromSuperview];
     [self.yrScrollViewCancelButton removeFromSuperview];
-    [self.grayView removeFromSuperview];
+    [self.resumeList setUserInteractionEnabled:YES];
 }
 
 -(void)tagCandidates
@@ -643,6 +648,30 @@
     }
 }
 
+-(void)showBusy
+{
+    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self.activityIndicator.center = self.view.center;
+    
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor darkGrayColor];
+    self.grayView.alpha = 0.5;
+    
+    [self.view addSubview:self.grayView];
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator startAnimating];
+}
+
+-(void)dismissBusy
+{
+    [self.activityIndicator stopAnimating];
+    [self.activityIndicator removeFromSuperview];
+    [self.grayView removeFromSuperview];
+    self.activityIndicator = nil;
+    self.grayView = nil;
+    [self.searchModeView.detailView dismissBusy];
+}
+
 #pragma mark - UITableViewDataSource
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -669,6 +698,8 @@
     //send request to host
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDataRequestForFile:self.currentDataEntry[@"fileNames"][indexPath.row]];
+    [tableView setUserInteractionEnabled:NO];
+    [self showBusy];
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -676,6 +707,15 @@
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
     return [scrollView.subviews objectAtIndex:0];
+}
+
+#pragma mark - UIAlertViewDelegate
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Show me"]) {
+        [self broadcastMode];
+    }
 }
 
 @end

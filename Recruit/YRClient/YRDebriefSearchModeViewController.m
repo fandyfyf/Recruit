@@ -17,6 +17,9 @@
 -(void)receiveResultAndUpdate:(NSNotification*)notification;
 -(void)broadcastMode;
 
+-(void)showBusy;
+-(void)dismissBusy;
+
 @end
 
 @implementation YRDebriefSearchModeViewController
@@ -47,52 +50,52 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
         self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-100, 50, 200, 50)];
-        self.modeLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:40];
+        self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         self.modeLabel.text = @"Search";
         
         self.queryLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-200, 110, 400, 30)];
-        self.queryLabel.font = [UIFont systemFontOfSize:25];
+        self.queryLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
         
         self.searchOptionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(50, 140, self.view.frame.size.width-100, 300)];
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.searchButton setFrame:CGRectMake(self.view.center.x-100, 340, 200, 50)];
-        self.searchButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size: 25];
+        self.searchButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         
         self.resultCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(600, 380, 100, 100)];
-        self.resultCountLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:70];
+        self.resultCountLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 70];
         self.resultCountLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         
         self.broadcastButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.broadcastButton setFrame:CGRectMake(self.view.center.x-150, 950, 300, 50)];
-        self.broadcastButton.titleLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:25];
+        self.broadcastButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         
         self.searchResultListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 400, self.view.frame.size.width, 530) style:UITableViewStyleGrouped];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
         self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 30, 120, 20)];
-        self.modeLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         self.modeLabel.text = @"Search";
     
         self.queryLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, 60, 200, 20)];
-        self.queryLabel.font = [UIFont systemFontOfSize:13];
+        self.queryLabel.font = [UIFont fontWithName:@"Helvetica" size: 13];
         
         self.searchOptionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(20, 70, 280, 100)];
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.searchButton setFrame:CGRectMake(self.view.center.x-50, 225, 100, 30)];
         self.searchButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
         
-        self.resultCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(250, 250, 50, 50)];
-        self.resultCountLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:40];
+        self.resultCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 250, 100, 50)];
+        self.resultCountLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
         self.resultCountLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         
         self.broadcastButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.broadcastButton setFrame:CGRectMake(70, 530, 180, 30)];
-        self.broadcastButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.broadcastButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         
         self.searchResultListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 260, 320, 260) style:UITableViewStyleGrouped];
     }
@@ -152,10 +155,12 @@
     
     //send search Query
     [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendSearchQuery:dic];
+    [self showBusy];
 }
 
 -(void)receiveResultAndUpdate:(NSNotification*)notification
 {
+    [self dismissBusy];
     self.searchResult = [notification object];
     
     self.resultCountLabel.text = [NSString stringWithFormat:@"%d",[self.searchResult count]];
@@ -174,7 +179,30 @@
     [self.view removeFromSuperview];
     
     [UIView commitAnimations];
+}
 
+-(void)showBusy
+{
+    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self.activityIndicator.center = self.view.center;
+    
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor darkGrayColor];
+    self.grayView.alpha = 0.5;
+    
+    [self.view addSubview:self.grayView];
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator startAnimating];
+}
+
+-(void)dismissBusy
+{
+    [self.activityIndicator stopAnimating];
+    [self.activityIndicator removeFromSuperview];
+    [self.grayView removeFromSuperview];
+    self.
+    self.activityIndicator = nil;
+    self.grayView = nil;
 }
 
 #pragma mark - UITableViewDataSource
@@ -200,17 +228,28 @@
         cell = [[YRSearchResultCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            cell.flagView = [[UIImageView alloc] initWithFrame:CGRectMake(20, 10, 30, 30)];
+            cell.flagView.image = [UIImage imageNamed:@"flag.jpg"];
+            cell.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(60, 10, 150, 30)];
+            cell.codeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
             
+            cell.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(230, 10, 300, 30)];
+            cell.nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
+            
+            cell.rankLabel = [[UILabel alloc] initWithFrame:CGRectMake(600, 10, 70, 70)];
+            cell.rankLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:60];
+            cell.halfRankLabel = [[UILabel alloc] initWithFrame:CGRectMake(635, 10, 40, 40)];
+            cell.halfRankLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:35];
         }
         else
         {
             cell.flagView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 20, 20)];
             cell.flagView.image = [UIImage imageNamed:@"flag.jpg"];
             cell.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 10, 60, 20)];
-            cell.codeLabel.font = [UIFont boldSystemFontOfSize:15];
+            cell.codeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
             
             cell.nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 10, 150, 20)];
-            cell.nameLabel.font = [UIFont systemFontOfSize:15];
+            cell.nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
             
             cell.rankLabel = [[UILabel alloc] initWithFrame:CGRectMake(260, 5, 50, 50)];
             cell.rankLabel.font = [UIFont fontWithName:@"IowanOldStyle-Bold" size:40];
@@ -259,7 +298,7 @@
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        return 0;
+        return 89;
     }
     else
     {
@@ -369,10 +408,10 @@
     if (!label) {
         label = [[UILabel alloc] init];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            label.font = [UIFont systemFontOfSize:15];
+            label.font = [UIFont fontWithName:@"Helvetica" size: 15];
         }
         else{
-            label.font = [UIFont systemFontOfSize:25];
+            label.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         }
         
         if (component == 0) {

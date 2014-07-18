@@ -18,7 +18,9 @@
 @property (weak, nonatomic) IBOutlet UITableView *yrtableView;
 @property (weak, nonatomic) IBOutlet UIButton *yrdisconnectButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrbrowseButton;
-@property (weak, nonatomic) IBOutlet UISwitch *yrVisibilityControl;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *yrOnOffControl;
+
+
 @property (weak, nonatomic) IBOutlet UIButton *yrSignOutButton;
 @property (weak, nonatomic) IBOutlet UITextField *yrPrefixTextField;
 
@@ -32,7 +34,7 @@
 - (IBAction)browseForDevices:(id)sender;
 - (IBAction)disconnectConnection:(id)sender;
 - (IBAction)signOut:(id)sender;
-- (IBAction)toggleVisibility:(id)sender;
 - (IBAction)backgroundTapped:(id)sender;
+- (IBAction)onOffSwitch:(id)sender;
 
 @end

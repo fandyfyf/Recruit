@@ -10,6 +10,7 @@
 #import "CandidateEntry.h"
 #import "Interviewer.h"
 #import "Appointment.h"
+#import "YRHostTimeCardViewController.h"
 
 @interface YRSchedulingViewController ()
 
@@ -30,35 +31,132 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
-    
     //=================set up UI===================//
-    self.view = [[UIView alloc] initWithFrame:self.view.frame];
-    self.view.backgroundColor = [UIColor whiteColor];
+    UILabel* candidateTitleLabel;
+    UILabel* interviewerTitleLabel;
+    UILabel* startTimeTitleLabel;
+    UILabel* roomNumberTitleLabel;
+    UILabel* candidateLabel;
+
+    NSLog(@"view did load");
     
-    UILabel* candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 40, 150, 20)];
-    [candidateTitleLabel setText:@"Candidates: "];
-    candidateTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.view = [[UIView alloc] initWithFrame:CGRectMake(0, 650, self.view.frame.size.width, 325)];
+        [[self.view layer] setCornerRadius:10];
+        
+        candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(250, 20, 200, 30)];
+        candidateTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 23];
+        
+        interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x + 130, 20, 200, 30)];
+        interviewerTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 23];
+        
+        startTimeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 40, 200, 30)];
+        startTimeTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 23];
+        
+        roomNumberTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 120, 200, 30)];
+        roomNumberTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 23];
+        
+        self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 70, 100, 30)];
+        self.startTimeLabel.font = [UIFont fontWithName:@"Helvetica" size: 23];
+        
+        self.roomLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 150, 100, 30)];
+        self.roomLabel.font = [UIFont fontWithName:@"Helvetica" size: 23];
+        
+        if (!self.isDataReady) {
+            self.candidatesPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(200, 50, self.view.frame.size.width-200, 300)];
+        }
+        else
+        {
+            self.candidatesPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(470, 50, self.view.frame.size.width-470, 300)];
+            
+            candidateLabel = [[UILabel alloc] initWithFrame:CGRectMake(250, 80, 200, 30)];
+            candidateLabel.font = [UIFont fontWithName:@"Helvetica" size: 23];
+        }
+        
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        self.view = [[UIView alloc] initWithFrame:CGRectMake(0, 300, self.view.frame.size.width, 219)];
+        [[self.view layer] setCornerRadius:5];
+        
+        candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 10, 100, 20)];
+        candidateTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 12];
+        
+        interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 10, 100, 20)];
+        interviewerTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 12];
+        
+        startTimeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 40, 80, 20)];
+        startTimeTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 12];
+        
+        roomNumberTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 100, 50, 20)];
+        roomNumberTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 12];
+        
+        self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 60, 50, 20)];
+        self.startTimeLabel.font = [UIFont fontWithName:@"Helvetica" size: 12];
+        
+        self.roomLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 120, 50, 20)];
+        self.roomLabel.font = [UIFont fontWithName:@"Helvetica" size: 12];
+        
+        if (!self.isDataReady) {
+            self.candidatesPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(80, 20, self.view.frame.size.width-80, 150)];
+        }
+        else
+        {
+            self.candidatesPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(200, 20, self.view.frame.size.width-200, 150)];
+            
+            candidateLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 80, 100, 20)];
+            candidateLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
+        }
+
+    }
+    
+    //common set up
+    self.view.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.9];
+    
+    [candidateTitleLabel setText:@"Candidates:"];
+    candidateTitleLabel.textAlignment = NSTextAlignmentCenter;
+    candidateTitleLabel.textColor = [UIColor purpleColor];
+    candidateTitleLabel.alpha = 0.9;
     [self.view addSubview:candidateTitleLabel];
     
-    UILabel* interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 250, 150, 20)];
-    [interviewerTitleLabel setText:@"Interviewers: "];
-    interviewerTitleLabel.font = [UIFont boldSystemFontOfSize:15];
+    [interviewerTitleLabel setText:@"Interviewers:"];
+    interviewerTitleLabel.textAlignment = NSTextAlignmentCenter;
+    interviewerTitleLabel.textColor = [UIColor purpleColor];
+    interviewerTitleLabel.alpha = 0.9;
     [self.view addSubview:interviewerTitleLabel];
     
-    self.candidatesPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 50, self.view.frame.size.width, 300)];
-    self.interviewerPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 250, self.view.frame.size.width, 300)];
+    [startTimeTitleLabel setText:@"Start Time:"];
+    startTimeTitleLabel.textAlignment = NSTextAlignmentLeft;
+    startTimeTitleLabel.textColor = [UIColor purpleColor];
+    startTimeTitleLabel.alpha = 0.9;
+    [self.view addSubview:startTimeTitleLabel];
+    
+    [roomNumberTitleLabel setText:@"Room:"];
+    roomNumberTitleLabel.textAlignment = NSTextAlignmentLeft;
+    roomNumberTitleLabel.textColor = [UIColor purpleColor];
+    roomNumberTitleLabel.alpha = 0.9;
+    [self.view addSubview:roomNumberTitleLabel];
+    
+    [self.startTimeLabel setText:self.yrTriggeringView.interviewStartTime];
+    self.startTimeLabel.textAlignment = NSTextAlignmentCenter;
+    self.startTimeLabel.textColor = [UIColor blackColor];
+    [self.view addSubview:self.startTimeLabel];
+    
+    [self.roomLabel setText:[NSString stringWithFormat:@"%d",self.yrTriggeringView.roomIndex+1]];
+    self.roomLabel.textAlignment = NSTextAlignmentCenter;
+    self.roomLabel.textColor = [UIColor blackColor];
+    [self.view addSubview:self.roomLabel];
+    
+    if (self.isDataReady) {
+        candidateLabel.textAlignment = NSTextAlignmentCenter;
+        candidateLabel.textColor = [UIColor blackColor];
+        candidateLabel.text = [self.yrTriggeringView candidateNameLabel].text;
+        [self.view addSubview:candidateLabel];
+    }
+    
     self.candidatesPickerView.delegate = self;
     self.candidatesPickerView.dataSource = self;
-    self.interviewerPickerView.delegate = self;
-    self.interviewerPickerView.dataSource = self;
-    
-    //diable user interaction on picker view doesn't work
-//    if (self.yrTriggeringView.candidateLock) {
-//        [self.candidatesPickerView setUserInteractionEnabled:NO];
-//    }
-    
     [self.view addSubview:self.candidatesPickerView];
-    [self.view addSubview:self.interviewerPickerView];
     
     UIButton* cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     UIButton* doneButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -69,98 +167,131 @@
     [deleteButton setTitle:@"Delete" forState:UIControlStateNormal];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        cancelButton.titleLabel.font = [UIFont systemFontOfSize:35];
-        doneButton.titleLabel.font = [UIFont systemFontOfSize:35];
-        deleteButton.titleLabel.font = [UIFont systemFontOfSize:35];
+        cancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
+        doneButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
+        deleteButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
         
-        [cancelButton setFrame:CGRectMake(50, 480, 150, 50)];
-        [doneButton setFrame:CGRectMake(self.view.frame.size.width-200, 480, 150, 50)];
-        [deleteButton setFrame:CGRectMake(self.view.center.x - 75, 480, 150, 50)];
+        [cancelButton setFrame:CGRectMake(50, 270, 100, 40)];
+        [doneButton setFrame:CGRectMake(self.view.frame.size.width-130, 270, 100, 40)];
+        [deleteButton setFrame:CGRectMake(self.view.center.x - 50, 270, 100, 40)];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
-        [cancelButton setFrame:CGRectMake(20, 480, 50, 30)];
-        [doneButton setFrame:CGRectMake(self.view.frame.size.width-70, 480, 50, 30)];
-        [deleteButton setFrame:CGRectMake(self.view.center.x-25, 480, 50, 30)];
+        cancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+        doneButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+        deleteButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+        
+        [cancelButton setFrame:CGRectMake(20, 180, 60, 30)];
+        [doneButton setFrame:CGRectMake(self.view.frame.size.width-80, 180, 60, 30)];
+        [deleteButton setFrame:CGRectMake(self.view.center.x-30, 180, 60, 30)];
     }
     [cancelButton setTintColor:[UIColor purpleColor]];
     [cancelButton addTarget:self action:@selector(cancelDetail) forControlEvents:UIControlEventTouchUpInside];
     [cancelButton.titleLabel setTextAlignment:NSTextAlignmentLeft];
+    [[cancelButton layer] setCornerRadius:10];
+    [[cancelButton layer] setBorderColor:[[UIColor purpleColor] CGColor]];
+    [[cancelButton layer] setBorderWidth:1];
     [self.view addSubview:cancelButton];
     
     [doneButton setTintColor:[UIColor purpleColor]];
     [doneButton addTarget:self action:@selector(saveDetail) forControlEvents:UIControlEventTouchUpInside];
     [doneButton.titleLabel setTextAlignment:NSTextAlignmentRight];
+    [[doneButton layer] setCornerRadius:10];
+    [[doneButton layer] setBorderColor:[[UIColor purpleColor] CGColor]];
+    [[doneButton layer] setBorderWidth:1];
     
     [self.view addSubview:doneButton];
     
     [deleteButton setTintColor:[UIColor purpleColor]];
     [deleteButton addTarget:self action:@selector(deleteDetail) forControlEvents:UIControlEventTouchUpInside];
     [deleteButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+    [[deleteButton layer] setCornerRadius:10];
+    [[deleteButton layer] setBorderColor:[[UIColor purpleColor] CGColor]];
+    [[deleteButton layer] setBorderWidth:1];
     
     [self.view addSubview:deleteButton];
-    
-    [UIView beginAnimations:@"pop" context:Nil];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
-    [UIView setAnimationDuration:0.5];
-
-    
-    [UIView commitAnimations];
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [self fetch];
     [self.candidatesPickerView reloadAllComponents];
-    [self.interviewerPickerView reloadAllComponents];
+    //[self.interviewerPickerView reloadAllComponents];
     
     //setting default appearance of picker view
     
-    if ([self.yrTriggeringView candidateNameLabel].text != nil) {
-        if (![[self.yrTriggeringView candidateNameLabel].text isEqualToString:@""]) {
-            //setting default at the beginning
-            self.selectedCandidate = [self.yrTriggeringView candidateNameLabel].text;
-            self.selectedCode = [self.yrTriggeringView codeLabel].text;
-            int index = 0;
-            for (int i = 0; i<[self.yrdataEntry count];i++) {
-                if ([[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] lastName]] isEqualToString:[self.yrTriggeringView candidateNameLabel].text]  ) {
-                    index = i;
+    if (!self.isDataReady) {
+        if ([self.yrTriggeringView candidateNameLabel].text != nil) {
+            if (![[self.yrTriggeringView candidateNameLabel].text isEqualToString:@""]) {
+                //setting default at the beginning
+                self.selectedCandidate = [self.yrTriggeringView candidateNameLabel].text;
+                self.selectedCode = [self.yrTriggeringView codeLabel].text;
+                int index = 0;
+                for (int i = 0; i<[self.yrdataEntry count];i++) {
+                    if ([[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:i] lastName]] isEqualToString:[self.yrTriggeringView candidateNameLabel].text]  ) {
+                        index = i;
+                    }
                 }
+                [self.candidatesPickerView selectRow:index+1 inComponent:0 animated:YES];
             }
-            [self.candidatesPickerView selectRow:index+1 inComponent:0 animated:YES];
+            else
+            {
+                [self.candidatesPickerView selectRow:0 inComponent:0 animated:YES];
+            }
         }
         else
         {
             [self.candidatesPickerView selectRow:0 inComponent:0 animated:YES];
         }
-    }
-    else
-    {
-        [self.candidatesPickerView selectRow:0 inComponent:0 animated:YES];
-    }
-    
-    
-    if ([self.yrTriggeringView interviewerNameLabel].text != nil) {
-        if (![[self.yrTriggeringView interviewerNameLabel].text isEqualToString:@""]) {
-            //setting default at the beginning
-            self.selectedInterviewer = [self.yrTriggeringView interviewerNameLabel].text;
-            int index = 0;
-            for (int i = 0; i<[self.yrinterviewerEntry count];i++) {
-                if ([[[self.yrinterviewerEntry objectAtIndex:i] name] isEqualToString:[self.yrTriggeringView interviewerNameLabel].text]) {
-                    index = i;
+        
+        
+        if ([self.yrTriggeringView interviewerNameLabel].text != nil) {
+            if (![[self.yrTriggeringView interviewerNameLabel].text isEqualToString:@""]) {
+                //setting default at the beginning
+                self.selectedInterviewer = [self.yrTriggeringView interviewerNameLabel].text;
+                int index = 0;
+                for (int i = 0; i<[self.yrinterviewerEntry count];i++) {
+                    if ([[[self.yrinterviewerEntry objectAtIndex:i] name] isEqualToString:[self.yrTriggeringView interviewerNameLabel].text]) {
+                        index = i;
+                    }
                 }
+                [self.candidatesPickerView selectRow:index+1 inComponent:1 animated:YES];
             }
-            [self.interviewerPickerView selectRow:index+1 inComponent:0 animated:YES];
+            else
+            {
+                [self.candidatesPickerView selectRow:0 inComponent:1 animated:YES];
+            }
         }
         else
         {
-            [self.interviewerPickerView selectRow:0 inComponent:0 animated:YES];
+            [self.candidatesPickerView selectRow:0 inComponent:1 animated:YES];
         }
     }
     else
     {
-        [self.interviewerPickerView selectRow:0 inComponent:0 animated:YES];
+        self.selectedCandidate = [self.yrTriggeringView candidateNameLabel].text;
+        self.selectedCode = [self.yrTriggeringView codeLabel].text;
+        if ([self.yrTriggeringView interviewerNameLabel].text != nil) {
+            if (![[self.yrTriggeringView interviewerNameLabel].text isEqualToString:@""]) {
+                //setting default at the beginning
+                self.selectedInterviewer = [self.yrTriggeringView interviewerNameLabel].text;
+                int index = 0;
+                for (int i = 0; i<[self.yrinterviewerEntry count];i++) {
+                    if ([[[self.yrinterviewerEntry objectAtIndex:i] name] isEqualToString:[self.yrTriggeringView interviewerNameLabel].text]) {
+                        index = i;
+                    }
+                }
+                [self.candidatesPickerView selectRow:index+1 inComponent:0 animated:YES];
+            }
+            else
+            {
+                [self.candidatesPickerView selectRow:0 inComponent:0 animated:YES];
+            }
+        }
+        else
+        {
+            [self.candidatesPickerView selectRow:0 inComponent:0 animated:YES];
+        }
     }
 }
 
@@ -173,28 +304,16 @@
 
 -(void)cancelDetail
 {
-    [UIView beginAnimations:@"disappear" context:Nil];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.view.superview cache:NO];
-    [UIView setAnimationDuration:0.5];
-    
+    [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
     [self.view removeFromSuperview];
-    
-    [UIView commitAnimations];
     self.yrTriggeringView.candidateLock = NO;
 }
 
 -(void)saveDetail
 {
     [self addContent:self.yrTriggeringView];
-    [UIView beginAnimations:@"disappear" context:Nil];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.view.superview cache:NO];
-    [UIView setAnimationDuration:0.5];
-    
+    [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
     [self.view removeFromSuperview];
-    
-    [UIView commitAnimations];
     self.yrTriggeringView.candidateLock = NO;
 }
 
@@ -204,14 +323,8 @@
     
     [self addContent:self.yrTriggeringView];
     
-    [UIView beginAnimations:@"disappear" context:Nil];
-    
-    [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.view.superview cache:NO];
-    [UIView setAnimationDuration:0.5];
-    
+    [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
     [self.view removeFromSuperview];
-    
-    [UIView commitAnimations];
     self.yrTriggeringView.candidateLock = NO;
 }
 
@@ -231,6 +344,7 @@
     
     fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
     
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
@@ -283,7 +397,7 @@
             
             NSFetchRequest *fetchRequestI = [[NSFetchRequest alloc] init];
             [fetchRequestI setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@",self.selectedInterviewer]];
+            [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",self.selectedInterviewer,[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
             
             NSArray* interviewer = [self.managedObjectContext executeFetchRequest:fetchRequestI error:&error];
             
@@ -346,7 +460,7 @@
             }
             else
             {
-                NSLog(@"The candidate doesn't exist");
+                NSLog(@"The candidate doesn't exist 2");
             }
         }
         else
@@ -375,12 +489,12 @@
             }
             else
             {
-                NSLog(@"The candidate doesn't exist");
+                NSLog(@"The candidate doesn't exist 1");
             }
             
             NSFetchRequest *fetchRequestI = [[NSFetchRequest alloc] init];
             [fetchRequestI setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@",previousViewer]];
+            [fetchRequestI setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",previousViewer,[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
             
             NSArray* interviewer = [self.managedObjectContext executeFetchRequest:fetchRequestI error:&error];
             
@@ -453,7 +567,7 @@
                 }
                 else
                 {
-                    NSLog(@"The candidate doesn't exist");
+                    NSLog(@"The candidate doesn't exist 3");
                 }
                 
                 if (![[self managedObjectContext] save:&error]) {
@@ -466,7 +580,7 @@
                 
                 NSFetchRequest *fetchRequestIP = [[NSFetchRequest alloc] init];
                 [fetchRequestIP setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-                [fetchRequestIP setPredicate:[NSPredicate predicateWithFormat:@"name = %@",previousViewer]];
+                [fetchRequestIP setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",previousViewer,[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
                 
                 NSArray* interviewerP = [self.managedObjectContext executeFetchRequest:fetchRequestIP error:&error];
                 
@@ -477,7 +591,7 @@
                 
                 NSFetchRequest *fetchRequestIC = [[NSFetchRequest alloc] init];
                 [fetchRequestIC setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-                [fetchRequestIC setPredicate:[NSPredicate predicateWithFormat:@"name = %@",self.selectedInterviewer]];
+                [fetchRequestIC setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",self.selectedInterviewer,[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
                 
                 NSArray* interviewerC = [self.managedObjectContext executeFetchRequest:fetchRequestIC error:&error];
                 
@@ -517,22 +631,33 @@
 
 -(NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
 {
-    return 1;
+    if (!self.isDataReady) {
+        return 2;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 -(NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
 {
-    //NSLog(@"%u",[self.yrdataEntry count]);
-    if (pickerView == self.candidatesPickerView) {
-        return [self.yrdataEntry count] + 1;
-    }
-    else if(pickerView == self.interviewerPickerView)
-    {
-        return [self.yrinterviewerEntry count] + 1;
+    if (!self.isDataReady) {
+        if (component == 0) {
+            return [self.yrdataEntry count] + 1;
+        }
+        else if (component == 1)
+        {
+            return [self.yrinterviewerEntry count] + 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
     else
     {
-        return 0;
+        return [self.yrinterviewerEntry count] + 1;
     }
 }
 
@@ -546,34 +671,52 @@
     }
     else
     {
-        if (pickerView == self.candidatesPickerView) {
-            return [NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] lastName]];
-        }
-        else if (pickerView == self.interviewerPickerView)
-        {
-            return [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
+        if (!self.isDataReady) {
+            if (component == 0) {
+                return [NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] lastName]];
+            }
+            else if (component == 1)
+            {
+                return [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
+            }
+            else
+            {
+                return @"?";
+            }
         }
         else
         {
-            return @"?";
+            return [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
         }
     }
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-    if (pickerView == self.candidatesPickerView) {
-        if (row == 0) {
-            self.selectedCandidate = @"";
-            self.selectedCode = @"";
+    if (!self.isDataReady) {
+        if (component == 0) {
+            if (row == 0) {
+                self.selectedCandidate = @"";
+                self.selectedCode = @"";
+            }
+            else
+            {
+                self.selectedCandidate = [NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] lastName]];
+                self.selectedCode = [(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] code];
+            }
         }
-        else
+        else if (component == 1)
         {
-            self.selectedCandidate = [NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] lastName]];
-            self.selectedCode = [(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] code];
+            if (row == 0) {
+                self.selectedInterviewer = @"";
+            }
+            else
+            {
+                self.selectedInterviewer = [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
+            }
         }
     }
-    else if (pickerView == self.interviewerPickerView)
+    else
     {
         if (row == 0) {
             self.selectedInterviewer = @"";
@@ -583,6 +726,41 @@
             self.selectedInterviewer = [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
         }
     }
+}
+
+-(UIView*)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view
+{
+    UILabel* label = (UILabel*)view;
+    if (!label) {
+        label = [[UILabel alloc] init];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+            label.font = [UIFont fontWithName:@"Helvetica" size: 15];
+        }
+        else{
+            label.font = [UIFont fontWithName:@"Helvetica" size: 25];
+        }
+        
+        if (row == 0) {
+            label.text = @"None";
+        }
+        else
+        {
+            if (!self.isDataReady) {
+                if (component == 0) {
+                    label.text = [NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] firstName],[(CandidateEntry*)[self.yrdataEntry objectAtIndex:row-1] lastName]];
+                }
+                else if (component == 1)
+                {
+                    label.text = [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
+                }
+            }
+            else
+            {
+                label.text = [NSString stringWithFormat:@"%@",[(Interviewer*)[self.yrinterviewerEntry objectAtIndex:row-1] name]];
+            }
+        }
+    }
+    return label;
 }
 
 

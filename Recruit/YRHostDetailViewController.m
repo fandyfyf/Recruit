@@ -53,7 +53,7 @@
     
     if ([self.dataSource.pdf boolValue]) {
         [self.yrFileNameButton setHidden:NO];
-        [self.yrFileNameButton setTitle:@"Resume" forState:UIControlStateNormal];
+        [self.yrFileNameButton setTitle:@"View Resume" forState:UIControlStateNormal];
     }
     else
     {
@@ -343,6 +343,7 @@
     [self.yrGPATextField resignFirstResponder];
     [self.yrPreferenceTextField resignFirstResponder];
     [self removeViews];
+    [self updateCoreData];
 }
 
 - (IBAction)emailCandidate:(id)sender {
@@ -381,7 +382,7 @@
     titleLabel.text = @"Options";
     titleLabel.textColor = [UIColor purpleColor];
     titleLabel.textAlignment = NSTextAlignmentLeft;
-    titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
     
     [self.emailOptionView addSubview:titleLabel];
     [self.emailOptionView addSubview:self.emailOptionTable];
@@ -413,7 +414,7 @@
 
 - (IBAction)scheduleInterview:(id)sender {
     [self updateCoreData];
-    NSDictionary* dic = @{@"code" : self.yrCodeLabel.text};
+    NSDictionary* dic = @{@"code" : self.yrCodeLabel.text, @"name" :[NSString stringWithFormat:@"%@ %@",self.dataSource.firstName,self.dataSource.lastName]};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SetUpInterview" object:dic];
     
     [self dismissViewControllerAnimated:YES completion:Nil];
@@ -509,7 +510,7 @@
     //self.imageView.image = chosenImage;
     //compress into Jpeg file
     
-    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Image Generated" message:@"Adding a new page or replacing an old one?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Adding New Page",@"Replacing Old Page", nil];
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Image Generated" message:@"Adding another one?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Done",@"Add another", nil];
     
     [alertView show];
     
@@ -552,6 +553,12 @@
     if (![[self.appDelegate managedObjectContext] save:&error]) {
         NSLog(@"ERROR -- saving coredata");
     }
+    //broadcast
+    //broadcast again.
+    NSDictionary* dic = @{@"firstName":selected.firstName,@"lastName":selected.lastName,@"email":selected.emailAddress,@"interviewer":selected.interviewer,@"code":selected.code,@"status":selected.status,@"pdf":selected.pdf,@"position":selected.position,@"preference":selected.preference,@"date":selected.date,@"note":selected.notes,@"rank":[selected.rank stringValue],@"gpa":[selected.gpa stringValue],@"BU1" : selected.businessUnit1, @"BU2" : selected.businessUnit2, @"fileNames" : selected.fileNames, @"tagList" : selected.tagList};
+    NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
+    
+    [self.appDelegate.dataManager broadCastData:packet];
 }
 
 - (void) spinWithOptions: (UIViewAnimationOptions) options onView:(UIView*)view withDuration:(NSTimeInterval)duration withAngle:(CGFloat)angle{
@@ -835,6 +842,8 @@
     [self.yrBusinessUnit2 resignFirstResponder];
     [self.yrGPATextField resignFirstResponder];
     [self.yrPreferenceTextField resignFirstResponder];
+    //test
+    [self updateCoreData];
 }
 
 -(void)changeRank:(id)sender
@@ -951,7 +960,7 @@
     titleLabel.text = @"Schedule Info";
     titleLabel.textColor = [UIColor purpleColor];
     titleLabel.textAlignment = NSTextAlignmentLeft;
-    titleLabel.font = [UIFont boldSystemFontOfSize:15];
+    titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
     
     [self.scheduleView addSubview:titleLabel];
     [self.scheduleView addSubview:self.scheduleTable];
@@ -1255,9 +1264,9 @@
         }
         
         //cell.detailLabel
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"Room %d",[[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] apIndex_y] intValue]+1];
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"Room %d",[[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] apIndex_x] intValue]+1];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            cell.textLabel.font = [UIFont systemFontOfSize:12];
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size: 12];
         }
         cell.contentView.alpha = 0.5;
     }
@@ -1270,7 +1279,7 @@
         cell.textLabel.text = [self.formList[indexPath.row] allKeys][0];
 
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            cell.textLabel.font = [UIFont systemFontOfSize:12];
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size: 12];
         }
     }
     else if (tableView == self.resumeOptionTable)
@@ -1282,7 +1291,7 @@
         cell.textLabel.text = self.dataSource.fileNames[indexPath.row];
         
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-            cell.textLabel.font = [UIFont systemFontOfSize:12];
+            cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size: 12];
         }
     }
     
@@ -1317,10 +1326,6 @@
             NSError *error;
             if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
                 [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-            //
-            //        NSDateFormatter* format = [[NSDateFormatter alloc] init];
-            //        [format setDateFormat:@"MMddyyyHHmm"];
-            //        NSString* date = [format stringFromDate:self.dataSource.date];
             
             NSString* fileName = self.dataSource.fileNames[indexPath.row];
             
@@ -1373,7 +1378,7 @@
                 [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
                 [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
                 
-                self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+                self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
             }
             else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
             {
@@ -1381,7 +1386,7 @@
                 [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
                 [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
                 
-                self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+                self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
             }
             
             
@@ -1425,12 +1430,6 @@
                 if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
                     [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
                 
-//                NSDateFormatter* format = [[NSDateFormatter alloc] init];
-//                [format setDateFormat:@"MMddyyyHHmm"];
-//                NSString* date = [format stringFromDate:self.dataSource.date];
-//                
-//                NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.fileNames count]+1]];
-                
                 NSString *fullPath = [dataPath stringByAppendingPathComponent:fileToReplace];
                 
                 bool ret = [imageData writeToFile:fullPath options:0 error:&error];
@@ -1448,7 +1447,7 @@
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Adding New Page"]) {
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Done"]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
             NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(self.chosenImage, 0.2)];
             //save in local resource
@@ -1488,7 +1487,7 @@
                     
                     [selected setPdf:[NSNumber numberWithBool:YES]];
                     
-                    [self.yrFileNameButton setTitle:@"Resume" forState:UIControlStateNormal];
+                    [self.yrFileNameButton setTitle:@"View Resume" forState:UIControlStateNormal];
                     [self.yrFileNameButton setHidden:NO];
                     
                     NSMutableArray* fileNames = [selected.fileNames mutableCopy];
@@ -1502,6 +1501,7 @@
                     if (![[self.appDelegate managedObjectContext] save:&error]) {
                         NSLog(@"ERROR -- saving coredata");
                     }
+                    [self updateCoreData];
                 });
                 
             } else{
@@ -1554,6 +1554,76 @@
         }
         self.resumeOptionTable.delegate = self;
         self.resumeOptionTable.dataSource = self;
+    }
+    else if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Add another"])
+    {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(self.chosenImage, 0.2)];
+            //save in local resource
+            
+            NSLog(@"%ul",imageData.length);
+            
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = [paths objectAtIndex:0];
+            
+            NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+            
+            NSError *error;
+            if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+                [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+            
+            NSDateFormatter* format = [[NSDateFormatter alloc] init];
+            [format setDateFormat:@"MMddyyyHHmm"];
+            NSString* date = [format stringFromDate:self.dataSource.date];
+            
+            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.fileNames count]+1]];
+            
+            NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
+            
+            bool ret = [imageData writeToFile:fullPath options:0 error:&error];
+            
+            if (ret) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+                    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+                    
+                    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@ and lastName = %@",self.dataSource.code,self.dataSource.firstName,self.dataSource.lastName]];
+                    
+                    NSError* error = nil;
+                    NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
+                    
+                    CandidateEntry* selected = mutableFetchResults[0];
+                    
+                    [selected setPdf:[NSNumber numberWithBool:YES]];
+                    
+                    [self.yrFileNameButton setTitle:@"View Resume" forState:UIControlStateNormal];
+                    [self.yrFileNameButton setHidden:NO];
+                    
+                    NSMutableArray* fileNames = [selected.fileNames mutableCopy];
+                    
+                    [fileNames addObject:[NSString stringWithFormat:@"%@.jpg",fileName]];
+                    
+                    [selected setFileNames:[NSArray arrayWithArray:fileNames]];
+                    
+                    self.dataSource = selected;
+                    
+                    if (![[self.appDelegate managedObjectContext] save:&error]) {
+                        NSLog(@"ERROR -- saving coredata");
+                    }
+                    [self updateCoreData];
+                });
+                
+            } else{
+                NSLog(@"Error while saving Image");
+            }
+        });
+        
+        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+        picker.delegate = self;
+        picker.allowsEditing = NO;
+        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        
+        [self presentViewController:picker animated:YES completion:NULL];
     }
 }
 

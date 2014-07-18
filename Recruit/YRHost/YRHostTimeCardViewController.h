@@ -37,6 +37,7 @@
 @property (strong, nonatomic) NSMutableArray *yrdataEntry;
 @property (strong, nonatomic) NSMutableArray *yrinterviewerEntry;
 @property (strong, nonatomic) NSString* passedInRid;
+@property (strong, nonatomic) NSString* passedInName;
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 

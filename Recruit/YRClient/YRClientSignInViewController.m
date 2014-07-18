@@ -103,9 +103,9 @@
         [[self.yrSignOutButton layer] setBorderColor:[[UIColor lightGrayColor] CGColor]];
         [[self.yrSignOutButton layer] setBorderWidth:2];
         
-        [[self.yrContinueButton layer] setCornerRadius:30];
-        [[self.yrContinueButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
-        [[self.yrContinueButton layer] setBorderWidth:2];
+//        [[self.yrContinueButton layer] setCornerRadius:30];
+//        [[self.yrContinueButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
+//        [[self.yrContinueButton layer] setBorderWidth:2];
     }
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
     
@@ -154,7 +154,8 @@
 
 - (IBAction)continueGo:(id)sender {
     if ([self checkReady]) {
-        [self performSegueWithIdentifier:@"SignInToForm" sender:self];
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Hi Student" message:@"Please hand back the device to our engineer." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Continue", nil];
+        [alert show];
     }
     else
     {
@@ -222,7 +223,7 @@
             self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x - 110, 100, 220, 300)];
             self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(5, 40, 210, 255) style:UITableViewStylePlain];
             titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 180, 30)];
-            titleLabel.font = [UIFont boldSystemFontOfSize:20];
+            titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
             cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(self.yrNameListView.frame.size.width-30, 0, 30, 30)];
             
         }
@@ -231,7 +232,7 @@
             self.yrNameListView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x-250, 250, 500, 600)];
             self.yrNameList = [[UITableView alloc] initWithFrame:CGRectMake(5, 80, 490, 515) style:UITableViewStylePlain];
             titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, self.yrNameListView.frame.size.width-40, 70)];
-            titleLabel.font = [UIFont boldSystemFontOfSize:30];
+            titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 30];
             cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(self.yrNameListView.frame.size.width-50, 0, 50, 50)];
         }
         [[self.yrNameListView layer] setCornerRadius:12];
@@ -272,7 +273,7 @@
     [self.yrNameListView removeFromSuperview];
     UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
     [alert show];
-    [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
+    //[self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
 }
 
 -(void)debriefingModeOnNotification:(NSNotification *)notification
@@ -538,6 +539,9 @@
         [self.appDelegate setDataManager:nil];
         
         [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Continue"]) {
+        [self performSegueWithIdentifier:@"SignInToForm" sender:self];
     }
 }
 

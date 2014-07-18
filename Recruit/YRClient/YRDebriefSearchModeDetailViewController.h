@@ -50,13 +50,17 @@
 @property (strong, nonatomic) UIScrollView* yrScrollView;
 @property (strong, nonatomic) UIImageView* showingImageView;
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
-@property (strong, nonatomic) UIControl* grayView;
 
 @property (strong, nonatomic) UIButton* backButton;
+
+@property (strong, nonatomic) UIActivityIndicatorView* activityIndicator;
+@property (strong, nonatomic) UIView* grayView;
 
 -(void)loadData;
 
 -(void)cancelScrollView;
 -(void)tagCandidates;
 
+-(void)showBusy;
+-(void)dismissBusy;
 @end

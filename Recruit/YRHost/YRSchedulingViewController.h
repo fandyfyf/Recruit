@@ -12,7 +12,7 @@
 @interface YRSchedulingViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate>
 
 @property (strong, nonatomic) UIPickerView* candidatesPickerView;
-@property (strong, nonatomic) UIPickerView* interviewerPickerView;
+//@property (strong, nonatomic) UIPickerView* interviewerPickerView;
 @property (strong, nonatomic) YRTimeCardView* yrTriggeringView;
 @property (strong, nonatomic) NSMutableArray *yrdataEntry;
 @property (strong, nonatomic) NSMutableArray *yrinterviewerEntry;
@@ -21,5 +21,11 @@
 @property (strong, nonatomic) NSString* selectedCode;
 @property (strong, nonatomic) NSString* selectedCandidate;
 @property (strong, nonatomic) NSString* selectedInterviewer;
+
+@property (strong, nonatomic) UIViewController* source;
+@property (strong, nonatomic) UILabel* startTimeLabel;
+@property (strong, nonatomic) UILabel* roomLabel;
+
+@property (assign, getter = isDataReady) BOOL dataReady;
 
 @end

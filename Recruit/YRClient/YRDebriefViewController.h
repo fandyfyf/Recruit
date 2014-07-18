@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "YRDebriefSearchModeViewController.h"
 
-@interface YRDebriefViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface YRDebriefViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) NSDictionary* currentDataEntry;
 @property (strong, nonatomic) NSMutableArray* tagList;
@@ -54,10 +54,12 @@
 @property (strong, nonatomic) UIScrollView* yrScrollView;
 @property (strong, nonatomic) UIImageView* showingImageView;
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
-@property (strong, nonatomic) UIControl* grayView;
 
 @property (strong, nonatomic) YRDebriefSearchModeViewController* searchModeView;
 @property (strong, nonatomic) UIButton* searchButton;
+
+@property (strong, nonatomic) UIActivityIndicatorView* activityIndicator;
+@property (strong, nonatomic) UIView* grayView;
 
 
 @end

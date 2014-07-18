@@ -188,7 +188,7 @@
 
 -(void)setUpInterviewNotification:(NSNotification *)notification
 {
-    [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:3]];
+    [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:2]];
 }
 
 -(void)updateTagInformation:(NSNotification*)notification
@@ -326,7 +326,7 @@
         [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
         
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:25];
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -334,7 +334,7 @@
         [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
         
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
     }
     
     [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
