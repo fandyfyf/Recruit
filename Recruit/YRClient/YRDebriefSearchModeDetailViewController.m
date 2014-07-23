@@ -39,9 +39,15 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
         self.backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        self.backButton.frame = CGRectMake(20, 30, 50, 20);
+        self.backButton.frame = CGRectMake(40, 60, 150, 30);
         [self.backButton setTitle:@"Back" forState:UIControlStateNormal];
+        [self.backButton.titleLabel setTextAlignment:NSTextAlignmentCenter];
+        self.backButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size:25];
         [self.backButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
+        [[self.backButton layer] setCornerRadius:10];
+        [[self.backButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
+        [[self.backButton layer] setBorderWidth:1];
+        
         [self.backButton addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
         
         self.tagButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -50,7 +56,7 @@
         [[self.tagButton layer] setCornerRadius:75];
         [[self.tagButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.tagButton layer] setBorderWidth:5];
-        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
         [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [self.tagButton setTintColor:[UIColor whiteColor]];
         self.tagButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
@@ -70,11 +76,11 @@
         self.flagView.image = [UIImage imageNamed:@"flag.jpg"];
         self.flagView.hidden = YES;
         
-        self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-100, 50, 200, 50)];
+        self.modeLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-150, 50, 300, 50)];
         self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
-        self.modeLabel.text = @"Result";
+        self.modeLabel.text = @"Search Result";
         
         self.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(150, 110, 300, 30)];
         self.codeLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
@@ -201,6 +207,11 @@
         [self.backButton setTitle:@"Back" forState:UIControlStateNormal];
         [self.backButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
         [self.backButton addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
+        self.backButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+        [[self.backButton layer] setCornerRadius:5];
+        [[self.backButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
+        [[self.backButton layer] setBorderWidth:1];
+        
         
         self.tagButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         self.tagButton.frame = CGRectMake(230, 435, 70, 70);
@@ -208,7 +219,7 @@
         [[self.tagButton layer] setCornerRadius:35];
         [[self.tagButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.tagButton layer] setBorderWidth:4];
-        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
         [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [self.tagButton setTintColor:[UIColor whiteColor]];
         self.tagButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
@@ -232,7 +243,7 @@
         self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
-        self.modeLabel.text = @"Result";
+        self.modeLabel.text = @"Search Result";
         
         self.codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 60, 200, 20)];
         self.codeLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
@@ -420,14 +431,14 @@
     self.tagButton.hidden = NO;
     
     self.flagView.hidden = YES;
-    [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+    [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
     
     for (NSString* rid in self.tagList)
     {
         if ([rid isEqualToString:self.currentDataEntry[@"code"]]) {
             self.flagView.hidden = NO;
             //tagged already then untag
-            [self.tagButton setTitle:@"unTag" forState:UIControlStateNormal];
+            [self.tagButton setTitle:@"unFlag" forState:UIControlStateNormal];
             break;
         }
     }
@@ -466,13 +477,13 @@
     [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] tagCandidate:self.currentDataEntry[@"code"] withOption:self.tagButton.titleLabel.text from:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
     
     //update title make sure the same request won't happen continously
-    if ([self.tagButton.titleLabel.text isEqualToString:@"Tag"]) {
-        [self.tagButton setTitle:@"unTag" forState:UIControlStateNormal];
+    if ([self.tagButton.titleLabel.text isEqualToString:@"Flag"]) {
+        [self.tagButton setTitle:@"unFlag" forState:UIControlStateNormal];
         [self.tagList addObject:self.currentDataEntry[@"code"]];
     }
     else
     {
-        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
         if ([self.tagList count] != 0) {
             int index = -1;
             for (int i = 0; i<[self.tagList count]; i++) {
@@ -495,7 +506,7 @@
     
     self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
     self.grayView.backgroundColor = [UIColor darkGrayColor];
-    self.grayView.alpha = 0.5;
+    self.grayView.alpha = 0.4;
     
     [self.view addSubview:self.grayView];
     [self.view addSubview:self.activityIndicator];

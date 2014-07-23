@@ -10,7 +10,7 @@
 #import "YRAppDelegate.h"
 #import "YRSchedulingViewController.h"
 
-@interface YRHostTimeCardViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate>
+@interface YRHostTimeCardViewController : UIViewController <UIScrollViewDelegate, UIGestureRecognizerDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) NSNumber* yrRowNumber;
 @property (strong, nonatomic) NSNumber* yrColumNumber;

@@ -53,11 +53,11 @@
     //Listen to notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:@"NeedUpdateCodeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:@"NameListReadyNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:kYRDataManagerNeedUpdateCodeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:kYRDataManagerNeedPromptNameListNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:@"debriefModeOnNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:@"debriefModeOffNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
@@ -296,6 +296,18 @@
     [self.debriefingViewController.view removeFromSuperview];
     [[NSNotificationCenter defaultCenter] removeObserver:self.debriefingViewController];
     self.debriefingViewController = nil;
+    
+    [[self.appDelegate mcManager].session disconnect];
+    [self.appDelegate mcManager].session = nil;
+    [self.yrarrayConnectedDevices removeAllObjects];
+    
+    [self.appDelegate.dataManager stopListeningForData];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    [self.appDelegate setDataManager:nil];
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 -(void)reconnectNotification:(NSNotification *)notification

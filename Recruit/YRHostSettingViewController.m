@@ -154,8 +154,8 @@
 - (IBAction)addInterviewer:(id)sender {
     
     self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-    self.grayView.backgroundColor = [UIColor darkGrayColor];
-    self.grayView.alpha = 0.5;
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
     
     [self.view addSubview:self.grayView];
     
@@ -318,8 +318,14 @@
     [self.yrCardView addSubview:emailLabel];
     [self.yrCardView addSubview:codeLabel];
     [self.yrCardView addSubview:titleLabel];
+    self.yrCardView.alpha = 0.0;
     
     [self.view addSubview:self.yrCardView];
+    
+    [UIView animateWithDuration:0.4 animations:^{
+        self.yrCardView.alpha = 1.0;
+        self.grayView.alpha = 0.4;
+    }];
 }
 
 - (IBAction)removeAll:(id)sender {
@@ -362,13 +368,25 @@
     }
 }
 
+- (IBAction)uploadData:(id)sender {
+    
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Upload All the data" message:@"upload all the data to email address: " delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
+    [alertView setAlertViewStyle:UIAlertViewStylePlainTextInput];
+    [alertView show];
+}
+
 -(void)yrCardViewCancel
 {
-    [self.yrCardView removeFromSuperview];
-    [self.grayView removeFromSuperview];
-    self.interviewerEmail = nil;
-    self.interviewerName = nil;
-    self.interviewerCode = nil;
+    [UIView animateWithDuration:0.4 animations:^{
+        self.yrCardView.alpha = 0.0;
+        self.grayView.alpha = 0.0;
+    } completion:^(BOOL finish){
+        [self.yrCardView removeFromSuperview];
+        [self.grayView removeFromSuperview];
+        self.interviewerEmail = nil;
+        self.interviewerName = nil;
+        self.interviewerCode = nil;
+    }];
 }
 
 -(void)yrCardViewSave
@@ -396,6 +414,9 @@
             //if the list is empty then add the code now
             eventCodeList = [NSMutableArray new];
             [eventCodeList addObject:item.code];
+            
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"New Event Created!" message:[NSString stringWithFormat:@"Event code %@ has been added to the list",item.code] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alertView show];
         }
         else
         {
@@ -406,22 +427,30 @@
                     break;
                 }
             }
-            if (!exit) {
+            if (!exist) {
                 //insert
                 [eventCodeList addObject:item.code];
+                
+                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"New Event Created!" message:[NSString stringWithFormat:@"Event code %@ has been added to the list",item.code] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                [alertView show];
             }
         }
         //update the event code list
-        [[NSUserDefaults standardUserDefaults] setObject:eventCodeList forKey:@"eventCodeList"];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:eventCodeList] forKey:@"eventCodeList"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
-        
-        
         [self.interviewerArray addObject:item];
-        
         [self.interviewerList reloadData];
-        [self.yrCardView removeFromSuperview];
-        [self.grayView removeFromSuperview];
+        
+        [UIView animateWithDuration:0.4 animations:^{
+            self.yrCardView.alpha = 0.0;
+            self.grayView.alpha = 0.0;
+        } completion:^(BOOL finish){
+            [self.yrCardView removeFromSuperview];
+            [self.grayView removeFromSuperview];
+            self.grayView = nil;
+            self.yrCardView = nil;
+        }];
     }
 }
 
@@ -838,7 +867,7 @@
             if (indexPath.section == 1) {
                 NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
                 [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-                [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",[(Interviewer*)self.interviewerArray[indexPath.row] name],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
+                [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",[(Interviewer*)self.interviewerArray[indexPath.row] name],[(Interviewer*)self.interviewerArray[indexPath.row] code]]];
                 
                 NSError* error = nil;
                 
@@ -852,10 +881,50 @@
                 {
                     [self.interviewerArray removeObjectAtIndex:indexPath.row];
                     [tableView reloadData];
+                    
+                    NSString* targetPrefix = [(Interviewer*)FetchResults[0] code];
                     [self.managedObjectContext deleteObject:FetchResults[0]];
                     
                     if (![self.managedObjectContext save:&error]) {
                         NSLog(@"ERROR -- saving coredata");
+                    }
+                    
+                    NSLog(@"trying to delete %@",targetPrefix);
+                    
+                    NSFetchRequest* checkRequest = [[NSFetchRequest alloc] init];
+                    [checkRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+                    NSError* error = nil;
+                    
+                    NSArray* Results = [self.managedObjectContext executeFetchRequest:checkRequest error:&error];
+                    
+                    BOOL checker = NO;
+                    for (Interviewer* interviewer in Results)
+                    {
+                        if ([interviewer.code isEqualToString:targetPrefix]) {
+                            checker = YES;
+                            break;
+                        }
+                    }
+                    if (!checker) {
+                        //delete
+                        NSMutableArray* eventCodeList = [[[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"] mutableCopy];
+                        int index = -1;
+                        for (int i=0; i<[eventCodeList count]; i++)
+                        {
+                            if ([[eventCodeList objectAtIndex:i] isEqualToString:targetPrefix]) {
+                                index = i;
+                            }
+                        }
+                        if (index >= 0) {
+                            [eventCodeList removeObjectAtIndex:index];
+                        }
+                        else
+                        {
+                            NSLog(@"The target prefix doesn't exist");
+                        }
+                        
+                        [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:eventCodeList] forKey:@"eventCodeList"];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
                     }
                 }
             }
@@ -884,10 +953,6 @@
     if ([buttonTitle isEqualToString:@"Yes"]) {
         [self removeAllInterviewerInfo];
     }
-//    if ([buttonTitle isEqualToString:@"Confirm"]) {
-//        [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
-//        [[NSUserDefaults standardUserDefaults] synchronize];
-//    }
     if ([buttonTitle isEqualToString:@"Accept"]) {
         if (self.formList == nil) {
             self.formList = [NSMutableArray new];
@@ -903,6 +968,53 @@
         [self.interviewerList reloadData];
         
         self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
+    }
+    if ([buttonTitle isEqualToString:@"Confirm"]) {
+        NSString* targetAddress = [alertView textFieldAtIndex:0].text;
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        
+        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+        NSError *error;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+        
+        NSString* fileName = [NSString stringWithFormat:@"%@-Data",[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]];
+        
+        NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"csv"]];
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+        
+        NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        
+        NSString* dataEntry = [NSString new];
+        for (CandidateEntry* candidate in FetchResults) {
+            NSString* scannedNote = [candidate.notes stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+            dataEntry = [dataEntry stringByAppendingString:[NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,\n",candidate.code,candidate.firstName,candidate.lastName,candidate.emailAddress,[candidate.gpa stringValue],[candidate.rank stringValue],candidate.position,candidate.preference,candidate.businessUnit1,candidate.businessUnit2,scannedNote]];
+        }
+        
+        [dataEntry writeToFile:fullPath atomically:YES encoding:NSUTF8StringEncoding error:&error];
+        
+        if ([MFMailComposeViewController canSendMail]) {
+            NSString *emailTitle = @"Data Upload";        //NSString *messageBody = @"Message goes here!";
+            
+            
+            self.yrMailViewController = [[MFMailComposeViewController alloc] init];
+            self.yrMailViewController.mailComposeDelegate = self;
+            [self.yrMailViewController setSubject:emailTitle];
+            [self.yrMailViewController setToRecipients:@[targetAddress]];
+            
+            [self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"csv" fileName:fileName];
+            // Present mail view controller on screen
+            [self presentViewController:self.yrMailViewController animated:YES completion:NULL];
+        }
+        else
+        {
+            NSLog(@"Fail");
+        }
+
     }
     
     if ([buttonTitle isEqualToString:@"Debrief!"]) {
@@ -947,6 +1059,33 @@
         self.yrAddButton.hidden = NO;
         //self.yrRemoveButton.hidden = NO;
     }
+}
+
+#pragma mark - MFMailComposeViewControllerDelegate
+
+- (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error
+{
+    switch (result)
+    {
+        case MFMailComposeResultCancelled:
+            NSLog(@"Mail cancelled: you cancelled the operation and no email message was queued.");
+            break;
+        case MFMailComposeResultSaved:
+            NSLog(@"Mail saved: you saved the email message in the drafts folder.");
+            break;
+        case MFMailComposeResultSent:
+            NSLog(@"Mail send: the email message is queued in the outbox. It is ready to send.");
+            break;
+        case MFMailComposeResultFailed:
+            NSLog(@"Mail failed: the email message was not saved or queued, possibly due to an error.");
+            break;
+        default:
+            NSLog(@"Mail not sent.");
+            break;
+    }
+    
+    // Remove the mail view
+    [self.yrMailViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

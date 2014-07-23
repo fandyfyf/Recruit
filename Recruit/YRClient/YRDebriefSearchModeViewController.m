@@ -34,7 +34,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveResultAndUpdate:) name:@"receiveSearchResultNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveResultAndUpdate:) name:kYRDataManagerReceiveSearchResultNotification object:nil];
     
     self.view = [[UIView alloc] initWithFrame:self.view.frame];
     self.view.backgroundColor = [UIColor whiteColor];
@@ -46,6 +46,8 @@
     
     self.detailView = [YRDebriefSearchModeDetailViewController new];
     self.detailView.tagList = self.tagList;
+    
+    //UIView * seperator1;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
@@ -60,18 +62,19 @@
         
         self.searchOptionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(50, 140, self.view.frame.size.width-100, 300)];
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [self.searchButton setFrame:CGRectMake(self.view.center.x-100, 340, 200, 50)];
-        self.searchButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
+        [self.searchButton setFrame:CGRectMake(self.view.center.x-75, 355, 150, 30)];
+        self.searchButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
         
         self.resultCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(600, 380, 100, 100)];
         self.resultCountLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 70];
         self.resultCountLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         
         self.broadcastButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [self.broadcastButton setFrame:CGRectMake(self.view.center.x-150, 950, 300, 50)];
-        self.broadcastButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
+        self.broadcastButton.frame = CGRectMake(40, 60, 150, 30);
+        self.broadcastButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size: 25];
+        [[self.broadcastButton layer] setCornerRadius:10];
         
-        self.searchResultListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 400, self.view.frame.size.width, 530) style:UITableViewStyleGrouped];
+        self.searchResultListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 400, self.view.frame.size.width, 624) style:UITableViewStyleGrouped];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -85,19 +88,25 @@
         self.queryLabel.font = [UIFont fontWithName:@"Helvetica" size: 13];
         
         self.searchOptionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(20, 70, 280, 100)];
+        
+        //seperator1 = [[UIView alloc] initWithFrame:CGRectMake(175, 95, 1, 120)];
+        //[seperator1 setBackgroundColor:[UIColor lightGrayColor]];
+        
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [self.searchButton setFrame:CGRectMake(self.view.center.x-50, 225, 100, 30)];
         self.searchButton.titleLabel.font = [UIFont boldSystemFontOfSize:15];
+        [[self.searchButton layer] setCornerRadius:5];
         
         self.resultCountLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 250, 100, 50)];
         self.resultCountLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
         self.resultCountLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
         
         self.broadcastButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [self.broadcastButton setFrame:CGRectMake(70, 530, 180, 30)];
-        self.broadcastButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+        self.broadcastButton.frame = CGRectMake(20, 30, 50, 20);
+        [[self.broadcastButton layer] setCornerRadius:5];
         
-        self.searchResultListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 260, 320, 260) style:UITableViewStyleGrouped];
+        
+        self.searchResultListTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 260, 320, 308) style:UITableViewStyleGrouped];
     }
     
     self.queryLabel.textColor = [UIColor lightGrayColor];
@@ -107,15 +116,13 @@
     [self.searchButton setTitle:@"Search" forState:UIControlStateNormal];
     [self.searchButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
     [self.searchButton addTarget:self action:@selector(remoteSearch) forControlEvents:UIControlEventTouchUpInside];
-    [[self.searchButton layer] setCornerRadius:5];
     [[self.searchButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
     [[self.searchButton layer] setBorderWidth:1];
     
+    [self.broadcastButton setTitle:@"Back" forState:UIControlStateNormal];
     self.broadcastButton.titleLabel.textAlignment = NSTextAlignmentCenter;
     [self.broadcastButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
-    [self.broadcastButton setTitle:@"Broadcast" forState:UIControlStateNormal];
     [self.broadcastButton addTarget:self action:@selector(broadcastMode) forControlEvents:UIControlEventTouchUpInside];
-    [[self.broadcastButton layer] setCornerRadius:5];
     [[self.broadcastButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
     [[self.broadcastButton layer] setBorderWidth:1];
 
@@ -132,6 +139,7 @@
     [self.view addSubview:self.modeLabel];
     [self.view addSubview:self.queryLabel];
     [self.view addSubview:self.searchOptionPicker];
+    //[self.view addSubview:seperator1];
     [self.view addSubview:self.searchButton];
     [self.view addSubview:self.searchResultListTableView];
     [self.view addSubview:self.resultCountLabel];
@@ -188,7 +196,7 @@
     
     self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
     self.grayView.backgroundColor = [UIColor darkGrayColor];
-    self.grayView.alpha = 0.5;
+    self.grayView.alpha = 0.4;
     
     [self.view addSubview:self.grayView];
     [self.view addSubview:self.activityIndicator];
@@ -214,7 +222,7 @@
 
 -(NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return @"Search Results";
+    return [NSString stringWithFormat:@"Search Results - %d",[self.searchResult count]];
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -420,6 +428,7 @@
         else if (component == 1)
         {
             label.text = [self.rankingOptions objectAtIndex:row];
+            label.textAlignment = NSTextAlignmentCenter;
         }
         else
         {

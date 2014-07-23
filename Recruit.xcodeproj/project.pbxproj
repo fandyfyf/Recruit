@@ -16,7 +16,6 @@
 		D251C66D197484E0003E86FD /* Interviewer.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C66C197484E0003E86FD /* Interviewer.m */; };
 		D251C66F19756B82003E86FD /* yahoo.png in Resources */ = {isa = PBXBuildFile; fileRef = D251C66E19756B82003E86FD /* yahoo.png */; };
 		D251C67119756C61003E86FD /* tag.ico in Resources */ = {isa = PBXBuildFile; fileRef = D251C67019756C61003E86FD /* tag.ico */; };
-		D251C6741975CFC1003E86FD /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C6731975CFC1003E86FD /* CandidateEntry.m */; };
 		D251C67719761610003E86FD /* YRDebriefSearchModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C67619761610003E86FD /* YRDebriefSearchModeViewController.m */; };
 		D251C67D1976DA1B003E86FD /* YRSearchResultCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C67C1976DA1B003E86FD /* YRSearchResultCell.m */; };
 		D251C6801976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D251C67F1976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m */; };
@@ -34,6 +33,10 @@
 		D2B5313D196B0AFE0019C7D7 /* Camera1.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B5313C196B0AFE0019C7D7 /* Camera1.png */; };
 		D2B5313F196B0B410019C7D7 /* Camera2.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B5313E196B0B410019C7D7 /* Camera2.png */; };
 		D2B53141196C994B0019C7D7 /* camera3.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B53140196C994B0019C7D7 /* camera3.png */; };
+		D2B623B8197EAB74006A385B /* upload.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B623B7197EAB74006A385B /* upload.png */; };
+		D2B8C396197D857400FBBE5F /* CandidateEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = D2B8C395197D857400FBBE5F /* CandidateEntry.m */; };
+		D2B8C398197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D2B8C397197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg */; };
+		D2B8C39A197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D2B8C399197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg */; };
 		D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */; };
 		D2BB4212195DC7E8002ECCC9 /* Appointment.m in Sources */ = {isa = PBXBuildFile; fileRef = D2BB4211195DC7E8002ECCC9 /* Appointment.m */; };
 		D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2CB59AE195393D900CAB252 /* YRClientSignInViewController.m */; };
@@ -92,8 +95,6 @@
 		D251C66C197484E0003E86FD /* Interviewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Interviewer.m; sourceTree = "<group>"; };
 		D251C66E19756B82003E86FD /* yahoo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = yahoo.png; sourceTree = "<group>"; };
 		D251C67019756C61003E86FD /* tag.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = tag.ico; sourceTree = "<group>"; };
-		D251C6721975CFC1003E86FD /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
-		D251C6731975CFC1003E86FD /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
 		D251C67519761610003E86FD /* YRDebriefSearchModeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRDebriefSearchModeViewController.h; sourceTree = "<group>"; };
 		D251C67619761610003E86FD /* YRDebriefSearchModeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRDebriefSearchModeViewController.m; sourceTree = "<group>"; };
 		D251C67B1976DA1B003E86FD /* YRSearchResultCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRSearchResultCell.h; sourceTree = "<group>"; };
@@ -117,6 +118,11 @@
 		D2B5313C196B0AFE0019C7D7 /* Camera1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Camera1.png; sourceTree = "<group>"; };
 		D2B5313E196B0B410019C7D7 /* Camera2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Camera2.png; sourceTree = "<group>"; };
 		D2B53140196C994B0019C7D7 /* camera3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera3.png; sourceTree = "<group>"; };
+		D2B623B7197EAB74006A385B /* upload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload.png; sourceTree = "<group>"; };
+		D2B8C394197D857400FBBE5F /* CandidateEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CandidateEntry.h; sourceTree = "<group>"; };
+		D2B8C395197D857400FBBE5F /* CandidateEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CandidateEntry.m; sourceTree = "<group>"; };
+		D2B8C397197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "corporate_en-US_purple_small_v.jpg"; sourceTree = "<group>"; };
+		D2B8C399197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "corporate_en-US_purple_medium_v.jpg"; sourceTree = "<group>"; };
 		D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "yahoo-icon.png"; sourceTree = "<group>"; };
 		D2BB4210195DC7E8002ECCC9 /* Appointment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Appointment.h; sourceTree = "<group>"; };
 		D2BB4211195DC7E8002ECCC9 /* Appointment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Appointment.m; sourceTree = "<group>"; };
@@ -254,14 +260,17 @@
 				D25268AF19507D7700EBE43E /* document.png */,
 				D251C66E19756B82003E86FD /* yahoo.png */,
 				D251C67019756C61003E86FD /* tag.ico */,
+				D2B8C397197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg */,
+				D2B8C399197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg */,
+				D2B623B7197EAB74006A385B /* upload.png */,
 				D25268A9194F4B4B00EBE43E /* iPad */,
 				D2F818A119478777006E88FD /* YRClient */,
 				D2F818A219478777006E88FD /* YRHost */,
 				D2F8186919465FE5006E88FD /* YRAppDelegate.h */,
 				D2F8186A19465FE5006E88FD /* YRAppDelegate.m */,
-				D251C6721975CFC1003E86FD /* CandidateEntry.h */,
-				D251C6731975CFC1003E86FD /* CandidateEntry.m */,
 				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
+				D2B8C394197D857400FBBE5F /* CandidateEntry.h */,
+				D2B8C395197D857400FBBE5F /* CandidateEntry.m */,
 				D251C66B197484E0003E86FD /* Interviewer.h */,
 				D251C66C197484E0003E86FD /* Interviewer.m */,
 				D2BB4210195DC7E8002ECCC9 /* Appointment.h */,
@@ -441,6 +450,7 @@
 				D25268B019507D7700EBE43E /* document.png in Resources */,
 				D2BB41FD195C5E54002ECCC9 /* yahoo-icon.png in Resources */,
 				D2F8187319465FE5006E88FD /* Images.xcassets in Resources */,
+				D2B623B8197EAB74006A385B /* upload.png in Resources */,
 				D25268B619507E5300EBE43E /* gear.png in Resources */,
 				D25268B419507DE400EBE43E /* wifi.png in Resources */,
 				D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */,
@@ -448,7 +458,9 @@
 				D251C66F19756B82003E86FD /* yahoo.png in Resources */,
 				D2F8186E19465FE5006E88FD /* Main_iPhone.storyboard in Resources */,
 				D2D1E5731960E3370084D8DA /* email.png in Resources */,
+				D2B8C398197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg in Resources */,
 				D251C67119756C61003E86FD /* tag.ico in Resources */,
+				D2B8C39A197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg in Resources */,
 				D2B53141196C994B0019C7D7 /* camera3.png in Resources */,
 				D251C65F196CA8B8003E86FD /* goldStar.png in Resources */,
 				D2B5313D196B0AFE0019C7D7 /* Camera1.png in Resources */,
@@ -492,12 +504,12 @@
 				D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */,
 				D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */,
 				D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */,
+				D2B8C396197D857400FBBE5F /* CandidateEntry.m in Sources */,
 				D2F8189D19474712006E88FD /* YRDataViewController.m in Sources */,
 				D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */,
 				D251C66D197484E0003E86FD /* Interviewer.m in Sources */,
 				D2D1E57D19633D4A0084D8DA /* YREmailGenerator.m in Sources */,
 				D2F8186B19465FE5006E88FD /* YRAppDelegate.m in Sources */,
-				D251C6741975CFC1003E86FD /* CandidateEntry.m in Sources */,
 				D2F8189A1946B3E4006E88FD /* YRFormViewController.m in Sources */,
 				D251C6801976E41A003E86FD /* YRDebriefSearchModeDetailViewController.m in Sources */,
 			);

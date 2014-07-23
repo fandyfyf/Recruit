@@ -28,4 +28,8 @@
 
 @property (assign, getter = isDataReady) BOOL dataReady;
 
+-(void)cancelDetail;
+-(void)saveDetail;
+-(void)deleteDetail;
+
 @end

@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import <Guile/AutoSuggestDelegate.h>
+#import <MessageUI/MFMailComposeViewController.h>
 
 @class AutoSuggestTextField;
 
-@interface YRHostSettingViewController : UIViewController <AutoSuggestTextFieldDelegate, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate, UITextViewDelegate>
+@interface YRHostSettingViewController : UIViewController <AutoSuggestTextFieldDelegate, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate, UITextViewDelegate,MFMailComposeViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *userNameTextField;
 @property (weak, nonatomic) IBOutlet AutoSuggestTextField *emailTextField;
 @property (weak, nonatomic) IBOutlet UITableView *interviewerList;
@@ -38,6 +39,7 @@
 @property (strong, nonatomic) UITableView* yrEditingTable;
 @property (strong, nonatomic) UIButton* removeFromViewButton;
 @property (strong, nonatomic) UIControl* grayView;
+@property (strong, nonatomic) MFMailComposeViewController* yrMailViewController;
 
 
 - (IBAction)addInterviewer:(id)sender;
@@ -46,4 +48,7 @@
 - (IBAction)addEmailForm:(id)sender;
 - (IBAction)removeEmailForms:(id)sender;
 - (IBAction)changeDebriefStatus:(id)sender;
+
+- (IBAction)uploadData:(id)sender;
+
 @end

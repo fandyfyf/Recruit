@@ -52,10 +52,6 @@
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     self.managedObjectContext = [self.appDelegate managedObjectContext];
     
-//    self.yrSchedulingController = [YRSchedulingViewController new];
-//    self.yrSchedulingController.source = self;
-//    self.yrSchedulingController.managedObjectContext = self.managedObjectContext;
-    
     self.columLabels = [NSMutableArray new];
     self.rowLabels = [NSMutableArray new];
     self.views = [NSMutableArray new];
@@ -274,13 +270,14 @@
     
     YRTimeCardView* targeView = (YRTimeCardView*)[self.views objectAtIndex:index_y* [self.yrColumNumber intValue] + index_x];
     
-    
     if (!dataIsReady) {
         self.yrSchedulingController.yrTriggeringView = targeView;
         
         self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-        [self.grayView setBackgroundColor:[UIColor darkGrayColor]];
-        self.grayView.alpha = 0.5;
+        [self.grayView setBackgroundColor:[UIColor blackColor]];
+        self.grayView.alpha = 0.0;
+        
+        [self.grayView addTarget:self action:@selector(dismissSchedulingView) forControlEvents:UIControlEventTouchUpInside];
         
         [self.view addSubview:self.grayView];
         [self.view addSubview:self.yrSchedulingController.view];
@@ -338,8 +335,9 @@
                     self.yrSchedulingController.yrTriggeringView.candidateLock = YES;
                     
                     self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-                    [self.grayView setBackgroundColor:[UIColor darkGrayColor]];
-                    self.grayView.alpha = 0.5;
+                    [self.grayView setBackgroundColor:[UIColor blackColor]];
+                    self.grayView.alpha = 0.0;
+                    [self.grayView addTarget:self action:@selector(dismissSchedulingView) forControlEvents:UIControlEventTouchUpInside];
                     
                     [self.view addSubview:self.grayView];
                     [self.view addSubview:self.yrSchedulingController.view];
@@ -361,6 +359,11 @@
             }
         }
     }
+}
+
+-(void)dismissSchedulingView
+{
+    [self.yrSchedulingController cancelDetail];
 }
 
 -(void)tabDelete:(id)sender
@@ -386,8 +389,8 @@
         //there is an appointment existing in that index
         if ([FetchResults count] != 0) {
             self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-            [self.grayView setBackgroundColor:[UIColor darkGrayColor]];
-            self.grayView.alpha = 0.5;
+            [self.grayView setBackgroundColor:[UIColor blackColor]];
+            self.grayView.alpha = 0.4;
             [self.grayView addTarget:self action:@selector(removeFromDeleteMode) forControlEvents:UIControlEventTouchUpInside];
             
             [self.view addSubview:self.grayView];
@@ -453,39 +456,16 @@
 
 -(void)reloadSchedule
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:kYRScheduleColumsKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        [self.yrSchedulingController.view removeFromSuperview];
-        [self.yrTimeCardScrollView removeFromSuperview];
-        [self.yrTimeLabelScrollView removeFromSuperview];
-        [self.yrPlaceOrNameScrollView removeFromSuperview];
-        self.yrTimeCardScrollView = nil;
-        self.yrTimeLabelScrollView = nil;
-        self.yrPlaceOrNameScrollView = nil;
-        self.yrSchedulingController = nil;
-        
-        [self.views removeAllObjects];
-        [self.yrAppointmentInfo removeAllObjects];
-        
-        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-        [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-        NSError* error = nil;
-        NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-        
-        [self setYrAppointmentInfo:[FetchResults mutableCopy]];
-        
-        [self buildSchedule];
-        self.yrTimeCardScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
-        self.yrPlaceOrNameScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
-    });
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Add a room?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
+    [alertView show];
 }
 
 -(void)removeFromDeleteMode
 {
     [self.selectedView removeFromSuperview];
     [self.grayView removeFromSuperview];
+    self.selectedView = nil;
+    self.grayView = nil;
 }
 
 -(void)removeAppointment
@@ -578,6 +558,41 @@
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return YES;
+}
+
+#pragma mark - UIAlertViewDelegate
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Add"]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:kYRScheduleColumsKey];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+            [self.yrSchedulingController.view removeFromSuperview];
+            [self.yrTimeCardScrollView removeFromSuperview];
+            [self.yrTimeLabelScrollView removeFromSuperview];
+            [self.yrPlaceOrNameScrollView removeFromSuperview];
+            self.yrTimeCardScrollView = nil;
+            self.yrTimeLabelScrollView = nil;
+            self.yrPlaceOrNameScrollView = nil;
+            self.yrSchedulingController = nil;
+            
+            [self.views removeAllObjects];
+            [self.yrAppointmentInfo removeAllObjects];
+            
+            NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+            [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+            NSError* error = nil;
+            NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+            
+            [self setYrAppointmentInfo:[FetchResults mutableCopy]];
+            
+            [self buildSchedule];
+            self.yrTimeCardScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
+            self.yrPlaceOrNameScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
+        });
+    }
 }
 
 

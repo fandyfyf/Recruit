@@ -20,6 +20,7 @@
 -(void)needUpdateTableNotification:(NSNotification *)notification;
 -(void)needUpdateConnectionListNotification:(NSNotification *)notification;
 -(void)doneWithPad;
+-(void)showEventCode;
 
 @end
 
@@ -48,8 +49,8 @@
     [[self.appDelegate mcManager] setHost:YES];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:@"NeedUpdateTableNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateConnectionListNotification:) name:@"NeedUpdateConnectionListNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:kYRDataManagerNeedUpdateTableNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateConnectionListNotification:) name:kYRDataManagerNeedUpdateConnectionListNotification object:nil];
     
     
     
@@ -82,6 +83,9 @@
                          [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],
                          nil];
     self.yrPrefixTextField.inputAccessoryView = doneToolbar;
+    
+    UITapGestureRecognizer* gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showEventCode)];
+    [self.yrPrefixTextField addGestureRecognizer:gestureRecognizer];
 }
 
 - (void)didReceiveMemoryWarning
@@ -110,7 +114,6 @@
     NSLog(@"sign out");
     
     UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Sign Out?" message:@"Signing out will affect connected interviewers!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Yes", nil];
-    
     [alert show];
 }
 
@@ -300,6 +303,54 @@
     self.yrPrefix = self.yrPrefixTextField.text;
 }
 
+-(void)showEventCode
+{
+    NSLog(@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"]);
+    
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
+
+    [self.grayView addTarget:self action:@selector(dismissEventList) forControlEvents:UIControlEventTouchUpInside];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.eventList = [[UITableView alloc] initWithFrame:CGRectMake(30, 134, 165, 150) style:UITableViewStylePlain];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        self.eventList = [[UITableView alloc] initWithFrame:CGRectMake(20, 84, 165, 150) style:UITableViewStylePlain];
+    }
+    self.eventList.alpha = 0.0;
+    
+    [self.eventList setDelegate:self];
+    [self.eventList setDataSource:self];
+    
+    [[self.eventList layer] setCornerRadius:10];
+    [[self.eventList layer] setBorderColor:[[UIColor blackColor] CGColor]];
+    [[self.eventList layer] setBorderWidth:0.5];
+    
+    [self.view addSubview:self.grayView];
+    [UIView animateWithDuration:0.4 animations:^{
+        self.grayView.alpha = 0.4;
+        self.eventList.alpha = 1.0;
+    }];
+    
+    [self.view addSubview:self.eventList];
+}
+
+-(void)dismissEventList
+{
+    [UIView animateWithDuration:0.4 animations:^{
+        self.grayView.alpha = 0.0;
+        self.eventList.alpha = 0.0;
+    } completion:^(BOOL finish){
+        [self.grayView removeFromSuperview];
+        [self.eventList removeFromSuperview];
+        self.grayView = nil;
+        self.eventList = nil;
+    }];
+}
+
 #pragma mark - MCBrowserViewControllerDelegate
 
 -(void)browserViewControllerDidFinish:(MCBrowserViewController *)browserViewController{
@@ -319,12 +370,33 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return @"Connected Peers";
+    if (tableView == self.yrtableView) {
+        return @"Connected Peers";
+    }
+    else if (tableView == self.eventList)
+    {
+        return @"Event Codes";
+    }
+    else
+    {
+        return @"???";
+    }
 }
 
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return [self.yrarrayConnectedDevices count];
+    if (tableView == self.yrtableView) {
+        return [self.yrarrayConnectedDevices count];
+    }
+    else if (tableView == self.eventList)
+    {
+        NSArray* eventList = [[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"];
+        return [eventList count];
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 
@@ -335,13 +407,46 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CellIdentifier"];
     }
     
-    cell.textLabel.text = [self.yrarrayConnectedDevices objectAtIndex:indexPath.row][@"confirmedName"];
+    if (tableView == self.yrtableView) {
+        cell.textLabel.text = [self.yrarrayConnectedDevices objectAtIndex:indexPath.row][@"confirmedName"];
+    }
+    else if (tableView == self.eventList)
+    {
+        NSArray* eventList = [[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"];
+        cell.textLabel.text = [eventList objectAtIndex:indexPath.row];
+    }
     
     return cell;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 60.0;
+    if (tableView == self.yrtableView) {
+        return 60.0;
+    }
+    else if (tableView == self.eventList)
+    {
+        return 44.0;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+#pragma mark - UITableViewDelegate
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tableView == self.eventList) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        
+        NSArray* eventList = [[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"];
+        self.yrPrefix = [eventList objectAtIndex:indexPath.row];
+        
+        self.yrPrefixTextField.text = self.yrPrefix;
+        
+        [self dismissEventList];
+    }
 }
 
 #pragma mark - UITextFieldDelegate

@@ -16,6 +16,8 @@
 @property (strong, nonatomic) NSString* hostUserName;
 @property (weak, nonatomic) IBOutlet UILabel *yrnameLabel;
 @property (weak, nonatomic) IBOutlet UITableView *yrtableView;
+@property (strong, nonatomic) UITableView *eventList;
+@property (strong, nonatomic) UIControl* grayView;
 @property (weak, nonatomic) IBOutlet UIButton *yrdisconnectButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrbrowseButton;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrOnOffControl;

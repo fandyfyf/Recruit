@@ -16,6 +16,9 @@
 @property (strong, nonatomic) UILabel* yrPromptMessageLabel;
 
 @property (strong, nonatomic) UIButton* tagButton;
+
+@property (strong, nonatomic)
+UIButton* signOutButton;
 @property (strong, nonatomic) UIGestureRecognizer* gestureRecognizer;
 
 @property (strong, nonatomic) UIImageView* flagView;

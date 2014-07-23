@@ -23,6 +23,7 @@
         <attribute name="position" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="preference" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="rank" optional="YES" attributeType="Float" defaultValueString="0" syncable="YES"/>
+        <attribute name="resumeCounter" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="tagList" optional="YES" attributeType="Transformable" syncable="YES"/>
         <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Appointment" inverseName="candidate" inverseEntity="Appointment" syncable="YES"/>

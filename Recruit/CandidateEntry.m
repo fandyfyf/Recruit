@@ -2,7 +2,7 @@
 //  CandidateEntry.m
 //  Recruit
 //
-//  Created by Yifan Fu on 7/15/14.
+//  Created by Yifan Fu on 7/21/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -17,6 +17,7 @@
 @dynamic code;
 @dynamic date;
 @dynamic emailAddress;
+@dynamic fileNames;
 @dynamic firstName;
 @dynamic gpa;
 @dynamic interviewer;
@@ -27,8 +28,8 @@
 @dynamic preference;
 @dynamic rank;
 @dynamic status;
-@dynamic fileNames;
 @dynamic tagList;
+@dynamic resumeCounter;
 @dynamic appointments;
 
 @end

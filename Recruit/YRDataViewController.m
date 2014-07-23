@@ -71,9 +71,9 @@
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:@"NeedUpdateTableNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:kYRDataManagerNeedUpdateTableNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setUpInterviewNotification:) name:@"SetUpInterview" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTagInformation:) name:@"needUpdateTagInformationNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTagInformation:) name:kYRDataManagerNeedUpdateTagInfoNotification object:nil];
     
     self.yrPrefix = [(YRHostMainViewController*)self.tabBarController.viewControllers[0] yrPrefix];
     

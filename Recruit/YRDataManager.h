@@ -10,6 +10,20 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "CandidateEntry.h"
 
+FOUNDATION_EXPORT NSString* const kYRDataManagerReceiveBroadcastNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerReceiveResumeNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerReceiveTagListNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerReceiveSearchResultNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerReceiveDebriefTerminationNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerReceiveDebriefInitiationNotification;
+
+FOUNDATION_EXPORT NSString* const kYRDataManagerNeedUpdateTableNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerNeedStartBroadcastNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerNeedUpdateTagInfoNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerNeedUpdateCodeNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerNeedUpdateConnectionListNotification;
+FOUNDATION_EXPORT NSString* const kYRDataManagerNeedPromptNameListNotification;
+
 @interface YRDataManager : NSObject <UIAlertViewDelegate>
 
 
@@ -45,6 +59,8 @@
 -(void)broadCastData:(NSDictionary*)data;
 
 -(void)sendDataRequestForFile:(NSString*)fileName;
+
+-(void)pullData;
 
 -(void)sendResume:(NSDictionary*)data toPeer:(MCPeerID*)peer;
 

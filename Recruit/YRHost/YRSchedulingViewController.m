@@ -41,13 +41,13 @@
     NSLog(@"view did load");
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.view = [[UIView alloc] initWithFrame:CGRectMake(0, 650, self.view.frame.size.width, 325)];
+        self.view = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 325)];//650
         [[self.view layer] setCornerRadius:10];
         
-        candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(250, 20, 200, 30)];
+        candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 20, 200, 30)];
         candidateTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 23];
         
-        interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x + 130, 20, 200, 30)];
+        interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x + 80, 20, 200, 30)];
         interviewerTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 23];
         
         startTimeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 40, 200, 30)];
@@ -76,13 +76,13 @@
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
-        self.view = [[UIView alloc] initWithFrame:CGRectMake(0, 300, self.view.frame.size.width, 219)];
+        self.view = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 219)];//300
         [[self.view layer] setCornerRadius:5];
         
-        candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(100, 10, 100, 20)];
+        candidateTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(80, 10, 100, 20)];
         candidateTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 12];
         
-        interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 10, 100, 20)];
+        interviewerTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(180, 10, 100, 20)];
         interviewerTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 12];
         
         startTimeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 40, 80, 20)];
@@ -171,9 +171,9 @@
         doneButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
         deleteButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
         
-        [cancelButton setFrame:CGRectMake(50, 270, 100, 40)];
-        [doneButton setFrame:CGRectMake(self.view.frame.size.width-130, 270, 100, 40)];
-        [deleteButton setFrame:CGRectMake(self.view.center.x - 50, 270, 100, 40)];
+        [cancelButton setFrame:CGRectMake(50, 265, 100, 40)];
+        [doneButton setFrame:CGRectMake(self.view.frame.size.width-130, 265, 100, 40)];
+        [deleteButton setFrame:CGRectMake(self.view.center.x - 50, 265, 100, 40)];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -210,6 +210,17 @@
     [[deleteButton layer] setBorderWidth:1];
     
     [self.view addSubview:deleteButton];
+    
+    [UIView animateWithDuration:0.4 animations:^{
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.view.frame = CGRectMake(0, 650, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            self.view.frame = CGRectMake(0, 300, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        [(YRHostTimeCardViewController*)self.source grayView].alpha = 0.4;
+    }];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -304,28 +315,65 @@
 
 -(void)cancelDetail
 {
-    [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
-    [self.view removeFromSuperview];
-    self.yrTriggeringView.candidateLock = NO;
+    [UIView animateWithDuration:0.4 animations:^{
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.view.frame = CGRectMake(0, 1024, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            self.view.frame = CGRectMake(0, 568, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        [(YRHostTimeCardViewController*)self.source grayView].alpha = 0.0;
+    } completion:^(BOOL finish){
+        [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
+        [self.view removeFromSuperview];
+        self.yrTriggeringView.candidateLock = NO;
+    }];
 }
 
 -(void)saveDetail
 {
-    [self addContent:self.yrTriggeringView];
-    [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
-    [self.view removeFromSuperview];
-    self.yrTriggeringView.candidateLock = NO;
+    [UIView animateWithDuration:0.4 animations:^{
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.view.frame = CGRectMake(0, 1024, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            self.view.frame = CGRectMake(0, 568, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        [(YRHostTimeCardViewController*)self.source grayView].alpha = 0.0;
+    } completion:^(BOOL finish){
+        
+        [self addContent:self.yrTriggeringView];
+        [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
+        [self.view removeFromSuperview];
+        self.yrTriggeringView.candidateLock = NO;
+    
+    }];
 }
 
 -(void)deleteDetail
 {
-    self.selectedCode = @"";
-    
-    [self addContent:self.yrTriggeringView];
-    
-    [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
-    [self.view removeFromSuperview];
-    self.yrTriggeringView.candidateLock = NO;
+    [UIView animateWithDuration:0.4 animations:^{
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.view.frame = CGRectMake(0, 1024, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            self.view.frame = CGRectMake(0, 568, self.view.frame.size.width, self.view.frame.size.height);
+        }
+        [(YRHostTimeCardViewController*)self.source grayView].alpha = 0.0;
+    } completion:^(BOOL finish){
+        
+        self.selectedCode = @"";
+        
+        [self addContent:self.yrTriggeringView];
+        
+        [[(YRHostTimeCardViewController*)self.source grayView] removeFromSuperview];
+        [self.view removeFromSuperview];
+        self.yrTriggeringView.candidateLock = NO;
+        
+    }];
 }
 
 -(void)fetch

@@ -39,12 +39,12 @@
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
     self.managedObjectContext = [self.appDelegate managedObjectContext];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:@"NeedUpdateCodeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:kYRDataManagerNeedUpdateCodeNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:@"NameListReadyNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:kYRDataManagerNeedPromptNameListNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:@"debriefModeOnNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:@"debriefModeOffNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needEndSessionNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
@@ -104,7 +104,7 @@
 
 - (IBAction)sendInformation:(id)sender {
     if ([self checkReady]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Tag!", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Flag!", nil];
         [alert show];
     }
     else
@@ -224,11 +224,11 @@
 -(void)showPlatformSeg
 {
     if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 3) {
-        self.yrPlatformSegCtrl.enabled = YES;
+        self.yrPlatformSegCtrl.hidden = NO;
     }
     else
     {
-        self.yrPlatformSegCtrl.enabled = NO;
+        self.yrPlatformSegCtrl.hidden = YES;
     }
 }
 
@@ -326,7 +326,7 @@
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];
         
-        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Tag!"]) {
+        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Flag!"]) {
             newDic[@"tagList"] = @[self.appDelegate.mcManager.userName];
         }
         //change NSDictionary to NSMutableDictionary

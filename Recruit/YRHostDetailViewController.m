@@ -28,6 +28,7 @@
 -(void)scrollRight;
 
 -(void)updateTagInformation:(NSNotification*)notification;
+-(void)broadcast:(NSNotification*)notification;
 
 @end
 
@@ -111,7 +112,8 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTagInformation:) name:@"needUpdateTagInformationNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTagInformation:) name:kYRDataManagerNeedUpdateTagInfoNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(broadcast:) name:kYRDataManagerNeedStartBroadcastNotification object:nil];
     
     self.appDelegate = (YRAppDelegate* )[[UIApplication sharedApplication] delegate];
     
@@ -286,13 +288,6 @@
     
     self.resumeOptionTable = [[UITableView alloc] initWithFrame:CGRectMake(5, 5, 2*half - 10, 150) style:UITableViewStylePlain];
     [[self.resumeOptionTable layer] setCornerRadius:10];
-    //        UILabel* titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 2*half - 100, 20)];
-    //        titleLabel.text = @"Files";
-    //        titleLabel.textColor = [UIColor purpleColor];
-    //        titleLabel.textAlignment = NSTextAlignmentLeft;
-    //        titleLabel.font = [UIFont boldSystemFontOfSize:15];
-    
-    //        [self.resumeOptionView addSubview:titleLabel];
     [self.resumeOptionView addSubview:self.resumeOptionTable];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -307,14 +302,19 @@
     else
     {
         self.resumeOptionView.backgroundColor = [UIColor purpleColor];
-        //            titleLabel.textColor = [UIColor whiteColor];
         self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-        self.grayView.backgroundColor = [UIColor darkGrayColor];
-        self.grayView.alpha = 0.5;
+        self.grayView.backgroundColor = [UIColor blackColor];
+        self.grayView.alpha = 0.0;
         [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:self.grayView];
         
+        self.resumeOptionView.alpha = 0.0;
+        [self.view addSubview:self.grayView];
         [self.view addSubview:self.resumeOptionView];
+        
+        [UIView animateWithDuration:0.4 animations:^{
+            self.grayView.alpha = 0.4;
+            self.resumeOptionView.alpha = 1.0;
+        }];
     }
     self.resumeOptionTable.delegate = self;
     self.resumeOptionTable.dataSource = self;
@@ -347,7 +347,6 @@
 }
 
 - (IBAction)emailCandidate:(id)sender {
-    [self removeViews];
     [self updateCoreData];
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -401,12 +400,18 @@
         [self.emailOptionView setBackgroundColor:[UIColor purpleColor]];
         titleLabel.textColor = [UIColor whiteColor];
         self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-        self.grayView.backgroundColor = [UIColor darkGrayColor];
-        self.grayView.alpha = 0.5;
+        self.grayView.backgroundColor = [UIColor blackColor];
+        self.grayView.alpha = 0.0;
         [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
+        
+        self.emailOptionView.alpha = 0.0;
         [self.view addSubview:self.grayView];
-
         [self.view addSubview:self.emailOptionView];
+        
+        [UIView animateWithDuration:0.4 animations:^{
+            self.emailOptionView.alpha = 1.0;
+            self.grayView.alpha = 0.4;
+        }];
     }
     self.emailOptionTable.delegate = self;
     self.emailOptionTable.dataSource = self;
@@ -623,11 +628,11 @@
 
 -(void)tapOnLabel:(UITapGestureRecognizer*)gestureRecognizer
 {
-    [self removeViews];
+    //[self removeViews];
     
     self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-    self.grayView.backgroundColor = [UIColor darkGrayColor];
-    self.grayView.alpha = 0.5;
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
     [self.grayView addTarget:self action:@selector(cancelRankChange) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.grayView];
     
@@ -711,7 +716,9 @@
             [self.rankTwoButton setFrame:CGRectMake(470, 42, 70, 70)];
             [self.rankThreeButton setFrame:CGRectMake(434, 131, 80, 80)];
             [self.rankThreeHalfButton setFrame:CGRectMake(482, 229, 90, 90)];
-            [self.rankFourButton setFrame:CGRectMake(604, 237, 100, 100)];} completion:^(BOOL finished){spin = NO;}];
+            [self.rankFourButton setFrame:CGRectMake(604, 237, 100, 100)];
+            self.grayView.alpha = 0.4;
+        } completion:^(BOOL finished){spin = NO;}];
         spin = YES;
         [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
         [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
@@ -801,7 +808,9 @@
             [self.rankTwoButton setFrame:CGRectMake(192, 28, 35, 35)];
             [self.rankThreeButton setFrame:CGRectMake(169, 82, 40, 40)];
             [self.rankThreeHalfButton setFrame:CGRectMake(192, 134, 45, 45)];
-            [self.rankFourButton setFrame:CGRectMake(251, 146, 50, 50)];} completion:^(BOOL finished){spin = NO;}];
+            [self.rankFourButton setFrame:CGRectMake(251, 146, 50, 50)];
+            self.grayView.alpha = 0.4;
+        } completion:^(BOOL finished){spin = NO;}];
         spin = YES;
         [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
         [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
@@ -897,12 +906,20 @@
             [self.rankTwoButton setCenter:CGPointMake(603, 157)];
             [self.rankThreeButton setCenter:CGPointMake(603, 157)];
             [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
-            [self.rankFourButton setCenter:CGPointMake(603, 157)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
-                [self.rankOneButton removeFromSuperview];
-                [self.rankTwoButton removeFromSuperview];
-                [self.rankThreeButton removeFromSuperview];
-                [self.rankThreeHalfButton removeFromSuperview];
-                [self.rankFourButton removeFromSuperview];}];
+            [self.rankFourButton setCenter:CGPointMake(603, 157)];
+            self.grayView.alpha = 0.0;
+            self.rankOneButton.alpha = 0.0;
+            self.rankTwoButton.alpha = 0.0;
+            self.rankThreeButton.alpha = 0.0;
+            self.rankFourButton.alpha = 0.0;
+            self.rankThreeHalfButton.alpha = 0.0;
+        } completion:^(BOOL finished){
+            [self.grayView removeFromSuperview];
+            [self.rankOneButton removeFromSuperview];
+            [self.rankTwoButton removeFromSuperview];
+            [self.rankThreeButton removeFromSuperview];
+            [self.rankThreeHalfButton removeFromSuperview];
+            [self.rankFourButton removeFromSuperview];}];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -911,26 +928,40 @@
             [self.rankTwoButton setCenter:CGPointMake(255, 102)];
             [self.rankThreeButton setCenter:CGPointMake(255, 102)];
             [self.rankThreeHalfButton setCenter:CGPointMake(255, 102)];
-            [self.rankFourButton setCenter:CGPointMake(255, 102)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
-                [self.rankOneButton removeFromSuperview];
-                [self.rankTwoButton removeFromSuperview];
-                [self.rankThreeButton removeFromSuperview];
-                [self.rankThreeHalfButton removeFromSuperview];
-                [self.rankFourButton removeFromSuperview];}];
+            [self.rankFourButton setCenter:CGPointMake(255, 102)];
+            self.grayView.alpha = 0.0;
+            self.rankOneButton.alpha = 0.0;
+            self.rankTwoButton.alpha = 0.0;
+            self.rankThreeButton.alpha = 0.0;
+            self.rankFourButton.alpha = 0.0;
+            self.rankThreeHalfButton.alpha = 0.0;
+        } completion:^(BOOL finished){
+            [self.grayView removeFromSuperview];
+            [self.rankOneButton removeFromSuperview];
+            [self.rankTwoButton removeFromSuperview];
+            [self.rankThreeButton removeFromSuperview];
+            [self.rankThreeHalfButton removeFromSuperview];
+            [self.rankFourButton removeFromSuperview];}];
     }
 }
 
 -(void)removeViews
 {
-    [self.scheduleView removeFromSuperview];
-    [self.emailOptionView removeFromSuperview];
-    [self.resumeOptionView removeFromSuperview];
-    [self.grayView removeFromSuperview];
+    [UIView animateWithDuration:0.4 animations:^{
+        self.scheduleView.alpha = 0.0;
+        self.emailOptionView.alpha = 0.0;
+        self.resumeOptionView.alpha = 0.0;
+        self.grayView.alpha = 0.0;
+    } completion:^(BOOL finish){
+        [self.scheduleView removeFromSuperview];
+        [self.emailOptionView removeFromSuperview];
+        [self.resumeOptionView removeFromSuperview];
+        [self.grayView removeFromSuperview];
+    }];
 }
 
 -(void)checkScheduleFunction
 {
-    [self removeViews];
     int half = 0;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         half = 150;
@@ -979,12 +1010,18 @@
         self.scheduleView.backgroundColor = [UIColor purpleColor];
         titleLabel.textColor = [UIColor whiteColor];
         self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-        self.grayView.backgroundColor = [UIColor darkGrayColor];
-        self.grayView.alpha = 0.5;
+        self.grayView.backgroundColor = [UIColor blackColor];
+        self.grayView.alpha = 0.0;
         [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:self.grayView];
         
+        self.scheduleView.alpha = 0.0;
+        [self.view addSubview:self.grayView];
         [self.view addSubview:self.scheduleView];
+        
+        [UIView animateWithDuration:0.4 animations:^{
+            self.scheduleView.alpha = 1.0;
+            self.grayView.alpha = 0.4;
+        }];
     }
     
     
@@ -1089,6 +1126,15 @@
         
         [self.appDelegate.dataManager broadCastData:packet];
     }
+}
+
+-(void)broadcast:(NSNotification*)notification
+{
+    CandidateEntry* selected = self.dataSource;
+    NSDictionary* dic = @{@"firstName":selected.firstName,@"lastName":selected.lastName,@"email":selected.emailAddress,@"interviewer":selected.interviewer,@"code":selected.code,@"status":selected.status,@"pdf":selected.pdf,@"position":selected.position,@"preference":selected.preference,@"date":selected.date,@"note":selected.notes,@"rank":[selected.rank stringValue],@"gpa":[selected.gpa stringValue],@"BU1" : selected.businessUnit1, @"BU2" : selected.businessUnit2, @"fileNames" : selected.fileNames, @"tagList" : selected.tagList};
+    NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
+    
+    [self.appDelegate.dataManager broadCastData:packet];
 }
 
 
@@ -1443,6 +1489,50 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tableView == self.resumeOptionTable) {
+        if (editingStyle == UITableViewCellEditingStyleDelete) {
+            //delete entry in core data and file system
+            NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+            [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+            
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@ and lastName = %@",self.dataSource.code,self.dataSource.firstName,self.dataSource.lastName]];
+            
+            NSError* error = nil;
+            NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
+            
+            CandidateEntry* selected = mutableFetchResults[0];
+            
+            NSMutableArray* fileNames = [selected.fileNames mutableCopy];
+            
+            [fileNames removeObjectAtIndex:indexPath.row];
+            
+            //remove corresponding file in file system
+            
+            
+            [selected setFileNames:[NSArray arrayWithArray:fileNames]];
+            
+            if ([fileNames count] == 0) {
+                [selected setPdf:[NSNumber numberWithBool:NO]];
+                [selected setResumeCounter:[NSNumber numberWithInt:0]];
+                
+                [self.yrFileNameButton setTitle:@"View Resume" forState:UIControlStateNormal];
+                [self.yrFileNameButton setHidden:YES];
+            }
+
+            self.dataSource = selected;
+            
+            if (![[self.appDelegate managedObjectContext] save:&error]) {
+                NSLog(@"ERROR -- saving coredata");
+            }
+            [self updateCoreData];
+            [self.resumeOptionTable reloadData];
+            [self.popOver dismissPopoverAnimated:YES];
+        }
+    }
+}
+
 #pragma mark - UIAlertViewDelegate
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -1467,7 +1557,7 @@
             [format setDateFormat:@"MMddyyyHHmm"];
             NSString* date = [format stringFromDate:self.dataSource.date];
             
-            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.fileNames count]+1]];
+            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.resumeCounter intValue]+1]];
             
             NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
             
@@ -1486,6 +1576,7 @@
                     CandidateEntry* selected = mutableFetchResults[0];
                     
                     [selected setPdf:[NSNumber numberWithBool:YES]];
+                    [selected setResumeCounter:[NSNumber numberWithInt:[selected.resumeCounter intValue] + 1]];
                     
                     [self.yrFileNameButton setTitle:@"View Resume" forState:UIControlStateNormal];
                     [self.yrFileNameButton setHidden:NO];
@@ -1545,8 +1636,8 @@
             self.resumeOptionView.backgroundColor = [UIColor purpleColor];
 //            titleLabel.textColor = [UIColor whiteColor];
             self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-            self.grayView.backgroundColor = [UIColor darkGrayColor];
-            self.grayView.alpha = 0.5;
+            self.grayView.backgroundColor = [UIColor blackColor];
+            self.grayView.alpha = 0.4;
             [self.grayView addTarget:self action:@selector(removeViews) forControlEvents:UIControlEventTouchUpInside];
             [self.view addSubview:self.grayView];
             
@@ -1576,7 +1667,7 @@
             [format setDateFormat:@"MMddyyyHHmm"];
             NSString* date = [format stringFromDate:self.dataSource.date];
             
-            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.fileNames count]+1]];
+            NSString* fileName = [self.yrCodeLabel.text stringByAppendingString:[NSString stringWithFormat:@"_%@_%d",date,[self.dataSource.resumeCounter intValue]+1]];
             
             NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"jpg"]];
             
@@ -1595,6 +1686,7 @@
                     CandidateEntry* selected = mutableFetchResults[0];
                     
                     [selected setPdf:[NSNumber numberWithBool:YES]];
+                    [selected setResumeCounter:[NSNumber numberWithInt:[selected.resumeCounter intValue] + 1]];
                     
                     [self.yrFileNameButton setTitle:@"View Resume" forState:UIControlStateNormal];
                     [self.yrFileNameButton setHidden:NO];

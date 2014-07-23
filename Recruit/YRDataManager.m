@@ -11,6 +11,19 @@
 #import "YRMCManager.h"
 #import "Interviewer.h"
 
+NSString* const kYRDataManagerReceiveBroadcastNotification = @"receiveBroadcastNotification";
+NSString* const kYRDataManagerReceiveResumeNotification = @"receiveResumeNotification";
+NSString* const kYRDataManagerReceiveTagListNotification = @"receiveTagListNotification";
+NSString* const kYRDataManagerReceiveSearchResultNotification = @"receiveSearchResultNotification";
+NSString* const kYRDataManagerReceiveDebriefTerminationNotification = @"debriefModeOffNotification";
+NSString* const kYRDataManagerReceiveDebriefInitiationNotification = @"debriefModeOnNotification";
+
+NSString* const kYRDataManagerNeedUpdateTableNotification = @"NeedUpdateTableNotification";
+NSString* const kYRDataManagerNeedStartBroadcastNotification = @"broadcastNotification";
+NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInformationNotification";
+NSString* const kYRDataManagerNeedUpdateCodeNotification = @"NeedUpdateCodeNotification";
+NSString* const kYRDataManagerNeedUpdateConnectionListNotification = @"NeedUpdateConnectionListNotification";
+NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNotification";
 
 @implementation YRDataManager
 
@@ -74,7 +87,7 @@
                 CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
                 NSDictionary *dict = @{@"entry" : curr};
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTableNotification
                                                                     object:nil
                                                                   userInfo:dict];
             }
@@ -91,7 +104,7 @@
                 CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
                 NSDictionary *dict = @{@"entry" : curr};
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateTableNotification"
+                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTableNotification
                                                                     object:nil
                                                                   userInfo:dict];
             }
@@ -107,7 +120,7 @@
             NSLog(@"receiving one broadcast entry");
             //post notification to observers
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"receiveBroadcastNotification" object:nil userInfo:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveBroadcastNotification object:nil userInfo:dic[@"data"]];
         }
         else if([dic[@"msg"] isEqualToString:@"resumeRequest"] && self.isHost)
         {
@@ -135,7 +148,7 @@
         {
             NSLog(@"receiving one resume");
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"receiveResumeNotification" object:nil userInfo:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveResumeNotification object:nil userInfo:dic[@"data"]];
         }
         else if([dic[@"msg"] isEqualToString:@"debriefInvitation"] && !self.isHost)
         {
@@ -174,9 +187,15 @@
         {
             NSLog(@"receiving tag list %@",dic[@"data"]);
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"receiveTagListNotification" object:nil userInfo:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveTagListNotification object:nil userInfo:dic[@"data"]];
         }
-        else if([dic[@"msg"] isEqualToString:@"Tag"] && self.isHost)
+        else if([dic[@"msg"] isEqualToString:@"pullData"] && self.isHost)
+        {
+            //send notification broadcast
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedStartBroadcastNotification object:nil];
+        }
+        else if([dic[@"msg"] isEqualToString:@"Flag"] && self.isHost)
         {
             NSLog(@"receiving tag request for Candidate %@ from %@",dic[@"data"],dic[@"viewer"]);
             
@@ -211,14 +230,14 @@
                 }
                 
                 //update UI in detail View
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"needUpdateTagInformationNotification" object:selected];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTagInfoNotification object:selected];
             }
             else
             {
                 NSLog(@"target candidate not found");
             }
         }
-        else if([dic[@"msg"] isEqualToString:@"unTag"] && self.isHost)
+        else if([dic[@"msg"] isEqualToString:@"unFlag"] && self.isHost)
         {
             NSLog(@"receiving untag request for Candidate %@ from %@",dic[@"data"],dic[@"viewer"]);
             
@@ -275,7 +294,7 @@
                 }
                 
                 //update UI in detail View
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"needUpdateTagInformationNotification" object:selected];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTagInfoNotification object:selected];
             }
             else
             {
@@ -306,7 +325,7 @@
         {
             NSLog(@"receiving search result: %@",dic[@"data"]);
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"receiveSearchResultNotification" object:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveSearchResultNotification object:dic[@"data"]];
         }
         else if([dic[@"msg"] isEqualToString:@"debriefTermination"] && !self.isHost)
         {
@@ -315,7 +334,7 @@
             UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Termination" message:@"The host is closing the session" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
             [alert show];
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"debriefModeOffNotification" object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
             //or post notification to observers
         }
         else if([dic[@"msg"] isEqualToString:@"identityConfirm"] && self.isHost)
@@ -324,7 +343,7 @@
             
             NSDictionary* dict = @{@"displayName": peerID.displayName, @"confirmedName" : dic[@"data"]};
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateConnectionListNotification" object:nil userInfo:dict];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateConnectionListNotification object:nil userInfo:dict];
             
             //===================send to new connected user====================//
             if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
@@ -337,12 +356,12 @@
             [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
             NSDictionary *dict = @{@"recruitID": dic[@"code"]};
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NeedUpdateCodeNotification"
-                                                                object:nil
-                                                              userInfo:dict];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateCodeNotification object:nil userInfo:dict];
+#if Debug
             //==================================debug========================================//
             //[self debugSenderActiveWithCode:dic[@"code"]];
             //===============================================================================//
+#endif
         }
         else if([dic[@"msg"] isEqualToString:@"nameList"])
         {
@@ -383,9 +402,7 @@
                 [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"SignedInAlready"];
                 [[NSUserDefaults standardUserDefaults] synchronize];
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"NameListReadyNotification"
-                                                                object:nil
-                                                              userInfo:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedPromptNameListNotification object:nil userInfo:nil];
             }
         }
         else
@@ -441,6 +458,7 @@
     [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
     [item setBusinessUnit1:@""];
     [item setBusinessUnit2:@""];
+    [item setResumeCounter:[NSNumber numberWithInt:0]];
     
     
     if ([infoData[@"tagList"] count] != 0) {
@@ -481,6 +499,7 @@
 -(CandidateEntry*)queuingLocalCandidate:(NSDictionary *)infoData
 {
     CandidateEntry* item = (CandidateEntry*)[NSEntityDescription insertNewObjectForEntityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext];
+    
     [item setFirstName:infoData[@"firstName"]];
     [item setLastName:infoData[@"lastName"]];
     [item setEmailAddress:infoData[@"email"]];
@@ -576,6 +595,17 @@
     NSDictionary* dic = @{@"msg" : @"resumeRequest", @"data" : fileName};
     
     NSError* error = [self sendToHostWithData:dic];
+    
+    if(error){
+        NSLog(@"%@", [error localizedDescription]);
+    }
+}
+
+-(void)pullData
+{
+    NSDictionary* data = @{@"msg" : @"pullData"};
+    
+    NSError* error = [self sendToHostWithData:data];
     
     if(error){
         NSLog(@"%@", [error localizedDescription]);
@@ -887,7 +917,7 @@
         //send acknowledge back?
         
         //bring up new view controller to show broadcast
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"debriefModeOnNotification" object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
     }
 }
 

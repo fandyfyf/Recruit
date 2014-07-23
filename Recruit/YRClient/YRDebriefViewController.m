@@ -22,6 +22,7 @@
 
 -(void)showBusy;
 -(void)dismissBusy;
+-(void)signOut;
 
 @end
 
@@ -37,11 +38,11 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewWithNewBroadCast:) name:@"receiveBroadcastNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshViewWithNewBroadCast:) name:kYRDataManagerReceiveBroadcastNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchTagList:) name:@"receiveTagListNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fetchTagList:) name:kYRDataManagerReceiveTagListNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showImageWithBroadCast:) name:@"receiveResumeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showImageWithBroadCast:) name:kYRDataManagerReceiveResumeNotification object:nil];
     
     self.view = [[UIView alloc] initWithFrame:self.view.frame];
     self.view.backgroundColor = [UIColor whiteColor];
@@ -70,20 +71,32 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
         self.tagButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        self.tagButton.frame = CGRectMake(575, 775, 150, 150);
+        self.tagButton.frame = CGRectMake(590, 760, 120, 120);
         self.tagButton.backgroundColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
-        [[self.tagButton layer] setCornerRadius:75];
+        [[self.tagButton layer] setCornerRadius:60];
         [[self.tagButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.tagButton layer] setBorderWidth:5];
-        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
         [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [self.tagButton setTintColor:[UIColor whiteColor]];
-        self.tagButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
+        self.tagButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         
         [self.tagButton addTarget:self action:@selector(tagCandidates) forControlEvents:UIControlEventTouchUpInside];
         
         self.tagButton.hidden = YES;
         
+        self.signOutButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        self.signOutButton.frame = CGRectMake(590, 890, 120, 120);
+        self.signOutButton.backgroundColor = [UIColor lightGrayColor];
+        [[self.signOutButton layer] setCornerRadius:60];
+        [[self.signOutButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.signOutButton layer] setBorderWidth:5];
+        [self.signOutButton setTitle:@"Sign Out" forState:UIControlStateNormal];
+        [self.signOutButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.signOutButton setTintColor:[UIColor whiteColor]];
+        self.signOutButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
+        
+        [self.signOutButton addTarget:self action:@selector(signOut) forControlEvents:UIControlEventTouchUpInside];
         
         self.codeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 110, 100, 30)];
         self.codeTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
@@ -99,15 +112,15 @@
         self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 40];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
-        self.modeLabel.text = @"Broadcast";
+        self.modeLabel.text = @"Debriefing";
         
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [self.searchButton setFrame:CGRectMake(self.view.center.x-150, 950, 300, 50)];
+        [self.searchButton setFrame:CGRectMake(40, 950, 500, 50)];
         self.searchButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
         self.searchButton.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self.searchButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
         [self.searchButton setTitle:@"Search" forState:UIControlStateNormal];
-        [[self.searchButton layer] setCornerRadius:5];
+        [[self.searchButton layer] setCornerRadius:10];
         [[self.searchButton layer] setBorderColor:[[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] CGColor]];
         [[self.searchButton layer] setBorderWidth:1];
         [self.searchButton addTarget:self action:@selector(searchMode) forControlEvents:UIControlEventTouchUpInside];
@@ -233,12 +246,12 @@
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
         self.tagButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        self.tagButton.frame = CGRectMake(230, 435, 70, 70);
+        self.tagButton.frame = CGRectMake(230, 425, 70, 70);
         self.tagButton.backgroundColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
         [[self.tagButton layer] setCornerRadius:35];
         [[self.tagButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.tagButton layer] setBorderWidth:4];
-        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
         [self.tagButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [self.tagButton setTintColor:[UIColor whiteColor]];
         self.tagButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
@@ -246,6 +259,19 @@
         [self.tagButton addTarget:self action:@selector(tagCandidates) forControlEvents:UIControlEventTouchUpInside];
         
         self.tagButton.hidden = YES;
+        
+        self.signOutButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        self.signOutButton.frame = CGRectMake(230, 495, 70, 70);
+        self.signOutButton.backgroundColor = [UIColor lightGrayColor];
+        [[self.signOutButton layer] setCornerRadius:35];
+        [[self.signOutButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.signOutButton layer] setBorderWidth:4];
+        [self.signOutButton setTitle:@"Sign Out" forState:UIControlStateNormal];
+        [self.signOutButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [self.signOutButton setTintColor:[UIColor whiteColor]];
+        self.signOutButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 12];
+        
+        [self.signOutButton addTarget:self action:@selector(signOut) forControlEvents:UIControlEventTouchUpInside];
         
         
         self.codeTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 60, 50, 20)];
@@ -262,10 +288,10 @@
         self.modeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         self.modeLabel.textAlignment = NSTextAlignmentCenter;
         self.modeLabel.textColor = [UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0];
-        self.modeLabel.text = @"Broadcast";
+        self.modeLabel.text = @"Debriefing";
         
         self.searchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [self.searchButton setFrame:CGRectMake(70, 530, 180, 30)];
+        [self.searchButton setFrame:CGRectMake(20, 530, 200, 30)];
         self.searchButton.titleLabel.font = [UIFont fontWithName:@"Helvetica" size: 15];
         self.searchButton.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self.searchButton setTitleColor:[UIColor colorWithRed:1.0 green:163.0/255.0 blue:43.0/255.0 alpha:1.0] forState:UIControlStateNormal];
@@ -395,6 +421,7 @@
     }
     
     [self.view addSubview:self.tagButton];
+    [self.view addSubview:self.signOutButton];
     [self.view addSubview:self.flagView];
     [self.view addSubview:self.modeLabel];
     
@@ -429,6 +456,7 @@
     //-----test-----//
 //    self.currentDataEntry = @{@"firstName":@"Tom",@"lastName":@"Cruise",@"email":@"tomcruise@gmail.com",@"interviewer":@"Peter Edmonston",@"code":@"Test-1",@"status":@"pending",@"pdf":[NSNumber numberWithBool:NO],@"position":@"Full-Time",@"preference":@"Actor",@"date":[NSDate date],@"note":@"#note#\nHello World.\n\n\n\n\nHello World.\n",@"rank":@"3.5",@"gpa":@"3.5",@"BU1" :@"NY-MEP", @"BU2" :@"LA_MEP"};
 //    [self loadData];
+    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] pullData];
 }
 
 - (void)didReceiveMemoryWarning
@@ -465,14 +493,14 @@
     self.tagButton.hidden = NO;
 
     self.flagView.hidden = YES;
-    [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+    [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
     
     for (NSString* rid in self.tagList)
     {
         if ([rid isEqualToString:self.currentDataEntry[@"code"]]) {
             self.flagView.hidden = NO;
             //tagged already then untag
-            [self.tagButton setTitle:@"unTag" forState:UIControlStateNormal];
+            [self.tagButton setTitle:@"unFlag" forState:UIControlStateNormal];
             break;
         }
     }
@@ -626,13 +654,13 @@
     [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] tagCandidate:self.currentDataEntry[@"code"] withOption:self.tagButton.titleLabel.text from:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
     
     //update title make sure the same request won't happen continously
-    if ([self.tagButton.titleLabel.text isEqualToString:@"Tag"]) {
-        [self.tagButton setTitle:@"unTag" forState:UIControlStateNormal];
+    if ([self.tagButton.titleLabel.text isEqualToString:@"Flag"]) {
+        [self.tagButton setTitle:@"unFlag" forState:UIControlStateNormal];
         [self.tagList addObject:self.currentDataEntry[@"code"]];
     }
     else
     {
-        [self.tagButton setTitle:@"Tag" forState:UIControlStateNormal];
+        [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
         if ([self.tagList count] != 0) {
             int index = -1;
             for (int i = 0; i<[self.tagList count]; i++) {
@@ -655,7 +683,7 @@
     
     self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
     self.grayView.backgroundColor = [UIColor darkGrayColor];
-    self.grayView.alpha = 0.5;
+    self.grayView.alpha = 0.4;
     
     [self.view addSubview:self.grayView];
     [self.view addSubview:self.activityIndicator];
@@ -670,6 +698,12 @@
     self.activityIndicator = nil;
     self.grayView = nil;
     [self.searchModeView.detailView dismissBusy];
+}
+
+-(void)signOut
+{
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Sign Out?" message:@"Signing out the debrief session" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Yes", nil];
+    [alertView show];
 }
 
 #pragma mark - UITableViewDataSource
@@ -715,6 +749,9 @@
 {
     if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Show me"]) {
         [self broadcastMode];
+    }
+    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Yes"]) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"debriefModeOffNotification" object:nil];
     }
 }
 
