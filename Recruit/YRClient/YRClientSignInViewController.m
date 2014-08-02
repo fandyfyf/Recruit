@@ -413,6 +413,7 @@
     static NSArray *domains;
     if (!domains) {
         domains = @[@"columbia.edu",
+                    @"colgate.edu",
                     @"gmail.com",
                     @"gmail.co.uk",
                     @"yahoo.com",

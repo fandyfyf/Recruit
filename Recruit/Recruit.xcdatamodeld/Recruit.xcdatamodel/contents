@@ -3,6 +3,7 @@
     <entity name="Appointment" representedClassName="Appointment" syncable="YES">
         <attribute name="apIndex_x" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="apIndex_y" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="startTime" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="candidate" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CandidateEntry" inverseName="appointments" inverseEntity="CandidateEntry" syncable="YES"/>
         <relationship name="interviewers" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Interviewer" inverseName="appointments" inverseEntity="Interviewer" syncable="YES"/>
@@ -28,6 +29,12 @@
         <attribute name="tagList" optional="YES" attributeType="Transformable" syncable="YES"/>
         <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Appointment" inverseName="candidate" inverseEntity="Appointment" syncable="YES"/>
     </entity>
+    <entity name="Event" representedClassName="Event" syncable="YES">
+        <attribute name="eventAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventCode" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="eventInterviewerCount" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="eventName" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Interviewer" representedClassName="Interviewer" syncable="YES">
         <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
@@ -38,6 +45,7 @@
     <elements>
         <element name="Appointment" positionX="0" positionY="0" width="0" height="0"/>
         <element name="CandidateEntry" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="Event" positionX="0" positionY="0" width="0" height="0"/>
         <element name="Interviewer" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>

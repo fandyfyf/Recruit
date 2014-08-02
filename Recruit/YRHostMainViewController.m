@@ -10,6 +10,7 @@
 #import "CandidateEntry.h"
 #import "YRMCManager.h"
 #import "YRDataManager.h"
+#import "Event.h"
 
 @interface YRHostMainViewController ()
 
@@ -166,50 +167,58 @@
 
 - (IBAction)onOffSwitch:(id)sender {
     [self.yrPrefixTextField resignFirstResponder];
-    self.yrPrefix = self.yrPrefixTextField.text;
     
-    //set the event code in the user default
-    
-    [[NSUserDefaults standardUserDefaults] setValue:self.yrPrefix forKey:@"eventCode"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    
-    if (self.yrOnOffControl.selectedSegmentIndex == 1) {
-        NSLog(@"On");
-        if (self.yrPrefixTextField.isEnabled) {
-            [self.yrPrefixTextField setEnabled:NO];
-        }
-        self.appDelegate.dataManager = nil;
-        if ([self.appDelegate dataManager] == nil) {
-            [self.appDelegate setDataManager:[[YRDataManager alloc] initWithPrefix:self.yrPrefix]];
-            [[self.appDelegate dataManager] startListeningForData];
-        }
-        [[self.appDelegate dataManager] setHost:YES];
+    if (![self.yrPrefixTextField.text isEqualToString:@""]) {
+        self.yrPrefix = self.yrPrefixTextField.text;
         
-        //init active session && set up advertiser and advertise
-        [[self.appDelegate mcManager] advertiseSelf:YES];
+        //set the event code in the user default
+        
+        [[NSUserDefaults standardUserDefaults] setValue:self.yrPrefix forKey:@"eventCode"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        
+        if (self.yrOnOffControl.selectedSegmentIndex == 1) {
+            NSLog(@"On");
+            if (self.yrPrefixTextField.isEnabled) {
+                [self.yrPrefixTextField setEnabled:NO];
+            }
+            self.appDelegate.dataManager = nil;
+            if ([self.appDelegate dataManager] == nil) {
+                [self.appDelegate setDataManager:[[YRDataManager alloc] initWithPrefix:self.yrPrefix]];
+                [[self.appDelegate dataManager] startListeningForData];
+            }
+            [[self.appDelegate dataManager] setHost:YES];
+            
+            //init active session && set up advertiser and advertise
+            [[self.appDelegate mcManager] advertiseSelf:YES];
+        }
+        else
+        {
+            NSLog(@"Off");
+            if (!self.yrPrefixTextField.isEnabled) {
+                [self.yrPrefixTextField setEnabled:YES];
+            }
+            if (self.appDelegate.dataManager != nil) {
+                [self.appDelegate.dataManager stopListeningForData];
+                [self.appDelegate setDataManager:nil];
+            }
+            
+            
+            for (NSDictionary *peerSession in [self.appDelegate mcManager].activeSessions) {
+                [[peerSession valueForKey:@"session"] disconnect];
+            }
+            [[self.appDelegate mcManager].activeSessions removeAllObjects];
+            [[[self.appDelegate mcManager] Nadvertiser] stopAdvertisingPeer];
+            [[self.appDelegate mcManager] setNadvertiser:nil];
+            
+            [self.yrarrayConnectedDevices removeAllObjects];
+            [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+        }
     }
     else
     {
-        NSLog(@"Off");
-        if (!self.yrPrefixTextField.isEnabled) {
-            [self.yrPrefixTextField setEnabled:YES];
-        }
-        if (self.appDelegate.dataManager != nil) {
-            [self.appDelegate.dataManager stopListeningForData];
-            [self.appDelegate setDataManager:nil];
-        }
-        
-        
-        for (NSDictionary *peerSession in [self.appDelegate mcManager].activeSessions) {
-            [[peerSession valueForKey:@"session"] disconnect];
-        }
-        [[self.appDelegate mcManager].activeSessions removeAllObjects];
-        [[[self.appDelegate mcManager] Nadvertiser] stopAdvertisingPeer];
-        [[self.appDelegate mcManager] setNadvertiser:nil];
-        
-        [self.yrarrayConnectedDevices removeAllObjects];
-        [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event code is empty" message:@"Please select an event code from the pull down menu. Or go to setting page to add new event" delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alertView show];
     }
 }
 
@@ -303,44 +312,69 @@
     self.yrPrefix = self.yrPrefixTextField.text;
 }
 
+-(NSArray*)fetchEventList
+{
+    NSFetchRequest* request = [[NSFetchRequest alloc] init];
+    [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+    
+    NSError* error = nil;
+    NSArray* fetchResults = [self.managedObjectContext executeFetchRequest:request error:&error];
+    
+//    NSMutableArray* eventList = [NSMutableArray new];
+//    
+//    for (Event* event in fetchResults)
+//    {
+//        [eventList addObject:event.eventCode];
+//    }
+//    return [NSArray arrayWithArray:eventList];
+    return fetchResults;
+}
+
 -(void)showEventCode
 {
-    NSLog(@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"]);
-    
     self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
     self.grayView.backgroundColor = [UIColor blackColor];
     self.grayView.alpha = 0.0;
 
     [self.grayView addTarget:self action:@selector(dismissEventList) forControlEvents:UIControlEventTouchUpInside];
     
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.eventList = [[UITableView alloc] initWithFrame:CGRectMake(30, 134, 165, 150) style:UITableViewStylePlain];
+    self.eventArray = [self fetchEventList];
+    
+    if (self.eventArray == nil || [self.eventArray count] == 0) {
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"No Existing Event" message:@"Please go to setting to create a new event." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alertView show];
     }
-    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    else
     {
-        self.eventList = [[UITableView alloc] initWithFrame:CGRectMake(20, 84, 165, 150) style:UITableViewStylePlain];
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            self.eventList = [[UITableView alloc] initWithFrame:CGRectMake(30, 134, 165, 20+44*[self.eventArray count]) style:UITableViewStylePlain];
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            self.eventList = [[UITableView alloc] initWithFrame:CGRectMake(20, 84, 165, 20+44*[self.eventArray count]) style:UITableViewStylePlain];
+        }
+        self.eventList.alpha = 0.0;
+        
+        [self.eventList setDelegate:self];
+        [self.eventList setDataSource:self];
+        
+        [[self.eventList layer] setCornerRadius:10];
+        [[self.eventList layer] setBorderColor:[[UIColor blackColor] CGColor]];
+        [[self.eventList layer] setBorderWidth:0.5];
+        
+        [self.view addSubview:self.grayView];
+        [UIView animateWithDuration:0.3 animations:^{
+            self.grayView.alpha = 0.4;
+            self.eventList.alpha = 1.0;
+        }];
+        
+        [self.view addSubview:self.eventList];
     }
-    self.eventList.alpha = 0.0;
-    
-    [self.eventList setDelegate:self];
-    [self.eventList setDataSource:self];
-    
-    [[self.eventList layer] setCornerRadius:10];
-    [[self.eventList layer] setBorderColor:[[UIColor blackColor] CGColor]];
-    [[self.eventList layer] setBorderWidth:0.5];
-    
-    [self.view addSubview:self.grayView];
-    [UIView animateWithDuration:0.4 animations:^{
-        self.grayView.alpha = 0.4;
-        self.eventList.alpha = 1.0;
-    }];
-    
-    [self.view addSubview:self.eventList];
 }
 
 -(void)dismissEventList
 {
-    [UIView animateWithDuration:0.4 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         self.grayView.alpha = 0.0;
         self.eventList.alpha = 0.0;
     } completion:^(BOOL finish){
@@ -390,8 +424,7 @@
     }
     else if (tableView == self.eventList)
     {
-        NSArray* eventList = [[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"];
-        return [eventList count];
+        return [self.eventArray count];
     }
     else
     {
@@ -412,8 +445,7 @@
     }
     else if (tableView == self.eventList)
     {
-        NSArray* eventList = [[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"];
-        cell.textLabel.text = [eventList objectAtIndex:indexPath.row];
+        cell.textLabel.text = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventCode];
     }
     
     return cell;
@@ -440,11 +472,16 @@
     if (tableView == self.eventList) {
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         
-        NSArray* eventList = [[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"];
-        self.yrPrefix = [eventList objectAtIndex:indexPath.row];
+        if ([[(Event*)[self.eventArray objectAtIndex:indexPath.row] eventInterviewerCount] intValue] == 0) {
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Selected Event has no Interviewer" message:@"Please go to setting page to add interviewers to the current event" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alertView show];
+        }
+        else
+        {
+            self.yrPrefix = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventCode];
         
-        self.yrPrefixTextField.text = self.yrPrefix;
-        
+            self.yrPrefixTextField.text = self.yrPrefix;
+        }
         [self dismissEventList];
     }
 }

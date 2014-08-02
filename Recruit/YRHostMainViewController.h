@@ -22,7 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *yrbrowseButton;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrOnOffControl;
 
-
+@property (strong, nonatomic) NSArray* eventArray;
 @property (weak, nonatomic) IBOutlet UIButton *yrSignOutButton;
 @property (weak, nonatomic) IBOutlet UITextField *yrPrefixTextField;
 

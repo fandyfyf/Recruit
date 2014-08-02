@@ -620,7 +620,7 @@
     [UIView beginAnimations:@"flip" context:nil];
     
     [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:self.view cache:NO];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.3];
     
     [self.view addSubview:self.searchModeView.view];
     
@@ -634,7 +634,7 @@
     [UIView beginAnimations:@"flip" context:nil];
     
     [UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft forView:self.view cache:NO];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.3];
     
     [self.searchModeView.view removeFromSuperview];
     

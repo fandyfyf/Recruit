@@ -255,7 +255,7 @@
     }
     else if ([tappedCell.yrstatusLabel.text isEqualToString:@"pending"])
     {
-        NSDictionary* dic = @{@"code" : tappedCell.yrcodeLabel.text};
+        NSDictionary* dic = @{@"code" : tappedCell.yrcodeLabel.text,@"name" :[NSString stringWithFormat:@"%@",tappedCell.yrnameLabel.text]};
         [[NSNotificationCenter defaultCenter] postNotificationName:@"SetUpInterview" object:dic];
     }
 }

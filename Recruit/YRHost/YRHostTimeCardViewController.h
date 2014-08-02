@@ -18,6 +18,14 @@
 @property (strong, nonatomic) NSNumber *cardHeight;
 @property (strong, nonatomic) NSNumber *toTop;
 @property (strong, nonatomic) NSNumber  *toLeft;
+
+//date title label
+@property (strong, nonatomic) UILabel* dateLabel;
+@property (strong, nonatomic) NSNumber* pageIndex;
+@property (strong, nonatomic) UIButton* leftArrow;
+@property (strong, nonatomic) UIButton* rightArrow;
+@property (strong, nonatomic) NSDate* currentDate;
+
 @property (strong, nonatomic) UIScrollView *yrTimeCardScrollView;
 @property (strong, nonatomic) UIScrollView *yrTimeLabelScrollView;
 @property (strong, nonatomic) UIScrollView * yrPlaceOrNameScrollView;

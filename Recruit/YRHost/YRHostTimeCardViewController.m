@@ -30,6 +30,14 @@
 
 -(void)removeAppointment;
 
+-(void)previousPage;
+
+-(void)nextPage;
+
+-(void)dateLabelSetUp;
+
+-(void)scheduleClearUp;
+
 @end
 
 @implementation YRHostTimeCardViewController
@@ -56,6 +64,37 @@
     self.rowLabels = [NSMutableArray new];
     self.views = [NSMutableArray new];
     self.yrAppointmentInfo = [NSMutableArray new];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-100, 30, 200, 30)];
+        self.dateLabel.textColor = [UIColor whiteColor];
+        self.dateLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 30];
+        self.dateLabel.textAlignment = NSTextAlignmentCenter;
+        
+        self.leftArrow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.leftArrow setFrame:CGRectMake(0, 0, 100, 30)];
+        [self.leftArrow setTitle:@"previous" forState:UIControlStateNormal];
+        [self.leftArrow setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.leftArrow.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+        self.leftArrow.center = CGPointMake(self.view.center.x-150, 40);
+        
+        self.rightArrow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rightArrow setFrame:CGRectMake(0, 0, 100, 30)];
+        [self.rightArrow setTitle:@"next" forState:UIControlStateNormal];
+        [self.rightArrow setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.rightArrow.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+        self.rightArrow.center = CGPointMake(self.view.center.x+150, 40);
+        
+    }
+    else
+    {
+        
+    }
+    
+    [self.leftArrow addTarget:self action:@selector(previousPage) forControlEvents:UIControlEventTouchUpInside];
+    [self.rightArrow addTarget:self action:@selector(nextPage) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.pageIndex = [NSNumber numberWithInt:0];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -66,27 +105,30 @@
     [self.views removeAllObjects];
     [self.yrAppointmentInfo removeAllObjects];
     
+    self.currentDate = [NSDate dateWithTimeInterval:24*60*60*[self.pageIndex intValue] sinceDate:(NSDate*)[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey]];
+    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
+    
     NSError* error = nil;
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
     [self setYrAppointmentInfo:[FetchResults mutableCopy]];
     
     [self buildSchedule];
+    
+    [self dateLabelSetUp];
 }
+
+
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    [self.yrSchedulingController.view removeFromSuperview];
-    [self.yrTimeCardScrollView removeFromSuperview];
-    [self.yrTimeLabelScrollView removeFromSuperview];
-    [self.yrPlaceOrNameScrollView removeFromSuperview];
-    self.yrTimeCardScrollView = nil;
-    self.yrTimeLabelScrollView = nil;
-    self.yrPlaceOrNameScrollView = nil;
-    self.yrSchedulingController = nil;
+    
+    [self scheduleClearUp];
+
     dataIsReady = NO;
 }
 
@@ -123,6 +165,10 @@
     [self.yrTimeLabelScrollView setContentSize:CGSizeMake(self.yrTimeLabelScrollView.frame.size.width, ([self.cardHeight intValue]+5)*[self.yrRowNumber intValue])];
     [self.yrPlaceOrNameScrollView setContentSize:CGSizeMake(([self.cardWidth intValue]+5)*[self.yrColumNumber intValue]+[self.toLeft intValue], self.yrPlaceOrNameScrollView.frame.size.height)];
     
+    //disable user interaction on the label views
+    [self.yrTimeLabelScrollView setUserInteractionEnabled:NO];
+    //[self.yrPlaceOrNameScrollView setUserInteractionEnabled:NO];
+    
     
     //======================add button=========================//
     UIButton* addColumButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -143,6 +189,7 @@
     
     
     self.yrTimeCardScrollView.delegate = self;
+    self.yrPlaceOrNameScrollView.delegate = self;
     self.yrTimeCardScrollView.directionalLockEnabled = YES;
 
     
@@ -153,7 +200,7 @@
         nameLabel.textColor = [UIColor whiteColor];
         nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
+            nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
         }
         
         nameLabel.textAlignment = NSTextAlignmentCenter;
@@ -185,7 +232,7 @@
         timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         timeLabel.textAlignment = NSTextAlignmentLeft;
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
+            timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
             timeLabel.textAlignment = NSTextAlignmentCenter;
         }
         
@@ -248,8 +295,11 @@
 
 -(BOOL)checkCandidateAvailability:(CandidateEntry*)candidate atTime:(NSString*)time
 {
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MM/dd/yyy"];
+    
     for (Appointment* ap in candidate.appointments) {
-        if ([ap.startTime isEqualToString:time]) {
+        if ([ap.startTime isEqualToString:time] && [[format stringFromDate:ap.date] isEqualToString:[format stringFromDate:self.currentDate]]) {
             return NO;
         }
     }
@@ -267,6 +317,7 @@
     self.yrSchedulingController.source = self;
     self.yrSchedulingController.managedObjectContext = self.managedObjectContext;
     [self.yrSchedulingController setDataReady:dataIsReady];
+    [self.yrSchedulingController setCurrentDate:self.currentDate];
     
     YRTimeCardView* targeView = (YRTimeCardView*)[self.views objectAtIndex:index_y* [self.yrColumNumber intValue] + index_x];
     
@@ -288,7 +339,7 @@
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
         
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d",[targeView roomIndex], [targeView slotIndex]]];
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d and date = %@",[targeView roomIndex], [targeView slotIndex],self.currentDate]];
         
         NSError* error = nil;
         NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -316,6 +367,7 @@
                     item.startTime = [targeView interviewStartTime];
                     item.apIndex_x = [NSNumber numberWithInt:[targeView roomIndex]];
                     item.apIndex_y = [NSNumber numberWithInt:[targeView slotIndex]];
+                    item.date = self.currentDate;
                     
                     [fetched addAppointmentsObject:item];
                     [fetched setStatus:@"scheduled"];
@@ -381,7 +433,7 @@
         
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
         
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d",index_x, index_y]];
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d and date = %@",index_x, index_y,self.currentDate]];
         
         NSError* error = nil;
         NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -472,7 +524,7 @@
 {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d",[self.selectedView roomIndex],[self.selectedView slotIndex]]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d and date = %@",[self.selectedView roomIndex],[self.selectedView slotIndex],self.currentDate]];
     
     NSError* error = nil;
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -525,12 +577,111 @@
     [self removeFromDeleteMode];
 }
 
+-(void)previousPage
+{
+    self.pageIndex = [NSNumber numberWithInt:([self.pageIndex intValue] - 1)];
+    self.currentDate = [NSDate dateWithTimeInterval:24*60*60*[self.pageIndex intValue] sinceDate:(NSDate*)[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey]];
+    
+    //reload everything
+    [self scheduleClearUp];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
+    
+    NSError* error = nil;
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    [self setYrAppointmentInfo:[FetchResults mutableCopy]];
+    
+    [self buildSchedule];
+    
+    [self dateLabelSetUp];
+}
+
+-(void)nextPage
+{
+    self.pageIndex = [NSNumber numberWithInt:([self.pageIndex intValue] + 1)];
+    self.currentDate = [NSDate dateWithTimeInterval:24*60*60*[self.pageIndex intValue] sinceDate:(NSDate*)[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey]];
+
+    //reload everything
+    [self scheduleClearUp];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
+    
+    NSError* error = nil;
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    [self setYrAppointmentInfo:[FetchResults mutableCopy]];
+    
+    [self buildSchedule];
+    
+    [self dateLabelSetUp];
+}
+
+-(void)dateLabelSetUp
+{
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MM/dd/yyy"];
+    
+    NSDate* date = [NSDate dateWithTimeInterval:24*60*60*[self.pageIndex intValue] sinceDate:(NSDate*)[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey]];
+    
+    self.dateLabel.text = [format stringFromDate:date];
+    
+    [self.view addSubview:self.dateLabel];
+    [self.view addSubview:self.leftArrow];
+    [self.view addSubview:self.rightArrow];
+    
+    if ([self.pageIndex intValue] == 0) {
+        self.leftArrow.hidden = YES;
+    }
+    else
+    {
+        self.leftArrow.hidden = NO;
+    }
+    if ([self.pageIndex intValue] < [(NSNumber*)[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleNumberOfDayKey] intValue] - 1) {
+        self.rightArrow.hidden = NO;
+    }
+    else
+    {
+        self.rightArrow.hidden = YES;
+    }
+}
+
+-(void)scheduleClearUp
+{
+    [self.columLabels removeAllObjects];
+    [self.rowLabels removeAllObjects];
+    [self.views removeAllObjects];
+    [self.yrAppointmentInfo removeAllObjects];
+    
+    [self.yrSchedulingController.view removeFromSuperview];
+    [self.yrTimeCardScrollView removeFromSuperview];
+    [self.yrTimeLabelScrollView removeFromSuperview];
+    [self.yrPlaceOrNameScrollView removeFromSuperview];
+    [self.dateLabel removeFromSuperview];
+    [self.leftArrow removeFromSuperview];
+    [self.rightArrow removeFromSuperview];
+    self.yrTimeCardScrollView = nil;
+    self.yrTimeLabelScrollView = nil;
+    self.yrPlaceOrNameScrollView = nil;
+    self.yrSchedulingController = nil;
+}
+
 #pragma mark - UIScrollViewDelegate
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    self.yrTimeLabelScrollView.contentOffset = CGPointMake(0, self.yrTimeCardScrollView.contentOffset.y);
-    self.yrPlaceOrNameScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentOffset.x, 0);
+    if (scrollView == self.yrTimeCardScrollView) {
+        self.yrTimeLabelScrollView.contentOffset = CGPointMake(0, self.yrTimeCardScrollView.contentOffset.y);
+        self.yrPlaceOrNameScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentOffset.x, 0);
+    }
+    
+    if (scrollView == self.yrPlaceOrNameScrollView) {
+        self.yrTimeCardScrollView.contentOffset = CGPointMake(self.yrPlaceOrNameScrollView.contentOffset.x, 0);
+    }
     
     for (UILabel* curr in self.rowLabels) {
         if (curr.frame.origin.y - self.yrTimeCardScrollView.contentOffset.y < [self.toTop intValue]) {
@@ -551,7 +702,6 @@
             curr.alpha = 1;
         }
     }
-    
 }
 
 #pragma mark - UIGestureRecognizerDelegate
@@ -569,26 +719,20 @@
             [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:[self.yrColumNumber intValue]+1]  forKey:kYRScheduleColumsKey];
             [[NSUserDefaults standardUserDefaults] synchronize];
             
-            [self.yrSchedulingController.view removeFromSuperview];
-            [self.yrTimeCardScrollView removeFromSuperview];
-            [self.yrTimeLabelScrollView removeFromSuperview];
-            [self.yrPlaceOrNameScrollView removeFromSuperview];
-            self.yrTimeCardScrollView = nil;
-            self.yrTimeLabelScrollView = nil;
-            self.yrPlaceOrNameScrollView = nil;
-            self.yrSchedulingController = nil;
-            
-            [self.views removeAllObjects];
-            [self.yrAppointmentInfo removeAllObjects];
+            [self scheduleClearUp];
             
             NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
             NSError* error = nil;
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
             [self setYrAppointmentInfo:[FetchResults mutableCopy]];
             
             [self buildSchedule];
+            
+            [self dateLabelSetUp];
+            
             self.yrTimeCardScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
             self.yrPlaceOrNameScrollView.contentOffset = CGPointMake(self.yrTimeCardScrollView.contentSize.width - self.view.frame.size.width, 0);
         });

@@ -30,6 +30,9 @@
 @end
 
 @implementation YRFormViewController
+{
+    CGRect noteRect;
+}
 
 - (void)viewDidLoad
 {
@@ -238,7 +241,7 @@
     [self.yrNoteTextView resignFirstResponder];
     
     [UIView beginAnimations:@"move" context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.3];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrNoteTextView.frame = CGRectMake(70, 531, 627, 280);
@@ -246,6 +249,7 @@
     else{
         self.yrNoteTextView.frame = CGRectMake(20, 298, 280, 150);
     }
+    //self.yrNoteTextView.frame = noteRect;
     
     [UIView commitAnimations];
     [self.yrNoteTextView resignFirstResponder];
@@ -256,7 +260,7 @@
     [self.yrGPATextField resignFirstResponder];
     
     [UIView beginAnimations:@"move" context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.3];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrNoteTextView.frame = CGRectMake(70, 531, 627, 280);
@@ -264,6 +268,7 @@
     else{
         self.yrNoteTextView.frame = CGRectMake(20, 298, 280, 150);
     }
+    //self.yrNoteTextView.frame = noteRect;
     
     [UIView commitAnimations];
     [self.yrNoteTextView resignFirstResponder];
@@ -346,7 +351,9 @@
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
     [UIView beginAnimations:@"move" context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.3];
+    //remember the current shape of the noteview, with the differece of 3.5 screen and 4.0 screen
+    noteRect = self.yrNoteTextView.frame;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrNoteTextView.frame = CGRectMake(30, 350, 708, 385);

@@ -2,7 +2,7 @@
 //  Appointment.h
 //  Recruit
 //
-//  Created by Yifan Fu on 6/27/14.
+//  Created by Yifan Fu on 7/31/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
@@ -13,9 +13,10 @@
 
 @interface Appointment : NSManagedObject
 
-@property (nonatomic, retain) NSString * startTime;
 @property (nonatomic, retain) NSNumber * apIndex_x;
 @property (nonatomic, retain) NSNumber * apIndex_y;
+@property (nonatomic, retain) NSString * startTime;
+@property (nonatomic, retain) NSDate * date;
 @property (nonatomic, retain) CandidateEntry *candidate;
 @property (nonatomic, retain) Interviewer *interviewers;
 

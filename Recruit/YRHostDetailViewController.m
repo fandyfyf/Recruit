@@ -11,6 +11,7 @@
 #import <Guile/Guile.h>
 #import "Appointment.h"
 #import "Interviewer.h"
+#import "Event.h"
 
 @interface YRHostDetailViewController ()
 
@@ -355,7 +356,16 @@
     NSError* error = nil;
     NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
     CandidateEntry* selected = mutableFetchResults[0];
+    
+    fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"eventCode = %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
+    
+    NSArray* result = [[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+    
+    
     [[self.appDelegate emailGenerator] setSelectedCandidate:selected];
+    [[self.appDelegate emailGenerator] setEventAddress: [(Event*)[result firstObject] eventAddress]];
     //reset appointments
     [[self.appDelegate emailGenerator].selectedAppointments removeAllObjects];
     
@@ -588,7 +598,7 @@
 -(void)email
 {
     if ([MFMailComposeViewController canSendMail]) {
-        NSString *emailTitle = [NSString stringWithFormat:@"Yahoo is Interested in Speaking with You! - %@",[[self.appDelegate emailGenerator] generateEmail:@"#studentFirstName# #studentLastName#"][@"message"]];
+        NSString *emailTitle = [NSString stringWithFormat:@"Yahoo is Interested in Speaking with You! - %@",[[self.appDelegate emailGenerator] generateEmail:@"{studentFirstName} {studentLastName}"][@"message"]];
         //NSString *messageBody = @"Message goes here!";
         
         NSDictionary* result = [[self.appDelegate emailGenerator] generateEmail:[self.formList[currentSelectedEmailForm] allValues][0]];
@@ -827,6 +837,7 @@
     [UIView beginAnimations:@"move" context:nil];
     [UIView setAnimationDuration:0.2];
     
+    self.grayView.alpha = 0;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrCommentTextView.frame = CGRectMake(84, 654, 600, 281);
     }
@@ -834,6 +845,8 @@
         self.yrCommentTextView.frame = CGRectMake(10, 443, 300, 94);
     }
     [UIView commitAnimations];
+    
+    [self.grayView removeFromSuperview];
     
 //    [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
 //        [self.rankOneButton setFrame:CGRectMake(603, 157, 80, 80)];
@@ -1149,8 +1162,14 @@
 
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
+//    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+//    self.grayView.backgroundColor = [UIColor blackColor];
+//    [self.view addSubview:self.grayView];
+//    self.grayView.alpha = 0.0;
+    
     [UIView beginAnimations:@"move" context:nil];
     [UIView setAnimationDuration:0.4];
+//    self.grayView.alpha = 0.4;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.yrCommentTextView.frame = CGRectMake(30, 350, 708, 385);
@@ -1310,7 +1329,10 @@
         }
         
         //cell.detailLabel
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"Room %d",[[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] apIndex_x] intValue]+1];
+        NSDateFormatter* format = [[NSDateFormatter alloc] init];
+        [format setDateFormat:@"MM/dd/yyy"];
+        
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"Room %d on %@",[[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] apIndex_x] intValue]+1,[format stringFromDate:[(Appointment*)[self.dataSource.appointments allObjects][indexPath.row] date]]];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
             cell.textLabel.font = [UIFont fontWithName:@"Helvetica" size: 12];
         }

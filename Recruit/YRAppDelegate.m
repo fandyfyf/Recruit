@@ -12,6 +12,8 @@ NSString* const kYREmailKeyWordsKey = @"emailKeyWords";
 NSString* const kYRScheduleColumsKey = @"scheduleColums";
 NSString* const kYRScheduleStartTimeKey = @"scheduleStartTime";
 NSString* const kYRScheduleDurationKey = @"scheduleDuration";
+NSString* const kYRScheduleStartDateKey = @"scheduleStartDate";
+NSString* const kYRScheduleNumberOfDayKey = @"scheduleNumberOfDay";
 NSString* const kYREmailFormsKey = @"emailForms";
 
 @implementation YRAppDelegate
@@ -29,20 +31,24 @@ NSString* const kYREmailFormsKey = @"emailForms";
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:3] forKey:kYRScheduleColumsKey];
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:8] forKey:kYRScheduleStartTimeKey];
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:45] forKey:kYRScheduleDurationKey];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSDate date] forKey:kYRScheduleStartDateKey];
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:1] forKey:kYRScheduleNumberOfDayKey];
     }
-    NSArray* dic = @[@{@"studentRid" : @"#studentRid#"},
-                     @{@"studentFirstName" : @"#studentFirstName#"},
-                     @{@"studentLastName" : @"#studentLastName#"},
-                     @{@"studentEmail" : @"#studentEmail#"},
-                     @{@"appointments" : @"#appointments#"},
-                     @{@"interviewDuration" : @"#interviewDuration#"},
-                     @{@"resume" : @"#resume#"}
+    NSArray* dic = @[@{@"studentRid" : @"{studentRid}"},
+                     @{@"studentFirstName" : @"{studentFirstName}"},
+                     @{@"studentLastName" : @"{studentLastName}"},
+                     @{@"studentEmail" : @"{studentEmail}"},
+                     @{@"appointments" : @"{appointments}"},
+                     @{@"appLink" : @"{applicationLink}"},
+                     @{@"interviewDuration" : @"{interviewDuration}"},
+                     @{@"resume" : @"{resume}"}
                           ];
     [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailKeyWordsKey];
     
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] == nil) {
-        NSArray* dic = @[@{@"Invitation" : @"Hi #studentFirstName#,\n\nWe have received your resume and we are impressed with your qualifications! Yahoo is interested in speaking with you about internship opportunities for 2014.\n\nWe'd like to set up sometime for you to chat over the phone with one of the members of our hiring team.\n\nIt'd be my pleasure to assist you with setting up this initial phone interview. Please reply back to me within 48 hours, with the following information:\n\n   -   Your availability(in PST) for 2 weeks\n   -   The best phone number to reach you\n   -   Current Resume-make sure GPA is noted\n\nOnce I have your availability, I'll confirm the logistics and email you the final details. If by chance you're not interested in pursuing this opportunity please let me know so we can proceed accordingly. Please note, Yahoo is an E-verify employer.\n\nTo learn more about our campus recruiting schedule, job opportunities and what it's like to work at Yahoo follow our Facebook fan page at https://www.facebook.com/YahooUniversityRecruiting?ref=sgm\n\nI look forward to hearing back from you!\n\nBest regards,\n\nSignature"},
-                         @{@"Confirmation" : @"Hi #studentFirstName#,\n\nGreat news! Your interview with Yahoo is confirmed with the following schedule,\n\n#appointments#\nPlease let me know if you have any other questions.\n\nSignature"},
+        NSArray* dic = @[@{@"Apply Online": @"Hi {studentFirstName}!\n\nIt was great meeting you at today's career fair!\n\nWe are excited that you are interested in opportunities with Yahoo. To be considered further, you must apply online via the following link within 48 hours: {applicationLink}\n\nWe look forward to your application and speaking with you again in the future.\n\nYahoo Campus Recruiting"},
+                         @{@"Invitation" : @"Hi {studentFirstName},\n\nWe have received your resume and we are impressed with your qualifications! Yahoo is interested in speaking with you about internship opportunities for 2014.\n\nWe'd like to set up sometime for you to chat over the phone with one of the members of our hiring team.\n\nIt'd be my pleasure to assist you with setting up this initial phone interview. Please reply back to me within 48 hours, with the following information:\n\n   -   Your availability(in PST) for 2 weeks\n   -   The best phone number to reach you\n   -   Current Resume-make sure GPA is noted\n\nOnce I have your availability, I'll confirm the logistics and email you the final details. If by chance you're not interested in pursuing this opportunity please let me know so we can proceed accordingly. Please note, Yahoo is an E-verify employer.\n\nTo learn more about our campus recruiting schedule, job opportunities and what it's like to work at Yahoo follow our Facebook fan page at https://www.facebook.com/YahooUniversityRecruiting?ref=sgm\n\nI look forward to hearing back from you!\n\nBest regards,\n\nSignature"},
+                         @{@"Confirmation" : @"Hello {studentFirstName}!\n\nWe are excited to have you interview with Yahoo on your school Campus. You will meet with members of our hiring team, who are eager to learn more about you and your professional goals.\n\nYour interview has been confirmed. Specific details can be found below along with application instructions and job description. We hope that you have a wonderful interivew experience with Yahoo. And of course, don't hesitate to email or call me if you have any questions.\n\n\nBest of luck!\n\nsignature\n\nINTERVIEW DETAILS:\n\n{appointments}\nAPPLICATION INSTRUCTIONS:\n\nPrior to your interview, please review the job description and apply online via the following link: {applicationLink}"},
                          @{@"Rejection" : @""}];
         [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailFormsKey];
     }

@@ -28,7 +28,7 @@
 {
     NSNumber* pdfFlag = [NSNumber numberWithBool:NO];
     
-    NSString* newDefaultForm = [defaultForm stringByReplacingOccurrencesOfString:@"#resume#" withString:@""];
+    NSString* newDefaultForm = [defaultForm stringByReplacingOccurrencesOfString:@"{resume}" withString:@""];
     //same means pdf doesn't exist
     if (![newDefaultForm isEqualToString:defaultForm]) {
         pdfFlag = [NSNumber numberWithBool:YES];
@@ -42,18 +42,18 @@
         NSString* replacement;
 
         //need to change after getting actual keywords
-        if ([keyword isEqualToString:@"#studentRid#"]) {
+        if ([keyword isEqualToString:@"{studentRid}"]) {
             replacement = self.selectedCandidate.code;
         }
-        else if ([keyword isEqualToString:@"#studentFirstName#"])
+        else if ([keyword isEqualToString:@"{studentFirstName}"])
         {
             replacement = self.selectedCandidate.firstName;
         }
-        else if ([keyword isEqualToString:@"#studentLastName#"])
+        else if ([keyword isEqualToString:@"{studentLastName}"])
         {
             replacement = self.selectedCandidate.lastName;
         }
-        else if ([keyword isEqualToString:@"#studentEmail#"])
+        else if ([keyword isEqualToString:@"{studentEmail}"])
         {
             replacement = self.selectedCandidate.emailAddress;
         }
@@ -69,24 +69,32 @@
 //        {
 //            replacement = self.selectedAppointment.startTime;
 //        }
-        else if ([keyword isEqualToString:@"#interviewDuration#"])
+        else if ([keyword isEqualToString:@"{interviewDuration}"])
         {
             replacement = [(NSNumber*)[[NSUserDefaults standardUserDefaults] objectForKey:kYRScheduleDurationKey] stringValue];
         }
-        else if ([keyword isEqualToString:@"#appointments#"])
+        else if ([keyword isEqualToString:@"{appointments}"])
         {
             //replacement is ...
             if ([self.selectedAppointments count] > 0) {
                 replacement = @"";
+                
+                NSDateFormatter* format = [[NSDateFormatter alloc] init];
+                [format setDateFormat:@"MM/dd/yyy"];
+                
                 for (Appointment* ap in self.selectedAppointments)
                 {
-                    replacement = [replacement stringByAppendingString:[NSString stringWithFormat:@"%@ with %@\n",ap.startTime,ap.interviewers.name]];
+                    replacement = [replacement stringByAppendingString:[NSString stringWithFormat:@"Date: %@\nTime: %@\nInterviewer: %@\nLocation: %@\n\n",[format stringFromDate:ap.date],ap.startTime,ap.interviewers.name,self.eventAddress]];
                 }
             }
             else
             {
                 replacement = @" --- pending --- \n";
             }
+        }
+        else if ([keyword isEqualToString:@"{applicationLink}"])
+        {
+            //replacelink
         }
         
         if (replacement != nil) {

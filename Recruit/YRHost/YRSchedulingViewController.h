@@ -28,6 +28,8 @@
 
 @property (assign, getter = isDataReady) BOOL dataReady;
 
+@property (weak, nonatomic) NSDate* currentDate;
+
 -(void)cancelDetail;
 -(void)saveDetail;
 -(void)deleteDetail;

@@ -211,7 +211,7 @@
     
     [self.view addSubview:deleteButton];
     
-    [UIView animateWithDuration:0.4 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             self.view.frame = CGRectMake(0, 650, self.view.frame.size.width, self.view.frame.size.height);
         }
@@ -315,7 +315,7 @@
 
 -(void)cancelDetail
 {
-    [UIView animateWithDuration:0.4 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             self.view.frame = CGRectMake(0, 1024, self.view.frame.size.width, self.view.frame.size.height);
         }
@@ -333,7 +333,7 @@
 
 -(void)saveDetail
 {
-    [UIView animateWithDuration:0.4 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             self.view.frame = CGRectMake(0, 1024, self.view.frame.size.width, self.view.frame.size.height);
         }
@@ -354,7 +354,7 @@
 
 -(void)deleteDetail
 {
-    [UIView animateWithDuration:0.4 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             self.view.frame = CGRectMake(0, 1024, self.view.frame.size.width, self.view.frame.size.height);
         }
@@ -401,8 +401,10 @@
 
 -(BOOL)checkCandidateAvailability:(CandidateEntry*)candidate atTime:(NSString*)time
 {
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MM/dd/yyy"];
     for (Appointment* ap in candidate.appointments) {
-        if ([ap.startTime isEqualToString:time]) {
+        if ([ap.startTime isEqualToString:time] && [[format stringFromDate:ap.date] isEqualToString:[format stringFromDate:self.currentDate]]) {
             return NO;
         }
     }
@@ -411,8 +413,10 @@
 
 -(BOOL)checkInterviewerAvailability:(Interviewer*)interviewer atTime:(NSString*)time
 {
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MM/dd/yyy"];
     for (Appointment* ap in interviewer.appointments) {
-        if ([ap.startTime isEqualToString:time]) {
+        if ([ap.startTime isEqualToString:time] && [[format stringFromDate:ap.date] isEqualToString:[format stringFromDate:self.currentDate]]) {
             return NO;
         }
     }
@@ -427,7 +431,7 @@
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d",[(YRTimeCardView*)owner roomIndex],[(YRTimeCardView*)owner slotIndex]]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"apIndex_x = %d and apIndex_y = %d and date = %@",[(YRTimeCardView*)owner roomIndex],[(YRTimeCardView*)owner slotIndex],self.currentDate]];
     
     NSError* error = nil;
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -458,6 +462,7 @@
                     item.startTime = [(YRTimeCardView*)owner interviewStartTime];
                     item.apIndex_x = [NSNumber numberWithInt:[(YRTimeCardView*)owner roomIndex]];
                     item.apIndex_y = [NSNumber numberWithInt:[(YRTimeCardView*)owner slotIndex]];
+                    item.date = self.currentDate;
                         
                     item.candidate = (CandidateEntry*)[candidate objectAtIndex:0];
                     

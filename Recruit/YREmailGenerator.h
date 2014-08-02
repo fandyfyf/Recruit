@@ -15,6 +15,7 @@
 
 @property (strong, nonatomic) CandidateEntry* selectedCandidate;
 @property (strong, nonatomic) Interviewer* selectedInterviewer;
+@property (strong, nonatomic) NSString* eventAddress;
 @property (strong, nonatomic) NSMutableArray* selectedAppointments;
 @property (strong, nonatomic) NSArray* keyWordsList;
 

@@ -8,19 +8,25 @@
 
 #import "YRHostSettingViewController.h"
 #import "YRViewerDataCell.h"
+#import "YRFormDataCell.h"
 #import <Guile/UITextField+AutoSuggestAdditions.h>
 #import <Guile/Guile.h>
 #import "YRAppDelegate.h"
 #import "Interviewer.h"
-
+#import "Event.h"
+#import <objc/message.h>
 
 @interface YRHostSettingViewController ()
 
 @property (strong, nonatomic) UIView* yrCardView;
+@property (copy, nonatomic) NSString* selectedEvent;
+@property (copy, nonatomic) NSString* selectedEventName;
 
--(void)fetchInterviewerInfo;
+-(void)fetchInterviewerInfoWithCode:(NSString*)code;
 -(void)yrCardViewCancel;
 -(void)yrCardViewSave;
+-(void)yrCardViewEventSave;
+
 -(void)removeAllInterviewerInfo;
 -(void)saveScheduleInfo;
 -(void)doneWithPad;
@@ -30,6 +36,8 @@
 -(void)nextInterviewerField;
 -(void)doneWithInterviewFields;
 
+-(void)showDatePicker;
+
 @end
 
 @implementation YRHostSettingViewController
@@ -38,13 +46,15 @@
     float remove_origin_y;
     float add_form_origin_y;
     float remove_form_origin_y;
+    float add_event_origin_y;
     int currentSelected;
+    BOOL modifyModeON;
 }
 
 -(void)awakeFromNib
 {
+    self.eventArray = [[NSMutableArray alloc] init];
     self.interviewerArray = [[NSMutableArray alloc] init];
-    self.emailKeywordArray = [[NSArray alloc] init];
 }
 
 - (void)viewDidLoad
@@ -72,10 +82,51 @@
     self.interviewDuration.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleDurationKey]];
     self.interviewLocations.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleColumsKey]];
     
-    [self fetchInterviewerInfo];
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MM/dd/yyy"];
+    
+    self.interviewStartDate.text = [format stringFromDate:(NSDate*)[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey]];
+    
+    self.interviewEndDate.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleNumberOfDayKey]];
+    
+    self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showDatePicker)];
+    
+    [self.interviewStartDate addGestureRecognizer:self.tapGestureRecognizer];
+    
+    self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showDatePicker)];
+    
+    [self.interviewEndDate addGestureRecognizer:self.tapGestureRecognizer];
+    
+    //set up date view
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.datePickerView = [[YRDatePickerView alloc] initWithFrame:CGRectMake(0, 50, self.view.frame.size.width/2+50, 300)];
+        [[self.datePickerView layer] setCornerRadius:10];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        self.datePickerView = [[YRDatePickerView alloc] initWithFrame:CGRectMake(0, 30, self.view.frame.size.width/2, 200)];
+        [[self.datePickerView layer] setCornerRadius:5];
+    }
+    
+    [self fetchEventInfo];
+    
+    if ([self.eventArray count] != 0) {
+        //there is event, return interviewer info for the first event
+        
+        self.selectedEvent = [(Event*)[self.eventArray firstObject] eventCode];
+        self.selectedEventName = [(Event*)[self.eventArray firstObject] eventName];
+        [self fetchInterviewerInfoWithCode:self.selectedEvent];
+        //select
+        [self.interviewerList selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+    }
     
     self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
-    int formListCount = [self.formList count];
+    //int formListCount = [self.formList count];
+    int interviewCount = [self.interviewerArray count];
+    int eventCount = [self.eventArray count];
+    
+    //add_event_button not yet used
+    //self.yrAddEventButton.hidden = YES;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrRemoveButton layer] setCornerRadius:20];
@@ -85,8 +136,10 @@
         [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddButton layer] setBorderWidth:5];
         
-        //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 50, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
-        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + formListCount*44 + 50, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        //set the button to a correct place
+        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y + interviewCount*60 + eventCount*60 + 100, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + eventCount*60 + 52, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        
         self.yrRemoveButton.hidden = YES;
         
         [[self.yrRemoveFormButton layer] setCornerRadius:20];
@@ -95,6 +148,10 @@
         [[self.yrAddFormButton layer] setCornerRadius:20];
         [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddFormButton layer] setBorderWidth:5];
+        
+        [[self.yrAddEventButton layer] setCornerRadius:20];
+        [[self.yrAddEventButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddEventButton layer] setBorderWidth:5];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -104,8 +161,12 @@
         [[self.yrAddButton layer] setCornerRadius:12.5];
         [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddButton layer] setBorderWidth:2];
-        //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y + formListCount*44 + 45, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
-        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + formListCount*44 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        
+        //set the button to a correct place
+        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y + interviewCount*50 + eventCount*50 + 90, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+        
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + eventCount*50 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        
         self.yrRemoveButton.hidden = YES;
         
         [[self.yrRemoveFormButton layer] setCornerRadius:12.5];
@@ -114,12 +175,17 @@
         [[self.yrAddFormButton layer] setCornerRadius:12.5];
         [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
         [[self.yrAddFormButton layer] setBorderWidth:2];
+        
+        [[self.yrAddEventButton layer] setCornerRadius:12.5];
+        [[self.yrAddEventButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddEventButton layer] setBorderWidth:2];
     }
     
     add_origin_y = self.yrAddButton.frame.origin.y;
     remove_origin_y = self.yrRemoveButton.frame.origin.y;
     add_form_origin_y = self.yrAddFormButton.frame.origin.y;
     remove_form_origin_y = self.yrRemoveFormButton.frame.origin.y;
+    add_event_origin_y = self.yrAddEventButton.frame.origin.y;
     
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
     
@@ -133,6 +199,8 @@
     self.interviewStartTime.inputAccessoryView = doneToolbar;
     self.interviewDuration.inputAccessoryView = doneToolbar;
     self.interviewLocations.inputAccessoryView = doneToolbar;
+    
+    modifyModeON = NO;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -268,14 +336,17 @@
         nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 50, 60, 30)];
         [nameLabel setText:@"name:"];
         [nameLabel setTextAlignment:NSTextAlignmentRight];
+        [nameLabel setFont:[UIFont fontWithName:@"Helvetica" size: 12]];
         
         emailLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 95, 60, 30)];
         [emailLabel setText:@"email:"];
         [emailLabel setTextAlignment:NSTextAlignmentRight];
+        [emailLabel setFont:[UIFont fontWithName:@"Helvetica" size: 12]];
         
         codeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 140, 60, 30)];
         [codeLabel setText:@"code:"];
         [codeLabel setTextAlignment:NSTextAlignmentRight];
+        [codeLabel setFont:[UIFont fontWithName:@"Helvetica" size: 12]];
         
         cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         cancelButton.frame = CGRectMake(40, 190, 60, 30);
@@ -322,7 +393,7 @@
     
     [self.view addSubview:self.yrCardView];
     
-    [UIView animateWithDuration:0.4 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         self.yrCardView.alpha = 1.0;
         self.grayView.alpha = 0.4;
     }];
@@ -353,6 +424,200 @@
 - (IBAction)removeEmailForms:(id)sender {
 }
 
+-(void)addEventFunction
+{
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
+    
+    [self.view addSubview:self.grayView];
+    
+    UILabel* titleLabel;
+    UILabel* eventCodeLabel;
+    UILabel* eventNameLabel;
+    UILabel* eventAddressLabel;
+    UIButton* cancelButton;
+    UIButton* saveButton;
+    
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        //rotation needs update setting
+        self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(self.view.center.x-214, self.view.center.y-250, 428, 300)];
+        
+        [[self.yrCardView layer] setCornerRadius:10];
+        
+        self.yrCardView.backgroundColor = [UIColor whiteColor];
+        
+        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 288, 40)];
+        if (modifyModeON) {
+            [titleLabel setText:@"Campus Event"];
+        }
+        else
+        {
+            [titleLabel setText:@"New Campus Event"];
+        }
+        [titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:25]];
+        [titleLabel setTextAlignment:NSTextAlignmentLeft];
+        
+        self.eventName = [[UITextField alloc] initWithFrame:CGRectMake(140, 80, 240, 30)];
+        self.eventName.borderStyle = UITextBorderStyleRoundedRect;
+        [self.eventName setFont:[UIFont systemFontOfSize: 14]];
+        self.eventName.autocapitalizationType = UITextAutocapitalizationTypeWords;
+        self.eventName.autocorrectionType = UITextAutocorrectionTypeNo;
+        
+        self.eventCode = [[UITextField alloc] initWithFrame:CGRectMake(140, 125, 240, 30)];
+        self.eventCode.borderStyle = UITextBorderStyleRoundedRect;
+        [self.eventCode setFont:[UIFont systemFontOfSize: 14]];
+        self.eventCode.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
+        self.eventCode.autocorrectionType = UITextAutocorrectionTypeNo;
+        
+        self.eventAddress = [[UITextField alloc] initWithFrame:CGRectMake(140, 170, 240, 30)];
+        self.eventAddress.borderStyle = UITextBorderStyleRoundedRect;
+        [self.eventAddress setFont:[UIFont systemFontOfSize: 14]];
+        self.eventAddress.autocapitalizationType = UITextAutocapitalizationTypeWords;
+        self.eventAddress.autocorrectionType = UITextAutocorrectionTypeYes;
+        
+        self.eventAddress.delegate = self;
+        self.eventCode.delegate = self;
+        self.eventName.delegate = self;
+        
+        eventNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 80, 80, 30)];
+        [eventNameLabel setText:@"School:"];
+        [eventNameLabel setTextAlignment:NSTextAlignmentRight];
+        
+        eventCodeLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 125, 80, 30)];
+        [eventCodeLabel setText:@"Code:"];
+        [eventCodeLabel setTextAlignment:NSTextAlignmentRight];
+        
+        eventAddressLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 170, 80, 30)];
+        [eventAddressLabel setText:@"Address:"];
+        [eventAddressLabel setTextAlignment:NSTextAlignmentRight];
+        
+        cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        cancelButton.frame = CGRectMake(40, 250, 100, 40);
+        [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+        cancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 22];
+        [cancelButton addTarget:self action:@selector(yrCardViewCancel) forControlEvents:UIControlEventTouchUpInside];
+        
+        saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        saveButton.frame = CGRectMake(308, 250, 100, 40);
+        [saveButton setTitle:@"Save" forState:UIControlStateNormal];
+        saveButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 22];
+        [saveButton addTarget:self action:@selector(yrCardViewEventSave) forControlEvents:UIControlEventTouchUpInside];
+    }
+    else
+    {
+        self.yrCardView = [[UIView alloc] initWithFrame:CGRectMake(20, 120, 280, 230)];
+        [[self.yrCardView layer] setCornerRadius:10];
+        
+        self.yrCardView.backgroundColor = [UIColor whiteColor];
+        
+        titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 200, 20)];
+        
+        if (modifyModeON) {
+            [titleLabel setText:@"Campus Event"];
+        }
+        else
+        {
+            [titleLabel setText:@"New Campus Event"];
+        }
+        
+        [titleLabel setFont:[UIFont fontWithName:@"Iowan Old Style" size:16]];
+        [titleLabel setTextAlignment:NSTextAlignmentLeft];
+        
+        
+        self.eventName = [[UITextField alloc] initWithFrame:CGRectMake(80, 50, 180, 30)];
+        self.eventName.borderStyle = UITextBorderStyleRoundedRect;
+        [self.eventName setFont:[UIFont systemFontOfSize: 14]];
+        self.eventName.autocapitalizationType = UITextAutocapitalizationTypeWords;
+        self.eventName.autocorrectionType = UITextAutocorrectionTypeNo;
+        
+        self.eventCode = [[UITextField alloc] initWithFrame:CGRectMake(80, 95, 180, 30)];
+        self.eventCode.borderStyle = UITextBorderStyleRoundedRect;
+        [self.eventCode setFont:[UIFont systemFontOfSize: 14]];
+        self.eventCode.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
+        self.eventCode.autocorrectionType = UITextAutocorrectionTypeNo;
+        
+        self.eventAddress = [[UITextField alloc] initWithFrame:CGRectMake(80, 140, 180, 30)];
+        self.eventAddress.borderStyle = UITextBorderStyleRoundedRect;
+        [self.eventAddress setFont:[UIFont systemFontOfSize: 14]];
+        self.eventAddress.autocapitalizationType = UITextAutocapitalizationTypeWords;
+        self.eventAddress.autocorrectionType = UITextAutocorrectionTypeYes;
+        
+        self.eventAddress.delegate = self;
+        self.eventCode.delegate = self;
+        self.eventName.delegate = self;
+        
+        eventNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 50, 60, 30)];
+        [eventNameLabel setText:@"School:"];
+        [eventNameLabel setTextAlignment:NSTextAlignmentRight];
+        [eventNameLabel setFont:[UIFont fontWithName:@"Helvetica" size: 12]];
+        
+        eventCodeLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 95, 60, 30)];
+        [eventCodeLabel setText:@"Code:"];
+        [eventCodeLabel setTextAlignment:NSTextAlignmentRight];
+        [eventCodeLabel setFont:[UIFont fontWithName:@"Helvetica" size: 12]];
+        
+        eventAddressLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 140, 60, 30)];
+        [eventAddressLabel setText:@"Address:"];
+        [eventAddressLabel setTextAlignment:NSTextAlignmentRight];
+        [eventAddressLabel setFont:[UIFont fontWithName:@"Helvetica" size: 12]];
+        
+        cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        cancelButton.frame = CGRectMake(40, 190, 60, 30);
+        [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+        [cancelButton addTarget:self action:@selector(yrCardViewCancel) forControlEvents:UIControlEventTouchUpInside];
+        
+        saveButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        saveButton.frame = CGRectMake(180, 190, 60, 30);
+        [saveButton setTitle:@"Save" forState:UIControlStateNormal];
+        [saveButton addTarget:self action:@selector(yrCardViewEventSave) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Next" style:UIBarButtonItemStyleDone target:self action:@selector(nextEventField)],
+                         nil];
+    self.eventCode.inputAccessoryView = doneToolbar;
+    self.eventName.inputAccessoryView = doneToolbar;
+    
+    doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    
+    doneToolbar.items = [NSArray arrayWithObjects:
+                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
+                         [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithEventFields)],
+                         nil];
+    
+    self.eventAddress.inputAccessoryView = doneToolbar;
+    
+    
+    [self.yrCardView addSubview:cancelButton];
+    [self.yrCardView addSubview:saveButton];
+    [self.yrCardView addSubview:self.eventCode];
+    [self.yrCardView addSubview:self.eventName];
+    [self.yrCardView addSubview:self.eventAddress];
+    [self.yrCardView addSubview:eventCodeLabel];
+    [self.yrCardView addSubview:eventNameLabel];
+    [self.yrCardView addSubview:eventAddressLabel];
+    [self.yrCardView addSubview:titleLabel];
+    self.yrCardView.alpha = 0.0;
+    
+    [self.view addSubview:self.yrCardView];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.yrCardView.alpha = 1.0;
+        self.grayView.alpha = 0.4;
+    }];
+}
+
+- (IBAction)addEvent:(id)sender {
+    [self addEventFunction];
+}
+
 - (IBAction)changeDebriefStatus:(id)sender {
     if (self.yrDebriefSegCtrl.selectedSegmentIndex ==1) {
         UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Mode On?" message:@"Turn on debrief will potentially interrupt ongoing interviews." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Debrief!", nil];
@@ -377,7 +642,17 @@
 
 -(void)yrCardViewCancel
 {
-    [UIView animateWithDuration:0.4 animations:^{
+    modifyModeON = NO;
+    //remove keyboard first
+    [self.eventCode resignFirstResponder];
+    [self.eventName resignFirstResponder];
+    [self.eventAddress resignFirstResponder];
+    
+    [self.interviewerCode resignFirstResponder];
+    [self.interviewerName resignFirstResponder];
+    [self.interviewerEmail resignFirstResponder];
+    
+    [UIView animateWithDuration:0.3 animations:^{
         self.yrCardView.alpha = 0.0;
         self.grayView.alpha = 0.0;
     } completion:^(BOOL finish){
@@ -386,6 +661,9 @@
         self.interviewerEmail = nil;
         self.interviewerName = nil;
         self.interviewerCode = nil;
+        self.eventCode = nil;
+        self.eventName = nil;
+        self.eventAddress = nil;
     }];
 }
 
@@ -397,80 +675,270 @@
     }
     else
     {
-        Interviewer* item = (Interviewer*)[NSEntityDescription insertNewObjectForEntityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext];
-        item.name = self.interviewerName.text;
-        item.email = self.interviewerEmail.text;
-        item.code = self.interviewerCode.text;
-        item.tagList = [NSArray new];
-        
-        NSError *error = nil;
-        if (![self.managedObjectContext save:&error]) {
-            NSLog(@"ERROR -- saving coredata");
+        BOOL exist = NO;
+        for (Event* event in self.eventArray)
+        {
+            if ([event.eventCode isEqualToString:self.interviewerCode.text]) {
+                exist = YES;
+                break;
+            }
         }
         
-        //save the event code list in the user default
-        NSMutableArray* eventCodeList = [[[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"] mutableCopy];
-        if (eventCodeList == nil) {
-            //if the list is empty then add the code now
-            eventCodeList = [NSMutableArray new];
-            [eventCodeList addObject:item.code];
+        if (exist) {
+            //Do a fetch first to rule out duplicate ones
+            NSFetchRequest* request = [[NSFetchRequest alloc] init];
+            [request setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+            [request setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and name = %@",self.interviewerCode.text,self.interviewerName.text]];
+            NSError* error = nil;
+            NSArray* result = [self.managedObjectContext executeFetchRequest:request error:&error];
             
-            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"New Event Created!" message:[NSString stringWithFormat:@"Event code %@ has been added to the list",item.code] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
-            [alertView show];
+            if ([result count] != 0) {
+                //already exist
+                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Interviewer existed" message:@"The Interviewer is already attending the event." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                [alertView show];
+            }
+            else
+            {
+                Interviewer* item = (Interviewer*)[NSEntityDescription insertNewObjectForEntityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext];
+                item.name = self.interviewerName.text;
+                item.email = self.interviewerEmail.text;
+                item.code = self.interviewerCode.text;
+                item.tagList = [NSArray new];
+                
+                request = [[NSFetchRequest alloc] init];
+                [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+                [request setPredicate:[NSPredicate predicateWithFormat:@"eventCode = %@",item.code]];
+                
+                NSArray* fetchResults = [self.managedObjectContext executeFetchRequest:request error:&error];
+                
+                //update interviewer count for the selected event
+                Event* selectedEvent = (Event*)[fetchResults firstObject];
+                [selectedEvent setEventInterviewerCount:[NSNumber numberWithInt:[selectedEvent.eventInterviewerCount intValue] + 1]];
+                
+                if (![self.managedObjectContext save:&error]) {
+                    NSLog(@"ERROR -- saving coredata");
+                }
+                
+                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"New Interviewer Created" message:[NSString stringWithFormat:@"\"%@\" has been added to Event: \"%@\"",item.name,selectedEvent.eventName] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                [alertView show];
+                
+                
+                if ([self.selectedEvent isEqualToString:self.interviewerCode.text]) {
+                    //the selected event is the same event
+                    [self.interviewerArray addObject:item];
+                    
+                    [self.interviewerList beginUpdates];
+                    
+                    [self.interviewerList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.interviewerArray count]-1 inSection:1]]withRowAnimation:UITableViewRowAnimationTop];
+                    
+                    [self.interviewerList endUpdates];
+                    
+                    
+                    [UIView animateWithDuration:0.3 animations:^{
+                        //adjust button;
+                        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                            [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y+60, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                            add_form_origin_y += 60;
+                        }
+                        else
+                        {
+                            [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y+50, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                            add_form_origin_y += 50;
+                        }
+                    }];
+                }
+                
+                [UIView animateWithDuration:0.4 animations:^{
+                    self.yrCardView.alpha = 0.0;
+                    self.grayView.alpha = 0.0;
+                } completion:^(BOOL finish){
+                    [self.yrCardView removeFromSuperview];
+                    [self.grayView removeFromSuperview];
+                    self.grayView = nil;
+                    self.yrCardView = nil;
+                }];
+            }
         }
         else
         {
-            BOOL exist = NO;
-            for (NSString* code in eventCodeList) {
-                if ([code isEqualToString:item.code]) {
-                    exist = YES;
-                    break;
-                }
-            }
-            if (!exist) {
-                //insert
-                [eventCodeList addObject:item.code];
-                
-                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"New Event Created!" message:[NSString stringWithFormat:@"Event code %@ has been added to the list",item.code] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
-                [alertView show];
-            }
+            //event is not existing in the list
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event doesn't exist." message:[NSString stringWithFormat:@"Event \"%@\" doesn't exist, please double check the spelling or create it first.",self.interviewerCode.text] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alertView show];
         }
-        //update the event code list
-        [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:eventCodeList] forKey:@"eventCodeList"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        [self.interviewerArray addObject:item];
-        [self.interviewerList reloadData];
-        
-        [UIView animateWithDuration:0.4 animations:^{
-            self.yrCardView.alpha = 0.0;
-            self.grayView.alpha = 0.0;
-        } completion:^(BOOL finish){
-            [self.yrCardView removeFromSuperview];
-            [self.grayView removeFromSuperview];
-            self.grayView = nil;
-            self.yrCardView = nil;
-        }];
     }
 }
 
--(void)fetchInterviewerInfo
+-(void)yrCardViewEventSave
+{
+    if (modifyModeON) {
+        //modify
+        modifyModeON = NO;
+        if (self.eventName.text.length == 0) {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"name shouldn't be empty" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+        else
+        {
+            NSFetchRequest* request = [[NSFetchRequest alloc] init];
+            [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+            [request setPredicate:[NSPredicate predicateWithFormat:@"eventCode = %@",self.eventCode.text]];
+            
+            NSError* error = nil;
+            NSArray* result = [self.managedObjectContext executeFetchRequest:request error:&error];
+            
+            Event* targetToModify = [result firstObject];
+            
+            [targetToModify setEventName:self.eventName.text];
+            [targetToModify setEventAddress:self.eventAddress.text];
+            
+            if (![self.managedObjectContext save:&error]) {
+                NSLog(@"ERROR -- saving coredata");
+            }
+            
+            [UIView animateWithDuration:0.3 animations:^{
+                self.yrCardView.alpha = 0.0;
+                self.grayView.alpha = 0.0;
+            } completion:^(BOOL finish){
+                [self.yrCardView removeFromSuperview];
+                [self.grayView removeFromSuperview];
+                self.grayView = nil;
+                self.yrCardView = nil;
+            }];
+            
+            [self fetchEventInfo];
+            [self.interviewerList reloadData];
+        }
+    }
+    else
+    {
+        if (self.eventCode.text.length == 0 || self.eventName.text.length == 0) {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"code/name shouldn't be empty" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+        else
+        {
+            NSFetchRequest* request = [[NSFetchRequest alloc] init];
+            [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+            
+            NSError* error = nil;
+            NSArray* result = [self.managedObjectContext executeFetchRequest:request error:&error];
+            
+            BOOL existInData = NO;
+            
+            for (Event* event in result)
+            {
+                if ([event.eventCode isEqualToString:self.eventCode.text]) {
+                    existInData = YES;
+                    break;
+                }
+            }
+            
+            if (existInData) {
+                //alert
+                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Code existed" message:@"The event code existed." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                [alertView show];
+            }
+            else
+            {
+                Event* item = (Event*)[NSEntityDescription insertNewObjectForEntityForName:@"Event" inManagedObjectContext:self.managedObjectContext];
+                item.eventCode = self.eventCode.text;
+                item.eventName = self.eventName.text;
+                item.eventAddress = self.eventAddress.text;
+                item.eventInterviewerCount = [NSNumber numberWithInt:0];
+                
+                NSError *error = nil;
+                if (![self.managedObjectContext save:&error]) {
+                    NSLog(@"ERROR -- saving coredata");
+                }
+                
+                [self.eventArray addObject:item];
+                
+                [self.interviewerList beginUpdates];
+                
+                [self.interviewerList insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.eventArray count]-1 inSection:0]]withRowAnimation:UITableViewRowAnimationTop];
+                
+                [self.interviewerList endUpdates];
+                
+                [UIView animateWithDuration:0.3 animations:^{
+                    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y+60, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                        add_form_origin_y += 60;
+                        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y+60, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+                        add_origin_y += 60;
+                    }
+                    else
+                    {
+                        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y+50, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                        add_form_origin_y += 50;
+                        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y+50, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+                        add_origin_y += 50;
+                    }
+                }];
+                
+                //change the header
+                if ([self.eventArray count] == 1) {
+                    //just insert the first one
+                    self.selectedEvent = [(Event*)[self.eventArray firstObject] eventCode];
+                    self.selectedEventName = [(Event*)[self.eventArray firstObject] eventName];
+                    [self.interviewerList reloadData];
+                    
+                    [self.interviewerList selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+                }
+                
+                [UIView animateWithDuration:0.3 animations:^{
+                    self.yrCardView.alpha = 0.0;
+                    self.grayView.alpha = 0.0;
+                } completion:^(BOOL finish){
+                    [self.yrCardView removeFromSuperview];
+                    [self.grayView removeFromSuperview];
+                    self.grayView = nil;
+                    self.yrCardView = nil;
+                }];
+            }
+        }
+    }
+}
+
+-(void)fetchInterviewerInfoWithCode:(NSString*)code
 {
     if (self.interviewerArray == nil) {
         self.interviewerArray = [NSMutableArray new];
     }
     
-    
     [self.interviewerArray removeAllObjects];
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",code]];
     
     NSError* error = nil;
     
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
     self.interviewerArray = [FetchResults mutableCopy];
+    
+    //in case interviewArray is nil
+    if (self.interviewerArray == nil) {
+        self.interviewerArray = [NSMutableArray new];
+    }
+}
+
+-(void)fetchEventInfo
+{
+    if (self.eventArray == nil) {
+        self.eventArray = [NSMutableArray new];
+    }
+    
+    [self.eventArray removeAllObjects];
+    
+    NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+    
+    NSError* error = nil;
+    
+    NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    self.eventArray = [FetchResults mutableCopy];
 }
 
 -(void)removeAllInterviewerInfo
@@ -527,6 +995,7 @@
 
 -(void)removeTextView
 {
+    [self checkKeyWordValidation];
     [self saveForm];
     [self.removeFromViewButton removeFromSuperview];
     [self.yrEditingTable removeFromSuperview];
@@ -542,6 +1011,8 @@
     
     [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [self.interviewerList reloadData];
 }
 
 -(void)insertString:(NSString*)insertingString
@@ -575,6 +1046,79 @@
 -(void)doneWithInterviewFields
 {
     [self.interviewerCode resignFirstResponder];
+}
+
+-(void)nextEventField
+{
+    if ([self.eventName isFirstResponder]) {
+        //[self.interviewerName resignFirstResponder];
+        [self.eventCode becomeFirstResponder];
+    }
+    else if ([self.eventCode isFirstResponder]) {
+        //[self.interviewerEmail resignFirstResponder];
+        [self.eventAddress becomeFirstResponder];
+    }
+}
+
+-(void)doneWithEventFields
+{
+    [self.eventAddress resignFirstResponder];
+}
+
+//not yet finished
+-(void)checkKeyWordValidation
+{
+    NSString* testString = self.yrEditingView.text;
+    
+    NSRange left = [testString rangeOfString:@"{"];
+    NSRange right = [testString rangeOfString:@"}"];
+    
+    while(left.location != NSNotFound && right.location != NSNotFound) {
+        NSRange key = NSMakeRange(left.location + left.length, right.location - left.location - left.length);
+        
+        NSString* potentialKey = [testString substringWithRange:key];
+        
+        if ([potentialKey rangeOfString:@" "].location == NSNotFound) {
+            //no space between
+            NSLog(@"target is %@",potentialKey);
+            
+            //check if it exist in the keylist
+            
+            testString = [testString substringFromIndex:right.location + 1];
+            
+            left = [testString rangeOfString:@"{"];
+            right = [testString rangeOfString:@"}"];
+        }
+        else
+        {
+            //there is space in between, it's not a key
+        }
+    }
+}
+
+-(void)showDatePicker
+{
+    //need implement
+    NSLog(@"tapped!");
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
+    self.datePickerView.alpha = 0.0;
+    
+    self.datePickerView.grayView = self.grayView;
+    self.datePickerView.startDate = self.interviewStartDate;
+    self.datePickerView.numberOfDay = self.interviewEndDate;
+    
+    self.datePickerView.datePicker.date = [[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey];
+    [self.datePickerView.numberPicker selectRow:[[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleNumberOfDayKey] intValue]-1 inComponent:0 animated:YES];
+    
+    [self.view addSubview:self.grayView];
+    [self.view addSubview:self.datePickerView];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.grayView.alpha = 0.4;
+        self.datePickerView.alpha = 1.0;
+    }];
 }
 
 #pragma mark - AutoSuggestDelegate
@@ -649,7 +1193,8 @@
     }
     else
     {
-        return 2;
+        //setting table has three sections
+        return 3;
     }
 }
 
@@ -661,11 +1206,21 @@
     else
     {
         if (section == 0) {
-            return @"Email Forms";
+            return @"Campus Events";
+        }
+        else if (section == 1)
+        {
+            if (self.selectedEventName == nil) {
+                return @"Onsite Interviewers -- None";
+            }
+            else
+            {
+                return [NSString stringWithFormat:@"Onsite Interviewers -- %@",self.selectedEventName];
+            }
         }
         else
         {
-            return @"Onsite Interviewers";
+            return @"Email Forms";
         }
     }
 }
@@ -679,6 +1234,13 @@
     else
     {
         if (section == 0) {
+            return [self.eventArray count];
+        }
+        else if (section == 1) {
+            return [self.interviewerArray count];
+        }
+        else
+        {
             self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
             if (self.formList == nil) {
                 return 0;
@@ -687,10 +1249,6 @@
             {
                 return [self.formList count];
             }
-        }
-        else
-        {
-            return [self.interviewerArray count];
         }
     }
 }
@@ -716,16 +1274,23 @@
     else
     {
         if (indexPath.section == 0) {
-            static NSString* identifier = @"formIdentifier";
-            UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+            //select row in section 0
+            static NSString* identifier = @"eventIdentifier";
+            
+            YREventDataCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
             if (cell == nil) {
-                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+                cell = [[YREventDataCell alloc] init];
             }
-            cell.textLabel.text = [self.formList[indexPath.row] allKeys][0];
+            Event* current = [self.eventArray objectAtIndex:indexPath.row];
+            cell.eventNameLabel.text = current.eventName;
+            cell.eventAddressLabel.text = current.eventAddress;
+            cell.eventCodeLabel.text = current.eventCode;
+            cell.indexPath = indexPath;
+            cell.delegate = self;
+            
             return cell;
         }
-        else
-        {
+        else if (indexPath.section == 1) {
             static NSString* identifier = @"interviewerIdentifier";
             
             YRViewerDataCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
@@ -736,6 +1301,18 @@
             cell.yrNameLabel.text = current.name;
             cell.yrEmailLabel.text = current.email;
             cell.yrCodeLabel.text = current.code;
+            return cell;
+        }
+        else
+        {
+            static NSString* identifier = @"formIdentifier";
+            YRFormDataCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+            if (cell == nil) {
+                cell = [YRFormDataCell new];
+            }
+            cell.formNameLabel.text = [[self.formList[indexPath.row] allKeys] firstObject];
+            cell.formDetailLabel.text = [[[self.formList[indexPath.row] allValues] firstObject] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+            
             return cell;
         }
     }
@@ -750,20 +1327,14 @@
     }
     else
     {
-        if (indexPath.section == 1) {
-            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-                return 50.0;
-            }
-            else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-            {
-                return 90.0;
-            }
-            else{
-                return 44.0;
-            }
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+            return 50.0;
         }
-        else
+        else if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
         {
+            return 60.0;
+        }
+        else{
             return 44.0;
         }
     }
@@ -772,7 +1343,12 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (tableView == self.yrEditingTable) {
+        //test
+        //self.emailKeywordArray = nil;
+        //objc_msgSend(nil, @selector(objectAtIndex:),0);
+        
         [self insertString:[(NSDictionary*)[self.emailKeywordArray objectAtIndex:indexPath.row] allValues][0]];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
     else if(tableView == self.interviewerList)
     {
@@ -784,7 +1360,7 @@
                              [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],
                              nil];
         
-        if (indexPath.section == 0) {
+        if (indexPath.section == 2) {
             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
                 //bring up text view
                 self.yrEditingView = [[UITextView alloc] initWithFrame:CGRectMake(self.view.center.x-384, self.view.center.y-450, 584, 650)];
@@ -851,8 +1427,49 @@
             [self.view addSubview:self.removeFromViewButton];
             [self.yrEditingView becomeFirstResponder];
         }
+        else if (indexPath.section == 0)
+        {
+            //refetch interview array
+            
+            if (![self.selectedEvent isEqualToString:[(Event*)[self.eventArray objectAtIndex:indexPath.row] eventCode]]) {
+                self.selectedEvent = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventCode];
+                self.selectedEventName = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventName];
+                [self fetchInterviewerInfoWithCode:self.selectedEvent];
+                
+                [tableView beginUpdates];
+                
+                [tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationFade];
+                
+                [tableView endUpdates];
+                
+                int interviewCount = [self.interviewerArray count];
+                int eventCount = [self.eventArray count];
+                
+                [UIView animateWithDuration:0.3 animations:^{
+                    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                        
+                        //set the button to a correct place
+                        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, add_event_origin_y + interviewCount*60 + eventCount*60 + 100, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, add_event_origin_y + eventCount*60 + 52, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+                    }
+                    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+                    {
+                        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, add_event_origin_y + interviewCount*50 + eventCount*50 + 90, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                        
+                        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, add_event_origin_y + eventCount*50 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+                    }
+                }];
+                add_origin_y = self.yrAddButton.frame.origin.y;
+                remove_origin_y = self.yrRemoveButton.frame.origin.y;
+                add_form_origin_y = self.yrAddFormButton.frame.origin.y;
+                remove_form_origin_y = self.yrRemoveFormButton.frame.origin.y;
+                add_event_origin_y = self.yrAddEventButton.frame.origin.y;
+            }
+        }
+        if (indexPath.section != 0) {
+            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        }
     }
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 //-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -864,7 +1481,64 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         if (tableView == self.interviewerList) {
-            if (indexPath.section == 1) {
+            if (indexPath.section == 0) {
+                //when event is about to be deleted
+                NSFetchRequest* request = [[NSFetchRequest alloc] init];
+                [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+                [request setPredicate:[NSPredicate predicateWithFormat:@"eventCode = %@",[(Event*)[self.eventArray objectAtIndex:indexPath.row] eventCode]]];
+                NSError* error = nil;
+                NSArray* fetchResults = [self.managedObjectContext executeFetchRequest:request error:&error];
+                Event* targetEvent = [fetchResults firstObject];
+                
+                if ([targetEvent.eventInterviewerCount intValue] > 0) {
+                    //prompt can't delete
+                    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"WARNNING" message:@"Please delete all the interviewers first to remove the event." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                    [alertView show];
+                }
+                else
+                {
+                    [self.eventArray removeObjectAtIndex:indexPath.row];
+                    //adjust button positions
+                    
+                    [tableView beginUpdates];
+                    
+
+                    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            
+                    
+                    [tableView endUpdates];
+                    
+                    [UIView animateWithDuration:0.3 animations:^{
+                        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                            [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y-60, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                            add_form_origin_y -= 60;
+                            [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y-60, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+                            add_origin_y -= 60;
+                        }
+                        else
+                        {
+                            [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y-50, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                            add_form_origin_y -= 50;
+                            [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y-50, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+                            add_origin_y -= 50;
+                        }
+                    }];
+                    
+                    [self.managedObjectContext deleteObject:[fetchResults firstObject]];
+                    
+                    if (![self.managedObjectContext save:&error]) {
+                        NSLog(@"ERROR -- saving coredata");
+                    }
+                    
+                    if ([self.eventArray count] == 0) {
+                        self.selectedEvent = nil;
+                        self.selectedEventName = nil;
+                        
+                        [tableView reloadData];
+                    }
+                }
+            }
+            else if (indexPath.section == 1) {
                 NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
                 [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
                 [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",[(Interviewer*)self.interviewerArray[indexPath.row] name],[(Interviewer*)self.interviewerArray[indexPath.row] code]]];
@@ -880,66 +1554,77 @@
                 else
                 {
                     [self.interviewerArray removeObjectAtIndex:indexPath.row];
-                    [tableView reloadData];
+                
+//                    [UIView animateWithDuration:0.3 animations:^{
+//                        [tableView beginUpdates];
+//                        
+//                        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
+//                        
+//                        [tableView endUpdates];
+//                    } completion:^(BOOL finished) {
+//                        [UIView animateWithDuration:0.3 animations:^{
+//                            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+//                                [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y-60, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+//                                add_form_origin_y -= 60;
+//                            }
+//                            else
+//                            {
+//                                [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y-50, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+//                                add_form_origin_y -= 50;
+//                            }
+//                        }];
+//                    }];
                     
-                    NSString* targetPrefix = [(Interviewer*)FetchResults[0] code];
-                    [self.managedObjectContext deleteObject:FetchResults[0]];
+                    [tableView beginUpdates];
                     
-                    if (![self.managedObjectContext save:&error]) {
-                        NSLog(@"ERROR -- saving coredata");
-                    }
+                    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
                     
-                    NSLog(@"trying to delete %@",targetPrefix);
+                    [tableView endUpdates];
                     
-                    NSFetchRequest* checkRequest = [[NSFetchRequest alloc] init];
-                    [checkRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-                    NSError* error = nil;
-                    
-                    NSArray* Results = [self.managedObjectContext executeFetchRequest:checkRequest error:&error];
-                    
-                    BOOL checker = NO;
-                    for (Interviewer* interviewer in Results)
-                    {
-                        if ([interviewer.code isEqualToString:targetPrefix]) {
-                            checker = YES;
-                            break;
-                        }
-                    }
-                    if (!checker) {
-                        //delete
-                        NSMutableArray* eventCodeList = [[[NSUserDefaults standardUserDefaults] objectForKey:@"eventCodeList"] mutableCopy];
-                        int index = -1;
-                        for (int i=0; i<[eventCodeList count]; i++)
-                        {
-                            if ([[eventCodeList objectAtIndex:i] isEqualToString:targetPrefix]) {
-                                index = i;
-                            }
-                        }
-                        if (index >= 0) {
-                            [eventCodeList removeObjectAtIndex:index];
+                    [UIView animateWithDuration:0.3 animations:^{
+                        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                            [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y-60, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                            add_form_origin_y -= 60;
                         }
                         else
                         {
-                            NSLog(@"The target prefix doesn't exist");
+                            [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y-50, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+                            add_form_origin_y -= 50;
                         }
-                        
-                        [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithArray:eventCodeList] forKey:@"eventCodeList"];
-                        [[NSUserDefaults standardUserDefaults] synchronize];
+                    }];
+                    
+                    [self.managedObjectContext deleteObject:[FetchResults firstObject]];
+                    
+                    //reset interviewer count
+                    NSFetchRequest* request = [[NSFetchRequest alloc] init];
+                    [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+                    [request setPredicate:[NSPredicate predicateWithFormat:@"eventCode = %@",[(Interviewer*)FetchResults[0] code]]];
+                    NSError* error = nil;
+                    NSArray* fetchResults = [self.managedObjectContext executeFetchRequest:request error:&error];
+                    
+                    //update interviewer count for the selected event
+                    Event* selectedEvent = (Event*)[fetchResults firstObject];
+                    [selectedEvent setEventInterviewerCount:[NSNumber numberWithInt:[selectedEvent.eventInterviewerCount intValue] - 1]];
+                    
+                    if (![self.managedObjectContext save:&error]) {
+                        NSLog(@"ERROR -- saving coredata");
                     }
                 }
             }
             else
             {
-//                UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please confirm if you want to delete this entry." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
-//                [alert show];
                 [self.formList removeObjectAtIndex:indexPath.row];
                 [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
                 [[NSUserDefaults standardUserDefaults] synchronize];
                 
-                [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y-44, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
-                //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y-44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
                 
-                [self.interviewerList reloadData];
+                [tableView beginUpdates];
+                
+                
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                
+                
+                [tableView endUpdates];
             }
         }
     }
@@ -962,8 +1647,7 @@
         [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
-        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y+44, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
-        //[self.yrRemoveButton setFrame:CGRectMake(self.yrRemoveButton.frame.origin.x, self.yrRemoveButton.frame.origin.y+44, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height)];
+        //[self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y+44, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
         
         [self.interviewerList reloadData];
         
@@ -1033,12 +1717,11 @@
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    self.yrAddEventButton.frame = CGRectMake(self.yrAddEventButton.frame.origin.x, add_event_origin_y-scrollView.contentOffset.y, self.yrAddEventButton.frame.size.width, self.yrAddEventButton.frame.size.height);
+    
     self.yrAddButton.frame = CGRectMake(self.yrAddButton.frame.origin.x, add_origin_y-scrollView.contentOffset.y, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height);
-    //self.yrRemoveButton.frame = CGRectMake(self.yrRemoveButton.frame.origin.x, remove_origin_y-scrollView.contentOffset.y, self.yrRemoveButton.frame.size.width, self.yrRemoveButton.frame.size.height);
     
     self.yrAddFormButton.frame = CGRectMake(self.yrAddFormButton.frame.origin.x, add_form_origin_y-scrollView.contentOffset.y, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height);
-    
-    //self.yrRemoveFormButton.frame = CGRectMake(self.yrRemoveFormButton.frame.origin.x, remove_form_origin_y-scrollView.contentOffset.y, self.yrRemoveFormButton.frame.size.width, self.yrRemoveFormButton.frame.size.height);
     
     if (add_form_origin_y-scrollView.contentOffset.y < self.interviewerList.frame.origin.y) {
         self.yrAddFormButton.hidden = YES;
@@ -1058,6 +1741,14 @@
     {
         self.yrAddButton.hidden = NO;
         //self.yrRemoveButton.hidden = NO;
+    }
+    
+    if (add_event_origin_y-scrollView.contentOffset.y < self.interviewerList.frame.origin.y) {
+        self.yrAddEventButton.hidden = YES;
+    }
+    else
+    {
+        self.yrAddEventButton.hidden = NO;
     }
 }
 
@@ -1086,6 +1777,20 @@
     
     // Remove the mail view
     [self.yrMailViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - YREventDataCellDelegate
+
+-(void)showInfoData:(NSIndexPath*)indexPath
+{
+    //show the form
+    modifyModeON = YES;
+    [self addEventFunction];
+    self.eventCode.text = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventCode];
+    self.eventName.text = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventName];
+    self.eventAddress.text = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventAddress];
+    
+    [self.eventCode setUserInteractionEnabled:NO];
 }
 
 @end
