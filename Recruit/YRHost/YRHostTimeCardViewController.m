@@ -72,23 +72,35 @@
         self.dateLabel.textAlignment = NSTextAlignmentCenter;
         
         self.leftArrow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [self.leftArrow setFrame:CGRectMake(0, 0, 100, 30)];
-        [self.leftArrow setTitle:@"previous" forState:UIControlStateNormal];
-        [self.leftArrow setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.leftArrow.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
-        self.leftArrow.center = CGPointMake(self.view.center.x-150, 40);
+        [self.leftArrow setFrame:CGRectMake(0, 0, 50, 30)];
+        [self.leftArrow setTintColor:[UIColor whiteColor]];
+        [self.leftArrow setImage:[UIImage imageNamed:@"right.png"] forState:UIControlStateNormal];
+        self.leftArrow.center = CGPointMake(self.view.center.x-120, 45);
         
         self.rightArrow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [self.rightArrow setFrame:CGRectMake(0, 0, 100, 30)];
-        [self.rightArrow setTitle:@"next" forState:UIControlStateNormal];
-        [self.rightArrow setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.rightArrow.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
-        self.rightArrow.center = CGPointMake(self.view.center.x+150, 40);
-        
+        [self.rightArrow setFrame:CGRectMake(0, 0, 50, 30)];
+        [self.rightArrow setTintColor:[UIColor whiteColor]];
+        [self.rightArrow setImage:[UIImage imageNamed:@"left.png"] forState:UIControlStateNormal];
+        self.rightArrow.center = CGPointMake(self.view.center.x+120, 45);
     }
     else
     {
+        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.view.center.x-75, 25, 150, 20)];
+        self.dateLabel.textColor = [UIColor whiteColor];
+        self.dateLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
+        self.dateLabel.textAlignment = NSTextAlignmentCenter;
         
+        self.leftArrow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.leftArrow setFrame:CGRectMake(0, 0, 30, 20)];
+        [self.leftArrow setTintColor:[UIColor whiteColor]];
+        [self.leftArrow setImage:[UIImage imageNamed:@"right.png"] forState:UIControlStateNormal];
+        self.leftArrow.center = CGPointMake(self.view.center.x-70, 35);
+        
+        self.rightArrow = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [self.rightArrow setFrame:CGRectMake(0, 0, 30, 20)];
+        [self.rightArrow setTintColor:[UIColor whiteColor]];
+        [self.rightArrow setImage:[UIImage imageNamed:@"left.png"] forState:UIControlStateNormal];
+        self.rightArrow.center = CGPointMake(self.view.center.x+70, 35);
     }
     
     [self.leftArrow addTarget:self action:@selector(previousPage) forControlEvents:UIControlEventTouchUpInside];
@@ -194,11 +206,19 @@
 
     
     for (int i=0; i<[self.yrColumNumber intValue]; i++) {
-        UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake([self.toLeft intValue]+i*([self.cardWidth intValue]+5), [self.toTop intValue] - 40, [self.cardWidth intValue], 30)];
+        UILabel *nameLabel;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            nameLabel = [[UILabel alloc] initWithFrame:CGRectMake([self.toLeft intValue]+i*([self.cardWidth intValue]+5), [self.toTop intValue] - 40, [self.cardWidth intValue], 30)];
+        }
+        else
+        {
+            nameLabel = [[UILabel alloc] initWithFrame:CGRectMake([self.toLeft intValue]+i*([self.cardWidth intValue]+5), [self.toTop intValue] - 20, [self.cardWidth intValue], 20)];
+        }
+        
         
         [nameLabel setText:[NSString stringWithFormat:@"Room %d",i+1]];
         nameLabel.textColor = [UIColor whiteColor];
-        nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
+        nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             nameLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
         }

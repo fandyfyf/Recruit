@@ -50,7 +50,27 @@
         }
         else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
         {
+            self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 20, 100, 300)];
+            self.datePicker.datePickerMode = UIDatePickerModeDate;
+            self.numberPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(50, 180, 200, 300)];
             
+            startDateTitle = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 100, 20)];
+            startDateTitle.textColor = [UIColor purpleColor];
+            startDateTitle.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+            startDateTitle.text = @"Start Date";
+            startDateTitle.textAlignment = NSTextAlignmentLeft;
+            
+            numberOfDaysTitle = [[UILabel alloc] initWithFrame:CGRectMake(20, 230, 50, 20)];
+            numberOfDaysTitle.textColor = [UIColor purpleColor];
+            numberOfDaysTitle.font = [UIFont fontWithName:@"Helvetica-Bold" size:15];
+            numberOfDaysTitle.text = @"Days";
+            numberOfDaysTitle.textAlignment = NSTextAlignmentLeft;
+            
+            cancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+            doneButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+            
+            [cancelButton setFrame:CGRectMake(20, 400, 100, 40)];
+            [doneButton setFrame:CGRectMake(self.frame.size.width-120, 400, 100, 40)];
         }
         
         self.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0];

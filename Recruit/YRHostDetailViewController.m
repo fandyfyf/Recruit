@@ -598,7 +598,7 @@
 -(void)email
 {
     if ([MFMailComposeViewController canSendMail]) {
-        NSString *emailTitle = [NSString stringWithFormat:@"Yahoo is Interested in Speaking with You! - %@",[[self.appDelegate emailGenerator] generateEmail:@"{studentFirstName} {studentLastName}"][@"message"]];
+        //NSString *emailTitle = [NSString stringWithFormat:@"Yahoo is Interested in Speaking with You! - %@",[[self.appDelegate emailGenerator] generateEmail:@"{studentFirstName} {studentLastName}"][@"message"]];
         //NSString *messageBody = @"Message goes here!";
         
         NSDictionary* result = [[self.appDelegate emailGenerator] generateEmail:[self.formList[currentSelectedEmailForm] allValues][0]];
@@ -607,7 +607,9 @@
         
         self.yrMailViewController = [[MFMailComposeViewController alloc] init];
         self.yrMailViewController.mailComposeDelegate = self;
-        [self.yrMailViewController setSubject:emailTitle];
+        
+        [self.yrMailViewController setSubject:result[@"subject"]];
+        
         [self.yrMailViewController setMessageBody:result[@"message"] isHTML:NO];
         [self.yrMailViewController setToRecipients:toRecipents];
         
@@ -1374,7 +1376,8 @@
         currentSelectedEmailForm = indexPath.row;
         //if (indexPath.row == 0) {
             //default now
-            [self email];
+        [self email];
+        [self.popOver dismissPopoverAnimated:YES];
         //}
     }
     else if (tableView == self.resumeOptionTable)

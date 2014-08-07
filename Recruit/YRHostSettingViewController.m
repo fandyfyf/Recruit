@@ -37,6 +37,7 @@
 -(void)doneWithInterviewFields;
 
 -(void)showDatePicker;
+-(void)showAddressInfo;
 
 @end
 
@@ -87,7 +88,7 @@
     
     self.interviewStartDate.text = [format stringFromDate:(NSDate*)[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey]];
     
-    self.interviewEndDate.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleNumberOfDayKey]];
+    self.interviewEndDate.text = [NSString stringWithFormat:@"%d",[[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleNumberOfDayKey] intValue]];
     
     self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showDatePicker)];
     
@@ -104,7 +105,7 @@
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
-        self.datePickerView = [[YRDatePickerView alloc] initWithFrame:CGRectMake(0, 30, self.view.frame.size.width/2, 200)];
+        self.datePickerView = [[YRDatePickerView alloc] initWithFrame:CGRectMake(0, 30, self.view.frame.size.width, 450)];
         [[self.datePickerView layer] setCornerRadius:5];
     }
     
@@ -439,6 +440,7 @@
     UIButton* cancelButton;
     UIButton* saveButton;
     
+    UIButton* addressInfoButton;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         //rotation needs update setting
@@ -492,6 +494,10 @@
         eventAddressLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 170, 80, 30)];
         [eventAddressLabel setText:@"Address:"];
         [eventAddressLabel setTextAlignment:NSTextAlignmentRight];
+        
+        addressInfoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+        [addressInfoButton setFrame:CGRectMake(390, 175, 20, 20)];
+        [addressInfoButton addTarget:self action:@selector(showAddressInfo) forControlEvents:UIControlEventTouchUpInside];
         
         cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         cancelButton.frame = CGRectMake(40, 250, 100, 40);
@@ -604,6 +610,7 @@
     [self.yrCardView addSubview:eventNameLabel];
     [self.yrCardView addSubview:eventAddressLabel];
     [self.yrCardView addSubview:titleLabel];
+    [self.yrCardView addSubview:addressInfoButton];
     self.yrCardView.alpha = 0.0;
     
     [self.view addSubview:self.yrCardView];
@@ -1119,6 +1126,12 @@
         self.grayView.alpha = 0.4;
         self.datePickerView.alpha = 1.0;
     }];
+}
+
+-(void)showAddressInfo
+{
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Address" message:@"Please put down the address of where the interview will take place" delegate:nil cancelButtonTitle:@"Gotcha" otherButtonTitles:nil, nil];
+    [alertView show];
 }
 
 #pragma mark - AutoSuggestDelegate
