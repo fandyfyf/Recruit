@@ -12,12 +12,13 @@
 
 @interface YRClientConnectionViewController : UIViewController <MCBrowserViewControllerDelegate, UITableViewDataSource, UITableViewDelegate,MCNearbyServiceBrowserDelegate>
 
-@property (strong, nonatomic) NSString* clientUserName;
-@property (weak, nonatomic) IBOutlet UILabel *yrnameLabel;
 
+@property (weak, nonatomic) IBOutlet UILabel *yrnameLabel;
 @property (weak, nonatomic) IBOutlet UITableView *yrtableView;
 @property (weak, nonatomic) IBOutlet UIButton *yrdisconnectButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrbrowseButton;
+
+@property (strong, nonatomic) NSString* clientUserName;
 @property (strong, nonatomic) NSMutableString *yrIDCode;
 
 @property (strong, nonatomic) UIView * yrNameListView;
@@ -28,7 +29,6 @@
 
 - (IBAction)browseForDevices:(id)sender;
 - (IBAction)disconnectConnection:(id)sender;
-
 - (IBAction)signOut:(id)sender;
 
 @end

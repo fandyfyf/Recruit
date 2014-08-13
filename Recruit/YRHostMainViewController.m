@@ -217,7 +217,7 @@
     }
     else
     {
-        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event code is empty" message:@"Please select an event code from the pull down menu. Or go to setting page to add new event" delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event code is empty" message:@"Please select an event code from the pull down menu. Or go to setting page to add new event" delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alertView show];
     }
 }
@@ -274,6 +274,9 @@
                     }
                 }
                 [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
+                
+                [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
             }
         }
         
@@ -301,6 +304,10 @@
             break;
         }
     }
+    
+    //remember the connected
+    [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     //update table here!!
     [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
@@ -341,7 +348,7 @@
     self.eventArray = [self fetchEventList];
     
     if (self.eventArray == nil || [self.eventArray count] == 0) {
-        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"No Existing Event" message:@"Please go to setting to create a new event." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"No Existing Event" message:@"Please go to setting to create a new event." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alertView show];
     }
     else
@@ -473,7 +480,7 @@
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         
         if ([[(Event*)[self.eventArray objectAtIndex:indexPath.row] eventInterviewerCount] intValue] == 0) {
-            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Selected Event has no Interviewer" message:@"Please go to setting page to add interviewers to the current event" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Selected Event has no Interviewer" message:@"Please go to setting page to add interviewers to the current event" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alertView show];
         }
         else

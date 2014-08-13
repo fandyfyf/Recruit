@@ -42,6 +42,8 @@
         [[self.yrSignInButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
     }
     
+    [self.yrsegmentedControl setSelectedSegmentIndex:1];
+    
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
     
     doneToolbar.items = [NSArray arrayWithObjects:
@@ -66,7 +68,7 @@
 - (IBAction)signIn:(id)sender {
     
     if ([self.yrtextField.text length] == 0) {
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Username shouldn't be empty" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Username shouldn't be empty" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
     }
     else

@@ -13,7 +13,6 @@
 
 @interface YRFormViewController ()
 
-
 -(BOOL)checkReady;
 -(void)needUpdateCodeNotification:(NSNotification *)notification;
 -(void)reconnectNotification:(NSNotification *)notification;
@@ -107,13 +106,13 @@
 
 - (IBAction)sendInformation:(id)sender {
     if ([self checkReady]) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:nil delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Flag!", nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:@"Please write down the resume ID on the back of resume!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Flag!", nil];
         [alert show];
     }
     else
     {
         //wait until GPA is filled out
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please enter GPA!" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please enter GPA!" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
     }
 }
@@ -212,7 +211,6 @@
 
 -(void)debriefingModeOffNotification:(NSNotification *)notification
 {
-    //[self.debriefingViewController dismissViewControllerAnimated:YES completion:nil];
     [self.debriefingViewController.view removeFromSuperview];
     [[NSNotificationCenter defaultCenter] removeObserver:self.debriefingViewController];
     self.debriefingViewController = nil;
@@ -285,7 +283,7 @@
 -(void)removeListView
 {
     [self.yrNameListView removeFromSuperview];
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alert show];
     //[self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
 }
@@ -391,10 +389,6 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"nameListCell"];
     }
     
-    //        Interviewer* current = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row];
-    //
-    //        cell.textLabel.text = current.name;
-    //        cell.detailTextLabel.text = current.email;
     NSDictionary* current = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row];
     
     cell.textLabel.text = current[@"name"];

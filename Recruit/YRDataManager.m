@@ -331,7 +331,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
         {
             //receive debrief invitation
             NSLog(@"receiving debrief termination");
-            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Termination" message:@"The host is closing the session" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Termination" message:@"The host is closing the session" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
@@ -655,9 +655,24 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
 
     NSMutableArray* currentList = [NSMutableArray new];
     
+    NSArray* connectedList = [[NSUserDefaults standardUserDefaults] objectForKey:@"connectedList"];
+    
     for (Interviewer* curr in FetchResults) {
-        NSDictionary * dic = @{@"name" : curr.name, @"email" : curr.email};
-        [currentList addObject:dic];
+        BOOL check = NO;
+        for (NSDictionary* connected in connectedList){
+            if ([connected[@"confirmedName"] isEqualToString:curr.name]) {
+                check = YES;
+                break;
+            }
+        }
+        if (check) {
+            continue;
+        }
+        else
+        {
+            NSDictionary * dic = @{@"name" : curr.name, @"email" : curr.email};
+            [currentList addObject:dic];
+        }
     }
     
     NSDictionary* dic = @{@"msg" : @"nameList", @"data" : currentList};

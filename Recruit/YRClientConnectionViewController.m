@@ -258,7 +258,7 @@
 -(void)removeListView
 {
     [self.yrNameListView removeFromSuperview];
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alert show];
     [self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
 }

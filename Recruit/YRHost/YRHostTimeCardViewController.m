@@ -366,7 +366,7 @@
         
         //there is an appointment existing in that index
         if ([FetchResults count] != 0) {
-            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"The slot is taken." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"The slot is taken." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
         }
         else
@@ -421,7 +421,7 @@
                 else
                 {
                     NSLog(@"There is a conflict with candidate");
-                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[FetchResults objectAtIndex:0] firstName],[(CandidateEntry*)[FetchResults objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[FetchResults objectAtIndex:0] firstName],[(CandidateEntry*)[FetchResults objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                     [alert show];
                 }
             }
@@ -522,7 +522,7 @@
     self.passedInRid = notification.object[@"code"];
     self.passedInName = notification.object[@"name"];
     
-    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Please select a slot!" message:[NSString stringWithFormat:@"Please select a slot for\n %@.",self.passedInName] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Please select a slot!" message:[NSString stringWithFormat:@"Please select a slot for\n %@.",self.passedInName] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alertView show];
 }
 

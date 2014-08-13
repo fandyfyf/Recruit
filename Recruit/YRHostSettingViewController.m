@@ -677,7 +677,7 @@
 -(void)yrCardViewSave
 {
     if (self.interviewerName.text.length == 0 || self.interviewerEmail.text.length == 0 || self.interviewerCode.text.length == 0) {
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"name/email/code shouldn't be empty" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"name/email/code shouldn't be empty" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
     }
     else
@@ -701,7 +701,7 @@
             
             if ([result count] != 0) {
                 //already exist
-                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Interviewer existed" message:@"The Interviewer is already attending the event." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Interviewer existed" message:@"The Interviewer is already attending the event." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                 [alertView show];
             }
             else
@@ -726,7 +726,7 @@
                     NSLog(@"ERROR -- saving coredata");
                 }
                 
-                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"New Interviewer Created" message:[NSString stringWithFormat:@"\"%@\" has been added to Event: \"%@\"",item.name,selectedEvent.eventName] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"New Interviewer Created" message:[NSString stringWithFormat:@"\"%@\" has been added to Event: \"%@\"",item.name,selectedEvent.eventName] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                 [alertView show];
                 
                 
@@ -769,7 +769,7 @@
         else
         {
             //event is not existing in the list
-            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event doesn't exist." message:[NSString stringWithFormat:@"Event \"%@\" doesn't exist, please double check the spelling or create it first.",self.interviewerCode.text] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event doesn't exist." message:[NSString stringWithFormat:@"Event \"%@\" doesn't exist, please double check the spelling or create it first.",self.interviewerCode.text] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alertView show];
         }
     }
@@ -781,7 +781,7 @@
         //modify
         modifyModeON = NO;
         if (self.eventName.text.length == 0) {
-            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"name shouldn't be empty" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"name shouldn't be empty" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
         }
         else
@@ -819,7 +819,7 @@
     else
     {
         if (self.eventCode.text.length == 0 || self.eventName.text.length == 0) {
-            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"code/name shouldn't be empty" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"code/name shouldn't be empty" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
         }
         else
@@ -842,7 +842,7 @@
             
             if (existInData) {
                 //alert
-                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Code existed" message:@"The event code existed." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Code existed" message:@"The event code existed." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                 [alertView show];
             }
             else
@@ -1505,7 +1505,7 @@
                 
                 if ([targetEvent.eventInterviewerCount intValue] > 0) {
                     //prompt can't delete
-                    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"WARNNING" message:@"Please delete all the interviewers first to remove the event." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"WARNNING" message:@"Please delete all the interviewers first to remove the event." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                     [alertView show];
                 }
                 else

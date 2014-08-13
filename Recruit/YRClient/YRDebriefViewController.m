@@ -57,11 +57,11 @@
     
     self.gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(searchMode)];
     [(UISwipeGestureRecognizer*)self.gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionLeft];
-    [self.view addGestureRecognizer:self.gestureRecognizer];
+    //[self.view addGestureRecognizer:self.gestureRecognizer];
     
     self.gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(broadcastMode)];
     [(UISwipeGestureRecognizer*)self.gestureRecognizer setDirection:UISwipeGestureRecognizerDirectionRight];
-    [self.view addGestureRecognizer:self.gestureRecognizer];
+    //[self.view addGestureRecognizer:self.gestureRecognizer];
 
     self.searchModeView = [YRDebriefSearchModeViewController new];
     self.searchModeView.source = self;
@@ -536,7 +536,7 @@
     for(NSString* rid in self.tagList)
     {
         if ([rid isEqualToString:self.currentDataEntry[@"code"]] && !self.Broadcast && ![prevRid isEqualToString:self.currentDataEntry[@"code"]]) {
-            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Attention!" message:@"A tagged candidate is being broadcasted." delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:@"Show me", nil];
+            UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Attention!" message:@"A tagged candidate is being broadcasted." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:@"Show me", nil];
             [alertView show];
         }
     }

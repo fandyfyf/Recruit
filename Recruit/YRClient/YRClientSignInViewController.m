@@ -159,7 +159,7 @@
     }
     else
     {
-        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"fields need to be completed" delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"fields need to be completed" delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
     }
 }
@@ -253,8 +253,6 @@
         [self.yrNameListView addSubview:self.yrNameList];
         [self.yrNameListView addSubview:titleLabel];
         [self.yrNameListView addSubview:cancelButton];
-        //        [[self.yrNameListView layer] setBorderColor:[[UIColor grayColor] CGColor]];
-        //        [[self.yrNameListView layer] setBorderWidth:2];
         self.yrNameListView.backgroundColor = [UIColor purpleColor];
         
         [self.view addSubview:self.yrNameListView];
@@ -271,7 +269,7 @@
 -(void)removeListView
 {
     [self.yrNameListView removeFromSuperview];
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Note" message:@"If you can't find your name on the list, please contact the coordinator soon." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alert show];
     //[self.tabBarController setSelectedViewController:[self.tabBarController.viewControllers objectAtIndex:1]];
 }

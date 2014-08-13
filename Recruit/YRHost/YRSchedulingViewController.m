@@ -479,7 +479,7 @@
                         else
                         {
                             NSLog(@"There is a conflict with interviewer");
-                            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Interviewer %@ has a conflict schedule",[(Interviewer*)[interviewer objectAtIndex:0] name]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Interviewer %@ has a conflict schedule",[(Interviewer*)[interviewer objectAtIndex:0] name]] delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                             [alert show];
                             
                             [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
@@ -501,7 +501,7 @@
                 {
                     NSLog(@"There is a conflict with candidate");
                     
-                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[candidate objectAtIndex:0] firstName],[(CandidateEntry*)[candidate objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[candidate objectAtIndex:0] firstName],[(CandidateEntry*)[candidate objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                     [alert show];
                     
                     [[(YRTimeCardView*)owner codeLabel] setText:@""];
@@ -608,7 +608,7 @@
                     {
                         NSLog(@"There is a conflict with candidate");
                         
-                        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[candidateC objectAtIndex:0] firstName],[(CandidateEntry*)[candidateC objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Candidate %@ has a conflict schedule",[NSString stringWithFormat:@"%@ %@",[(CandidateEntry*)[candidateC objectAtIndex:0] firstName],[(CandidateEntry*)[candidateC objectAtIndex:0] lastName]]] delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                         [alert show];
                         
                         [[(YRTimeCardView*)owner codeLabel] setText:@""];
@@ -659,7 +659,7 @@
                     {
                         NSLog(@"There is a conflict with interviewer");
                         [[(YRTimeCardView*)owner interviewerNameLabel] setText:@""];
-                        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Interviewer %@ has a conflict schedule",[(Interviewer*)[interviewerC objectAtIndex:0] name]] delegate:Nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+                        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat:@"Interviewer %@ has a conflict schedule",[(Interviewer*)[interviewerC objectAtIndex:0] name]] delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
                         [alert show];
                     }
                 }
