@@ -24,8 +24,10 @@ NSString* const kYREmailFormsKey = @"emailForms";
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    //create the mcManager at application launch
     self.mcManager = [YRMCManager new];
+    
+    // Room configuration initialization
     if([[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleColumsKey] == nil)
     {
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:3] forKey:kYRScheduleColumsKey];
@@ -34,17 +36,22 @@ NSString* const kYREmailFormsKey = @"emailForms";
         [[NSUserDefaults standardUserDefaults] setValue:[NSDate date] forKey:kYRScheduleStartDateKey];
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:1] forKey:kYRScheduleNumberOfDayKey];
     }
-    NSArray* dic = @[@{@"studentRid" : @"{studentRid}"},
-                     @{@"studentFirstName" : @"{studentFirstName}"},
-                     @{@"studentLastName" : @"{studentLastName}"},
-                     @{@"studentEmail" : @"{studentEmail}"},
-                     @{@"appointments" : @"{appointments}"},
-                     @{@"appLink" : @"{applicationLink}"},
-                     @{@"interviewDuration" : @"{interviewDuration}"},
-                     @{@"resume" : @"{resume}"}
-                          ];
-    [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailKeyWordsKey];
     
+    //set up email keyword list
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:kYREmailKeyWordsKey] == nil) {
+        NSArray* dic = @[@{@"studentRid" : @"{studentRid}"},
+                         @{@"studentFirstName" : @"{studentFirstName}"},
+                         @{@"studentLastName" : @"{studentLastName}"},
+                         @{@"studentEmail" : @"{studentEmail}"},
+                         @{@"appointments" : @"{appointments}"},
+                         @{@"appLink" : @"{applicationLink}"},
+                         @{@"interviewDuration" : @"{interviewDuration}"},
+                         @{@"resume" : @"{resume}"}];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailKeyWordsKey];
+    }
+    
+    //set up email template list
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] == nil) {
         NSArray* dic = @[@{@"Apply Online": @"<subject:Yahoo is Interested in Speaking with You! - {studentFirstName} {studentLastName}>\nHi {studentFirstName}!\n\nIt was great meeting you at today's career fair!\n\nWe are excited that you are interested in opportunities with Yahoo. To be considered further, you must apply online via the following link within 48 hours: {applicationLink}\n\nWe look forward to your application and speaking with you again in the future.\n\nYahoo Campus Recruiting"},
                          @{@"Invitation" : @"<subject:Yahoo is Interested in Speaking with You! - {studentFirstName} {studentLastName}>\nHi {studentFirstName},\n\nWe have received your resume and we are impressed with your qualifications! Yahoo is interested in speaking with you about internship opportunities for 2014.\n\nWe'd like to set up sometime for you to chat over the phone with one of the members of our hiring team.\n\nIt'd be my pleasure to assist you with setting up this initial phone interview. Please reply back to me within 48 hours, with the following information:\n\n   -   Your availability(in PST) for 2 weeks\n   -   The best phone number to reach you\n   -   Current Resume-make sure GPA is noted\n\nOnce I have your availability, I'll confirm the logistics and email you the final details. If by chance you're not interested in pursuing this opportunity please let me know so we can proceed accordingly. Please note, Yahoo is an E-verify employer.\n\nTo learn more about our campus recruiting schedule, job opportunities and what it's like to work at Yahoo follow our Facebook fan page at https://www.facebook.com/YahooUniversityRecruiting?ref=sgm\n\nI look forward to hearing back from you!\n\nBest regards,\n\nSignature"},
@@ -53,10 +60,11 @@ NSString* const kYREmailFormsKey = @"emailForms";
         [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailFormsKey];
     }
     
+    //save all the setting
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    //create email generater
     self.emailGenerator = [[YREmailGenerator alloc] init];
-    
     return YES;
 }
 

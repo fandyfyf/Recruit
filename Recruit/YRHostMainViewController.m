@@ -31,39 +31,35 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    //self.hostUserName = [self.source valueForKey:@"userName"];
-    self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
-    self.managedObjectContext = [self.appDelegate managedObjectContext];
-    
-    self.hostUserName = self.appDelegate.mcManager.userName;
-    NSLog(@"Hello: %@ as a Host",self.hostUserName);
-    
-    [self debuggerFunction];
-    
-    [self.yrnameLabel setText:self.hostUserName];
-    //self.yrnameLabel.textAlignment = NSTextAlignmentCenter;
-    
-    
-    self.yrPrefix = [NSString new];
-    //set up session with host username
-    [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:self.hostUserName];
-    [[self.appDelegate mcManager] setHost:YES];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:kYRDataManagerNeedUpdateTableNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateConnectionListNotification:) name:kYRDataManagerNeedUpdateConnectionListNotification object:nil];
     
-    
-    
+    //initialization
+    self.yrPrefix = [[NSString alloc] init];
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
+    
+    //property set up
+    self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
+    self.managedObjectContext = [self.appDelegate managedObjectContext];
+    self.hostUserName = self.appDelegate.mcManager.userName;
+    NSLog(@"Hello: %@ as a Host",self.hostUserName);
+    
+    [self debuggerFunction];
+    [self.yrnameLabel setText:self.hostUserName];
+    
+    //set up session with host username
+    [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:self.hostUserName];
+    [[self.appDelegate mcManager] setHost:YES];
+    
     [self.yrtableView setDelegate:self];
     [self.yrtableView setDataSource:self];
     [self.yrPrefixTextField setDelegate:self];
     
-    //advertise
-    //[[self.appDelegate mcManager] advertiseSelf:self.yrVisibilityControl.isOn];
     //disable brower button
     [self.yrbrowseButton setEnabled:NO];
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrSignOutButton layer] setCornerRadius:35];
         [[self.yrSignOutButton layer] setBorderColor:[[UIColor lightGrayColor] CGColor]];
@@ -76,15 +72,15 @@
         [[self.yrSignOutButton layer] setBorderWidth:2];
     }
     
-    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 50)];
     
     doneToolbar.items = [NSArray arrayWithObjects:
                          //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
                          [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],
-                         nil];
+                         [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],nil];
     self.yrPrefixTextField.inputAccessoryView = doneToolbar;
     
+    //tap gesture recognizer
     UITapGestureRecognizer* gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showEventCode)];
     [self.yrPrefixTextField addGestureRecognizer:gestureRecognizer];
 }
@@ -176,7 +172,6 @@
         [[NSUserDefaults standardUserDefaults] setValue:self.yrPrefix forKey:@"eventCode"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
-        
         if (self.yrOnOffControl.selectedSegmentIndex == 1) {
             NSLog(@"On");
             if (self.yrPrefixTextField.isEnabled) {
@@ -217,8 +212,10 @@
     }
     else
     {
-        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event code is empty" message:@"Please select an event code from the pull down menu. Or go to setting page to add new event" delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Event code is empty" message:@"Please select an event code from the pull down menu. Or go to setting page to add new event" delegate:Nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [alertView show];
+        //reset the control
+        [self.yrOnOffControl setSelectedSegmentIndex:0];
     }
 }
 
@@ -326,14 +323,6 @@
     
     NSError* error = nil;
     NSArray* fetchResults = [self.managedObjectContext executeFetchRequest:request error:&error];
-    
-//    NSMutableArray* eventList = [NSMutableArray new];
-//    
-//    for (Event* event in fetchResults)
-//    {
-//        [eventList addObject:event.eventCode];
-//    }
-//    return [NSArray arrayWithArray:eventList];
     return fetchResults;
 }
 

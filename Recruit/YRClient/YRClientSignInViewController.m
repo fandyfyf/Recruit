@@ -52,13 +52,11 @@
     
     //Listen to notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:kYRDataManagerNeedUpdateCodeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:kYRDataManagerNeedPromptNameListNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
@@ -541,12 +539,17 @@
     if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Yes"]) {
         [[self.appDelegate mcManager].session disconnect];
         [self.appDelegate mcManager].session = nil;
+        [[self.appDelegate mcManager].autoBrowser stopBrowsingForPeers];
+        [self.appDelegate mcManager].autoBrowser = nil;
+        
+        self.yrIDCode = nil;
         [self.yrarrayConnectedDevices removeAllObjects];
+        self.yrarrayConnectedDevices = nil;
         
-        [self.appDelegate.dataManager stopListeningForData];
-        
+        //stop listening to notifications
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         
+        [self.appDelegate.dataManager stopListeningForData];
         [self.appDelegate setDataManager:nil];
         
         [self dismissViewControllerAnimated:YES completion:nil];
