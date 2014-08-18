@@ -31,8 +31,34 @@
             
             [cancelButton setFrame:CGRectMake(20, 250, 100, 40)];
             [doneButton setFrame:CGRectMake(self.frame.size.width-120, 250, 100, 40)];
-            
         }
+        
+//        self.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0];
+//        [self addSubview:self.datePicker];
+//        
+//        self.numberPicker.delegate = self;
+//        self.numberPicker.dataSource = self;
+//        
+//        [self addSubview:self.numberPicker];
+//        [self addSubview:startDateTitle];
+//        [self addSubview:numberOfDaysTitle];
+//        
+//        [cancelButton setTintColor:[UIColor purpleColor]];
+//        [cancelButton addTarget:self action:@selector(cancelDetail) forControlEvents:UIControlEventTouchUpInside];
+//        [cancelButton.titleLabel setTextAlignment:NSTextAlignmentLeft];
+//        [[cancelButton layer] setCornerRadius:10];
+//        [[cancelButton layer] setBorderColor:[[UIColor purpleColor] CGColor]];
+//        [[cancelButton layer] setBorderWidth:1];
+//        [self addSubview:cancelButton];
+//        
+//        [doneButton setTintColor:[UIColor purpleColor]];
+//        [doneButton addTarget:self action:@selector(saveDetail) forControlEvents:UIControlEventTouchUpInside];
+//        [doneButton.titleLabel setTextAlignment:NSTextAlignmentRight];
+//        [[doneButton layer] setCornerRadius:10];
+//        [[doneButton layer] setBorderColor:[[UIColor purpleColor] CGColor]];
+//        [[doneButton layer] setBorderWidth:1];
+//        
+//        [self addSubview:doneButton];
 
     }
     return self;
