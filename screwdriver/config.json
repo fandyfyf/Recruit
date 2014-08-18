@@ -7,7 +7,7 @@
 		"xcode_version": "5",
 		"coverage_type": "none",
 		"workspace": "Recruit.xcworkspace",
-		"scheme": "Recruit",
+		"scheme": "RecruitDogfood",
 		"sdk": "iphoneos7.0",
 		"build": {
 			"test": {
