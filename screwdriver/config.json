@@ -6,6 +6,7 @@
 		"app": "com.yahoo.Recruit",
 		"xcode_version": "5",
 		"coverage_type": "none",
+		"workspace": "Recruit.xcworkspace",
 		"scheme": "Recruit",
 		"sdk": "iphoneos7.0",
 		"build": {
