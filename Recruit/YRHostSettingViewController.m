@@ -39,6 +39,8 @@
 -(void)showDatePicker;
 -(void)showAddressInfo;
 
+-(void)showYdatePicker;
+
 @end
 
 @implementation YRHostSettingViewController
@@ -120,11 +122,20 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         self.datePickerView = [[YRDatePickerView alloc] initWithFrame:CGRectMake(0, 50, self.view.frame.size.width/2+50, 300)];
         [[self.datePickerView layer] setCornerRadius:10];
+        
+        //ydaypicker
+        self.yDayPickerView = [[YRYDayPickerView alloc] initWithFrame:CGRectMake(0, 600, self.view.frame.size.width, 300)];
+        [[self.yDayPickerView layer] setCornerRadius:10];
+        
+        self.yDayPickerView.delegate = self;
+
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
         self.datePickerView = [[YRDatePickerView alloc] initWithFrame:CGRectMake(0, 30, self.view.frame.size.width, 450)];
         [[self.datePickerView layer] setCornerRadius:5];
+        
+        //ydaypicker
     }
     
     [self fetchEventInfo];
@@ -1122,6 +1133,8 @@
     }
 }
 
+#pragma mark - OnCampusInterviewDatePicker
+
 -(void)showDatePicker
 {
     //need implement
@@ -1151,6 +1164,28 @@
 {
     UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Address" message:@"Please put down the address of where the interview will take place" delegate:nil cancelButtonTitle:@"Gotcha" otherButtonTitles:nil, nil];
     [alertView show];
+}
+
+#pragma mark - OnSiteInterviewDatePicker
+
+-(void)showYdatePicker
+{
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
+    self.yDayPickerView.alpha = 0.0;
+    
+    self.yDayPickerView.grayView = self.grayView;
+    
+    self.yDayPickerView.datePicker.date = [NSDate date];
+    
+    [self.view addSubview:self.grayView];
+    [self.view addSubview:self.yDayPickerView];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.grayView.alpha = 0.4;
+        self.yDayPickerView.alpha = 1.0;
+    }];
 }
 
 #pragma mark - AutoSuggestDelegate
@@ -1379,7 +1414,7 @@
             else
             {
                 cell.formNameLabel.textColor = [UIColor darkGrayColor];
-                cell.formNameLabel.text = [NSString stringWithFormat:@"day%d",indexPath.row+1];
+                cell.formNameLabel.text = [self.YdayList objectAtIndex:indexPath.row];
                 //cell.formDetailLabel.text = [[[self.formList[indexPath.row] allValues] firstObject] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
             }
             
@@ -1534,6 +1569,12 @@
                 add_form_origin_y = self.yrAddFormButton.frame.origin.y;
                 remove_form_origin_y = self.yrRemoveFormButton.frame.origin.y;
                 add_event_origin_y = self.yrAddEventButton.frame.origin.y;
+            }
+        }
+        else if (indexPath.section == 3)
+        {
+            if (indexPath.row == [self.YdayList count]) {
+                [self showYdatePicker];
             }
         }
         if (indexPath.section != 0) {
@@ -1699,6 +1740,20 @@
             else
             {
                 //remove from Yday list
+                if (indexPath.row != [self.YdayList count]) {
+                    [self.YdayList removeObjectAtIndex:indexPath.row];
+                    
+                    [[NSUserDefaults standardUserDefaults] setObject:self.YdayList forKey:@"YdayList"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    
+                    [tableView beginUpdates];
+                    
+                    
+                    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                    
+                    
+                    [tableView endUpdates];
+                }
             }
         }
     }
@@ -1865,6 +1920,13 @@
     self.eventAddress.text = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventAddress];
     
     [self.eventCode setUserInteractionEnabled:NO];
+}
+
+#pragma mark - YRYDayPickerViewDelegate
+
+-(void)reloadYDayList
+{
+    [self.interviewerList performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 }
 
 @end

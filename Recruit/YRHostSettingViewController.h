@@ -11,10 +11,11 @@
 #import <MessageUI/MFMailComposeViewController.h>
 #import "YREventDataCell.h"
 #import "YRDatePickerView.h"
+#import "YRYDayPickerView.h"
 
 @class AutoSuggestTextField;
 
-@interface YRHostSettingViewController : UIViewController <AutoSuggestTextFieldDelegate, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate, UITextViewDelegate,MFMailComposeViewControllerDelegate, YREventDataCellDelegate>
+@interface YRHostSettingViewController : UIViewController <AutoSuggestTextFieldDelegate, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate, UITextViewDelegate,MFMailComposeViewControllerDelegate, YREventDataCellDelegate,YRYDayPickerViewDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *userNameTextField;
 @property (weak, nonatomic) IBOutlet AutoSuggestTextField *emailTextField;
 @property (weak, nonatomic) IBOutlet UITableView *interviewerList;
@@ -46,6 +47,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *interviewEndDate;
 @property (strong, nonatomic) UITapGestureRecognizer* tapGestureRecognizer;
 @property (strong, nonatomic) YRDatePickerView* datePickerView;
+@property (strong, nonatomic) YRYDayPickerView* yDayPickerView;
 
 //addButtons, remove buttons are not used
 @property (weak, nonatomic) IBOutlet UIButton *yrRemoveButton;

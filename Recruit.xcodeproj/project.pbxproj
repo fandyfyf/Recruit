@@ -33,8 +33,8 @@
 		D290360A19A256AF007D354B /* upload1.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360919A256AF007D354B /* upload1.png */; };
 		D290360C19A258B4007D354B /* upload2.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360B19A258B4007D354B /* upload2.png */; };
 		D290360F19A28E47007D354B /* YRYDayPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = D290360E19A28E47007D354B /* YRYDayPickerView.m */; };
+		D290361319A2B392007D354B /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
-		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
 		D2B2CAAB1987F2A70078C5B3 /* YRFormDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D2B2CAAA1987F2A70078C5B3 /* YRFormDataCell.m */; };
 		D2B2CAAD19885B490078C5B3 /* Edit-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D2B2CAAC19885B490078C5B3 /* Edit-icon.png */; };
@@ -216,13 +216,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D290361319A2B392007D354B /* Guile.framework in Frameworks */,
 				D2D1E571195F36DF0084D8DA /* QuartzCore.framework in Frameworks */,
 				D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */,
 				D2F818A719489FF8006E88FD /* CoreData.framework in Frameworks */,
 				D2F8185D19465FE5006E88FD /* CoreGraphics.framework in Frameworks */,
 				D2F8185F19465FE5006E88FD /* UIKit.framework in Frameworks */,
 				D2F8185B19465FE5006E88FD /* Foundation.framework in Frameworks */,
-				D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

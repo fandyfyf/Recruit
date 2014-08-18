@@ -8,9 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol YRYDayPickerViewDelegate <NSObject>
+
+@required
+
+-(void)reloadYDayList;
+
+@end
+
 @interface YRYDayPickerView : UIView
 
 @property (strong, nonatomic) UIDatePicker* datePicker;
 @property (weak, nonatomic) UIView* grayView;
+@property (strong, nonatomic) id<YRYDayPickerViewDelegate> delegate;
 
 @end
