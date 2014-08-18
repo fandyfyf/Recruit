@@ -30,6 +30,9 @@
 		D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D25268B81950826800EBE43E /* YRViewerDataCell.m */; };
 		D25E489D198FCCBD0005A466 /* left.png in Resources */ = {isa = PBXBuildFile; fileRef = D25E489C198FCCBD0005A466 /* left.png */; };
 		D25E489F198FCCCA0005A466 /* right.png in Resources */ = {isa = PBXBuildFile; fileRef = D25E489E198FCCCA0005A466 /* right.png */; };
+		D290360A19A256AF007D354B /* upload1.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360919A256AF007D354B /* upload1.png */; };
+		D290360C19A258B4007D354B /* upload2.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360B19A258B4007D354B /* upload2.png */; };
+		D290360F19A28E47007D354B /* YRYDayPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = D290360E19A28E47007D354B /* YRYDayPickerView.m */; };
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68070194BA00F0091B768 /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
@@ -130,6 +133,10 @@
 		D25268B81950826800EBE43E /* YRViewerDataCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRViewerDataCell.m; sourceTree = "<group>"; };
 		D25E489C198FCCBD0005A466 /* left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = left.png; sourceTree = "<group>"; };
 		D25E489E198FCCCA0005A466 /* right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = right.png; sourceTree = "<group>"; };
+		D290360919A256AF007D354B /* upload1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload1.png; sourceTree = "<group>"; };
+		D290360B19A258B4007D354B /* upload2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload2.png; sourceTree = "<group>"; };
+		D290360D19A28E47007D354B /* YRYDayPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRYDayPickerView.h; sourceTree = "<group>"; };
+		D290360E19A28E47007D354B /* YRYDayPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRYDayPickerView.m; sourceTree = "<group>"; };
 		D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostSettingViewController.h; path = Recruit/YRHostSettingViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostSettingViewController.m; path = Recruit/YRHostSettingViewController.m; sourceTree = SOURCE_ROOT; };
 		D2A6806F194BA00F0091B768 /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
@@ -312,6 +319,8 @@
 				D2B8C397197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg */,
 				D2B8C399197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg */,
 				D2B623B7197EAB74006A385B /* upload.png */,
+				D290360919A256AF007D354B /* upload1.png */,
+				D290360B19A258B4007D354B /* upload2.png */,
 				D2B6245C1981617C006A385B /* Recruit_Icon.png */,
 				D2B2CAAC19885B490078C5B3 /* Edit-icon.png */,
 				D25E489C198FCCBD0005A466 /* left.png */,
@@ -404,6 +413,8 @@
 				D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */,
 				D2B80EE3198BDA290058B5DE /* YRDatePickerView.h */,
 				D2B80EE4198BDA290058B5DE /* YRDatePickerView.m */,
+				D290360D19A28E47007D354B /* YRYDayPickerView.h */,
+				D290360E19A28E47007D354B /* YRYDayPickerView.m */,
 				D24341461954FFE4004A31E1 /* YRHostTimeCardViewController.h */,
 				D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */,
 				D24341491959C23C004A31E1 /* YRSchedulingViewController.h */,
@@ -505,6 +516,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D25E489D198FCCBD0005A466 /* left.png in Resources */,
+				D290360C19A258B4007D354B /* upload2.png in Resources */,
 				D2D1E57519611BC90084D8DA /* Columbia_engineering.jpg in Resources */,
 				D251C661196F209A003E86FD /* flag.jpg in Resources */,
 				D2B6245719805232006A385B /* 72x72.png in Resources */,
@@ -528,6 +540,7 @@
 				D2D1E5731960E3370084D8DA /* email.png in Resources */,
 				D2B2CAAD19885B490078C5B3 /* Edit-icon.png in Resources */,
 				D2B8C398197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg in Resources */,
+				D290360A19A256AF007D354B /* upload1.png in Resources */,
 				D251C67119756C61003E86FD /* tag.ico in Resources */,
 				D2B8C39A197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg in Resources */,
 				D2B53141196C994B0019C7D7 /* camera3.png in Resources */,
@@ -565,6 +578,7 @@
 				D2F818B31948E691006E88FD /* YRDataManager.m in Sources */,
 				D2F8186719465FE5006E88FD /* main.m in Sources */,
 				D251C66419704035003E86FD /* YRDebriefViewController.m in Sources */,
+				D290360F19A28E47007D354B /* YRYDayPickerView.m in Sources */,
 				D2F8189119466940006E88FD /* YRHostMainViewController.m in Sources */,
 				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
 				D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */,
@@ -635,6 +649,80 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		D290361019A290B4007D354B /* Wildcard */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = "YBUILD_WILDCARD=1";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Wildcard;
+		};
+		D290361119A290B4007D354B /* Wildcard */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
+				INFOPLIST_FILE = "Recruit/Recruit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Wildcard;
+		};
+		D290361219A290B4007D354B /* Wildcard */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Recruit.app/Recruit";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
+				INFOPLIST_FILE = "RecruitTests/RecruitTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Wildcard;
+		};
 		D2F8188719465FE5006E88FD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -799,6 +887,7 @@
 			buildConfigurations = (
 				D2F8188719465FE5006E88FD /* Debug */,
 				D2F8188819465FE5006E88FD /* Release */,
+				D290361019A290B4007D354B /* Wildcard */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -808,6 +897,7 @@
 			buildConfigurations = (
 				D2F8188A19465FE5006E88FD /* Debug */,
 				D2F8188B19465FE5006E88FD /* Release */,
+				D290361119A290B4007D354B /* Wildcard */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -817,6 +907,7 @@
 			buildConfigurations = (
 				D2F8188D19465FE5006E88FD /* Debug */,
 				D2F8188E19465FE5006E88FD /* Release */,
+				D290361219A290B4007D354B /* Wildcard */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

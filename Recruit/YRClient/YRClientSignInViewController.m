@@ -299,11 +299,15 @@
     
     [self.appDelegate.dataManager stopListeningForData];
     
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
     [self.appDelegate setDataManager:nil];
     
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+-(void)dealloc
+{
+    NSLog(@"deallocating...");
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 -(void)reconnectNotification:(NSNotification *)notification

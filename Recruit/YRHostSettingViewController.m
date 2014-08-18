@@ -58,6 +58,24 @@
     self.interviewerArray = [[NSMutableArray alloc] init];
 }
 
+- (UIImage *)colorImage:(UIImage *)origImage withColor:(UIColor *)color
+{
+    UIGraphicsBeginImageContextWithOptions(origImage.size, YES, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, (CGRect){ {0,0}, origImage.size} );
+    
+    CGAffineTransform flipVertical = CGAffineTransformMake(1, 0, 0, -1, 0, origImage.size.height);
+    CGContextConcatCTM(context, flipVertical);
+    CGContextDrawImage(context, (CGRect){ CGPointMake(0, 0), origImage.size }, [origImage CGImage]);
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -126,8 +144,9 @@
     int interviewCount = [self.interviewerArray count];
     int eventCount = [self.eventArray count];
     
-    //add_event_button not yet used
-    //self.yrAddEventButton.hidden = YES;
+    
+    //set background image fail
+    //[self.uploadButton setBackgroundImage:[self colorImage:[UIImage imageNamed:@"upload2.png"] withColor:[UIColor redColor]] forState:UIControlStateNormal];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrRemoveButton layer] setCornerRadius:20];
@@ -1207,7 +1226,7 @@
     else
     {
         //setting table has three sections
-        return 3;
+        return 4;
     }
 }
 
@@ -1231,9 +1250,13 @@
                 return [NSString stringWithFormat:@"Onsite Interviewers -- %@",self.selectedEventName];
             }
         }
-        else
+        else if (section == 2)
         {
             return @"Email Forms";
+        }
+        else
+        {
+            return @"Ydays";
         }
     }
 }
@@ -1252,7 +1275,7 @@
         else if (section == 1) {
             return [self.interviewerArray count];
         }
-        else
+        else if (section == 2)
         {
             self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
             if (self.formList == nil) {
@@ -1261,6 +1284,18 @@
             else
             {
                 return [self.formList count];
+            }
+        }
+        else
+        {
+            //load Ydays
+            self.YdayList = [[[NSUserDefaults standardUserDefaults] objectForKey:@"YdayList"] mutableCopy];
+            if (self.YdayList == nil) {
+                return 1;//add one
+            }
+            else
+            {
+                return [self.YdayList count]+1;
             }
         }
     }
@@ -1316,6 +1351,19 @@
             cell.yrCodeLabel.text = current.code;
             return cell;
         }
+        else if (indexPath.section == 2)
+        {
+            static NSString* identifier = @"formIdentifier";
+            YRFormDataCell* cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+            if (cell == nil) {
+                cell = [YRFormDataCell new];
+            }
+            cell.formNameLabel.textColor = [UIColor darkGrayColor];
+            cell.formNameLabel.text = [[self.formList[indexPath.row] allKeys] firstObject];
+            cell.formDetailLabel.text = [[[self.formList[indexPath.row] allValues] firstObject] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+            
+            return cell;
+        }
         else
         {
             static NSString* identifier = @"formIdentifier";
@@ -1323,8 +1371,17 @@
             if (cell == nil) {
                 cell = [YRFormDataCell new];
             }
-            cell.formNameLabel.text = [[self.formList[indexPath.row] allKeys] firstObject];
-            cell.formDetailLabel.text = [[[self.formList[indexPath.row] allValues] firstObject] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+            
+            if (indexPath.row == [self.YdayList count]) {
+                cell.formNameLabel.textColor = [UIColor lightGrayColor];
+                cell.formNameLabel.text = @"Click to add a date...";
+            }
+            else
+            {
+                cell.formNameLabel.textColor = [UIColor darkGrayColor];
+                cell.formNameLabel.text = [NSString stringWithFormat:@"day%d",indexPath.row+1];
+                //cell.formDetailLabel.text = [[[self.formList[indexPath.row] allValues] firstObject] stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+            }
             
             return cell;
         }
@@ -1624,7 +1681,7 @@
                     }
                 }
             }
-            else
+            else if(indexPath.section == 2)
             {
                 [self.formList removeObjectAtIndex:indexPath.row];
                 [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
@@ -1638,6 +1695,10 @@
                 
                 
                 [tableView endUpdates];
+            }
+            else
+            {
+                //remove from Yday list
             }
         }
     }

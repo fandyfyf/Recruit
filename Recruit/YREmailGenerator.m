@@ -169,6 +169,7 @@
         else if ([keyword isEqualToString:@"{applicationLink}"])
         {
             //replacelink
+            replacement = @"<a href='www.yahoo.com'>Yahoo!</a>";
         }
         
         if (replacement != nil) {

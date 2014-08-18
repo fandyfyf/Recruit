@@ -610,7 +610,7 @@
         
         [self.yrMailViewController setSubject:result[@"subject"]];
         
-        [self.yrMailViewController setMessageBody:result[@"message"] isHTML:NO];
+        [self.yrMailViewController setMessageBody:result[@"message"] isHTML:YES];
         [self.yrMailViewController setToRecipients:toRecipents];
         
         if (! self.yrFileNameButton.isHidden && [result[@"pdfFlag"] boolValue]) {

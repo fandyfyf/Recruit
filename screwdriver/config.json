@@ -1,0 +1,33 @@
+{
+	"version": 2,
+	"shared": {
+		"notification_email": "yifanfu@yahoo-inc.com",
+		"template": "build",
+		"app": "com.yahoo.Recruit",
+		"xcode_version": "5",
+		"coverage_type": "none",
+		"scheme": "Recruit",
+		"sdk": "iphoneos7.0",
+		"build": {
+			"test": {
+				"task": "fake-test"
+			}
+		}
+	},
+	"jobs": {
+		"component": {
+			"sdk": "iphonesimulator7.0",
+			"triggers": [ "debug", "dogfood" ]
+		},
+		"debug": {
+			"flavor": "debug",
+			"build_number_offset": 100,
+			"configuration": "Debug"
+		},
+		"dogfood": {
+			"build_number_offset": 100,
+			"flavor": "wildcard",
+			"configuration": "Wildcard"
+		}
+	}
+}

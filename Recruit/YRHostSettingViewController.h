@@ -33,6 +33,10 @@
 @property (strong, nonatomic) NSMutableArray* interviewerArray;
 @property (strong, nonatomic) NSMutableArray* formList;
 @property (strong, nonatomic) NSArray* emailKeywordArray;
+@property (strong, nonatomic) NSMutableArray* YdayList;
+
+
+@property (weak, nonatomic) IBOutlet UIButton *uploadButton;
 
 //schedule configuration
 @property (weak, nonatomic) IBOutlet UITextField *interviewStartTime;
