@@ -483,9 +483,6 @@
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Yahoo-inc";
 				TargetAttributes = {
-					D2F8185619465FE5006E88FD = {
-						DevelopmentTeam = 2ARNJY38FW;
-					};
 					D2F8187719465FE5006E88FD = {
 						TestTargetID = D2F8185619465FE5006E88FD;
 					};
