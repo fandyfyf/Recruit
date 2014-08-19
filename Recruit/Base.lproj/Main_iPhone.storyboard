@@ -301,24 +301,29 @@
                                 </segments>
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
                             </segmentedControl>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="xyN-m5-iaP">
+                            <view contentMode="scaleToFill" id="dTc-Io-rYN">
                                 <rect key="frame" x="0.0" y="72" width="320" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                <items>
-                                    <barButtonItem style="plain" id="CO0-Zl-gVP">
-                                        <searchBar key="customView" contentMode="redraw" text="" placeholder="Recruit ID/Name" id="yRk-yR-2yY">
-                                            <rect key="frame" x="16" y="0.0" width="226" height="44"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                            <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no"/>
-                                        </searchBar>
-                                    </barButtonItem>
-                                    <barButtonItem title="Cancel" id="ulO-GO-6D4">
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="ULG-20-3pF">
+                                        <rect key="frame" x="257" y="7" width="48" height="30"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Cancel">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
                                         <connections>
-                                            <action selector="cancelSearch:" destination="foz-Ft-zgJ" id="3jH-qt-YLl"/>
+                                            <action selector="cancelSearch:" destination="foz-Ft-zgJ" eventType="touchUpInside" id="G4Y-dl-ReO"/>
                                         </connections>
-                                    </barButtonItem>
-                                </items>
-                            </toolbar>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <searchBar contentMode="redraw" text="" placeholder="Recruit ID/Name" id="4Bi-qG-H1w">
+                                <rect key="frame" x="0.0" y="72" width="240" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters" autocorrectionType="no"/>
+                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -327,7 +332,7 @@
                     <connections>
                         <outlet property="infoDataList" destination="6bu-UF-Owe" id="rnT-ZP-epo"/>
                         <outlet property="yrPositionFilter" destination="hzP-EK-tJe" id="QCo-Ug-T9e"/>
-                        <outlet property="yrSearchBar" destination="yRk-yR-2yY" id="hvd-Ic-OA0"/>
+                        <outlet property="yrSearchBar" destination="4Bi-qG-H1w" id="8g8-in-Za9"/>
                         <outlet property="yrSortingSegmentControl" destination="tDr-bm-xuo" id="cWx-bg-G0y"/>
                         <segue destination="u9p-ym-xQw" kind="modal" identifier="ListToDetail" id="Sne-F2-Tcq"/>
                     </connections>
