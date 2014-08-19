@@ -33,7 +33,7 @@
 		D290360A19A256AF007D354B /* upload1.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360919A256AF007D354B /* upload1.png */; };
 		D290360C19A258B4007D354B /* upload2.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360B19A258B4007D354B /* upload2.png */; };
 		D290360F19A28E47007D354B /* YRYDayPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = D290360E19A28E47007D354B /* YRYDayPickerView.m */; };
-		D290361319A2B392007D354B /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2A6806F194BA00F0091B768 /* Guile.framework */; };
+		D290361919A38CBE007D354B /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D290361819A38CBE007D354B /* Guile.framework */; };
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
 		D2B2CAAB1987F2A70078C5B3 /* YRFormDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D2B2CAAA1987F2A70078C5B3 /* YRFormDataCell.m */; };
@@ -137,9 +137,9 @@
 		D290360B19A258B4007D354B /* upload2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload2.png; sourceTree = "<group>"; };
 		D290360D19A28E47007D354B /* YRYDayPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRYDayPickerView.h; sourceTree = "<group>"; };
 		D290360E19A28E47007D354B /* YRYDayPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRYDayPickerView.m; sourceTree = "<group>"; };
+		D290361819A38CBE007D354B /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
 		D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostSettingViewController.h; path = Recruit/YRHostSettingViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostSettingViewController.m; path = Recruit/YRHostSettingViewController.m; sourceTree = SOURCE_ROOT; };
-		D2A6806F194BA00F0091B768 /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostDetailViewController.m; path = Recruit/YRHostDetailViewController.m; sourceTree = SOURCE_ROOT; };
 		D2B2CAA91987F2A70078C5B3 /* YRFormDataCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRFormDataCell.h; path = ../YRFormDataCell.h; sourceTree = "<group>"; };
@@ -216,7 +216,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D290361319A2B392007D354B /* Guile.framework in Frameworks */,
+				D290361919A38CBE007D354B /* Guile.framework in Frameworks */,
 				D2D1E571195F36DF0084D8DA /* QuartzCore.framework in Frameworks */,
 				D25268A8194F3E6100EBE43E /* MessageUI.framework in Frameworks */,
 				D2F818A719489FF8006E88FD /* CoreData.framework in Frameworks */,
@@ -284,9 +284,9 @@
 		D2F8185919465FE5006E88FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D290361819A38CBE007D354B /* Guile.framework */,
 				D2D1E570195F36DF0084D8DA /* QuartzCore.framework */,
 				D25268A7194F3E6100EBE43E /* MessageUI.framework */,
-				D2A6806F194BA00F0091B768 /* Guile.framework */,
 				D2F818A619489FF8006E88FD /* CoreData.framework */,
 				D2F8185A19465FE5006E88FD /* Foundation.framework */,
 				D2F8185C19465FE5006E88FD /* CoreGraphics.framework */,
@@ -690,8 +690,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
 					"$(inherited)",
-					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
@@ -801,8 +801,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
 					"$(inherited)",
-					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
@@ -824,8 +824,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
 					"$(inherited)",
-					/Users/yifanfu/Workspace/iOS_YAHOO/Recruit,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Recruit/Recruit-Prefix.pch";
