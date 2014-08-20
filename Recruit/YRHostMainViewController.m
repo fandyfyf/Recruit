@@ -484,6 +484,17 @@
 
 #pragma mark - UITextFieldDelegate
 
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    if (textField == self.yrPrefixTextField) {
+        return NO;
+    }
+    else
+    {
+        return YES;
+    }
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [self.yrPrefixTextField resignFirstResponder];

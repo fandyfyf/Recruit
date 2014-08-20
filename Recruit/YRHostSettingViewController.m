@@ -98,6 +98,8 @@
     self.interviewStartTime.delegate = self;
     self.interviewDuration.delegate = self;
     self.interviewLocations.delegate = self;
+    self.interviewStartDate.delegate = self;
+    self.interviewEndDate.delegate = self;
     
     self.interviewStartTime.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartTimeKey]];
     self.interviewDuration.text = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleDurationKey]];
@@ -1150,6 +1152,8 @@
     
     self.datePickerView.datePicker.date = [[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartDateKey];
     [self.datePickerView.numberPicker selectRow:[[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleNumberOfDayKey] intValue]-1 inComponent:0 animated:YES];
+    self.datePickerView.selectedDays = [NSString stringWithFormat:@"%d",[[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleNumberOfDayKey] intValue]];
+    
     
     [self.view addSubview:self.grayView];
     [self.view addSubview:self.datePickerView];
@@ -1232,6 +1236,17 @@
 }
 
 #pragma mark- UITextFieldDelegate
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    if (textField == self.interviewStartDate || textField == self.interviewEndDate) {
+        return NO;
+    }
+    else
+    {
+        return YES;
+    }
+}
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
