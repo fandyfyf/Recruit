@@ -628,11 +628,11 @@
     }
     
     if (self.yrPositionFilter.selectedSegmentIndex != 0 && ![searchText isEqualToString:@""]) {
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(code BEGINSWITH[cd] %@ || firstName CONTAINS[cd] %@ || lastName CONTAINS[cd] %@) && position = %@",searchText,searchText,searchText,[self.yrPositionFilter titleForSegmentAtIndex:self.yrPositionFilter.selectedSegmentIndex]]];
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"(code CONTAINS[cd] %@ || firstName CONTAINS[cd] %@ || lastName CONTAINS[cd] %@) && position = %@",searchText,searchText,searchText,[self.yrPositionFilter titleForSegmentAtIndex:self.yrPositionFilter.selectedSegmentIndex]]];
     }
     else if (![searchText isEqualToString:@""])
     {
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code BEGINSWITH[cd] %@ || firstName CONTAINS[cd] %@ || lastName CONTAINS[cd] %@",searchText,searchText,searchText]];
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code CONTAINS[cd] %@ || firstName CONTAINS[cd] %@ || lastName CONTAINS[cd] %@",searchText,searchText,searchText]];
     }
 
     NSError* error = nil;
