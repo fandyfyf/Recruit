@@ -158,12 +158,23 @@
                 
                 for (Appointment* ap in self.selectedAppointments)
                 {
-                    replacement = [replacement stringByAppendingString:[NSString stringWithFormat:@"Date: %@\nTime: %@\nInterviewer: %@\nLocation: %@\n\n",[format stringFromDate:ap.date],ap.startTime,ap.interviewers.name,self.eventAddress]];
+                    NSString* interviewerName = ap.interviewers.name;
+                    NSString* interviewerLocation = self.eventAddress;
+                    
+                    if (interviewerName == nil) {
+                        interviewerName = @"--- pending ---";
+                    }
+                    
+                    if (interviewerLocation == nil) {
+                        interviewerLocation = @"--- pending ---";
+                    }
+                    
+                    replacement = [replacement stringByAppendingString:[NSString stringWithFormat:@"Date: %@<br />Time: %@<br />Interviewer: %@<br />Location: %@<br /><br />",[format stringFromDate:ap.date],ap.startTime,interviewerName,interviewerLocation]];
                 }
             }
             else
             {
-                replacement = @" --- pending --- \n";
+                replacement = @" --- pending --- <br />";
             }
         }
         else if ([keyword isEqualToString:@"{applicationLink}"])

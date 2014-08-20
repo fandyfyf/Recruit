@@ -152,7 +152,7 @@
 
 -(void)buildSchedule
 {
-    //======================UI parameters=========================//
+    //======================UI parameters====================//
     self.cardWidth = [NSNumber numberWithInt:130];
     self.cardHeight = [NSNumber numberWithInt:100];
     self.toTop = [NSNumber numberWithInt:70];
@@ -204,6 +204,7 @@
     self.yrPlaceOrNameScrollView.delegate = self;
     self.yrTimeCardScrollView.directionalLockEnabled = YES;
 
+    //==================populate room labels===================//
     
     for (int i=0; i<[self.yrColumNumber intValue]; i++) {
         UILabel *nameLabel;
@@ -228,6 +229,8 @@
         [self.columLabels addObject:nameLabel];
     }
     
+    //=========================================================//
+    
     int hour = [[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleStartTimeKey] intValue];
     int min = 0;
     int period = [[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleDurationKey] intValue];
@@ -248,6 +251,12 @@
             hour ++;
             min = min%60;
         }
+        //change hour standard to 12-hour-standard
+        
+        if (hour > 12) {
+            hour = hour%12;
+        }
+        
         timeLabel.textColor = [UIColor whiteColor];
         timeLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
         timeLabel.textAlignment = NSTextAlignmentLeft;
