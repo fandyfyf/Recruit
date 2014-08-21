@@ -7,7 +7,6 @@
 //
 
 #import "YRHostSettingViewController.h"
-#import "YRViewerDataCell.h"
 #import "YRFormDataCell.h"
 #import <Guile/UITextField+AutoSuggestAdditions.h>
 #import <Guile/Guile.h>
@@ -1404,6 +1403,8 @@
             cell.yrNameLabel.text = current.name;
             cell.yrEmailLabel.text = current.email;
             cell.yrCodeLabel.text = current.code;
+            cell.indexPath = indexPath;
+            cell.delegate = self;
             return cell;
         }
         else if (indexPath.section == 2)
@@ -1952,6 +1953,33 @@
     self.eventAddress.text = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventAddress];
     
     [self.eventCode setUserInteractionEnabled:NO];
+}
+
+#pragma mark - YRViewerDataCellDelegate
+
+-(void)emailEngineer:(NSIndexPath *)indexPath
+{
+    Interviewer* selectedInterviewer = [self.interviewerArray objectAtIndex:indexPath.row];
+    
+    if ([MFMailComposeViewController canSendMail]) {
+        NSString *emailTitle = @"Upcoming Interview Schedule";        //NSString *messageBody = @"Message goes here!";
+        
+        
+        self.yrMailViewController = [[MFMailComposeViewController alloc] init];
+        self.yrMailViewController.mailComposeDelegate = self;
+        [self.yrMailViewController setSubject:emailTitle];
+        [self.yrMailViewController setToRecipients:@[selectedInterviewer.email]];
+        
+        //[self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"csv" fileName:fileName];
+        
+        // Present mail view controller on screen
+        [self presentViewController:self.yrMailViewController animated:YES completion:NULL];
+    }
+    else
+    {
+        NSLog(@"Fail");
+    }
+
 }
 
 #pragma mark - YRYDayPickerViewDelegate

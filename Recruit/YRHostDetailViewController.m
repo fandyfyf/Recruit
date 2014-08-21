@@ -465,7 +465,7 @@
     
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.emailOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 150, 200)];
+        self.emailOptionView = [[UIView alloc] initWithFrame:CGRectMake(self.yrEmailButton.center.x-125, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 200, 200)];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {
@@ -491,8 +491,8 @@
         UIViewController* newController = [UIViewController new];
         self.popOver = [[UIPopoverController alloc] initWithContentViewController:newController];
         newController.view = self.emailOptionView;
-        [self.popOver setPopoverContentSize:CGSizeMake(150, 200)];
-        [self.popOver presentPopoverFromRect:CGRectMake(self.yrEmailButton.center.x-75, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 150, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        [self.popOver setPopoverContentSize:CGSizeMake(200, 200)];
+        [self.popOver presentPopoverFromRect:CGRectMake(self.yrEmailButton.center.x-125, self.yrEmailButton.center.y+[self.yrEmailButton layer].cornerRadius+5, 200, -2) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
     {

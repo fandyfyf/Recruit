@@ -19,6 +19,8 @@
     if (self) {
         _keyWordsList = [[NSUserDefaults standardUserDefaults] objectForKey:kYREmailKeyWordsKey];
         _selectedAppointments = [NSMutableArray new];
+        _selectedCandidate = nil;
+        _selectedInterviewer = nil;
     }
     
     return self;
@@ -35,6 +37,7 @@
     
     NSString* subjectString = nil;
     
+    //================================try to form subject string====================================
     if (left.location != NSNotFound && right.location != NSNotFound) {
         NSRange key = NSMakeRange(left.location + left.length, right.location - left.location - left.length);
         
@@ -91,16 +94,14 @@
             {
                 //replacelink
             }
-            
+        
             if (replacement != nil) {
                 
                 subjectString = [subjectString stringByReplacingOccurrencesOfString:keyword withString:replacement];
             }
         }
     }
-    
-    
-    
+    //======================================================================================
     
     NSString* newDefaultForm = [defaultForm stringByReplacingOccurrencesOfString:@"{resume}" withString:@""];
     //same means pdf doesn't exist
@@ -131,18 +132,6 @@
         {
             replacement = self.selectedCandidate.emailAddress;
         }
-//        else if ([keyword isEqualToString:@"#interviewerName#"])
-//        {
-//            replacement = self.selectedInterviewer.name;
-//        }
-//        else if ([keyword isEqualToString:@"#interviewerEmail#"])
-//        {
-//            replacement = self.selectedInterviewer.email;
-//        }
-//        else if ([keyword isEqualToString:@"#interviewStartTime#"])
-//        {
-//            replacement = self.selectedAppointment.startTime;
-//        }
         else if ([keyword isEqualToString:@"{interviewDuration}"])
         {
             replacement = [(NSNumber*)[[NSUserDefaults standardUserDefaults] objectForKey:kYRScheduleDurationKey] stringValue];
@@ -177,10 +166,15 @@
                 replacement = @" --- pending --- <br />";
             }
         }
-        else if ([keyword isEqualToString:@"{applicationLink}"])
+        else if ([keyword isEqualToString:@"{applicationLinkIntern}"])
         {
             //replacelink
-            replacement = @"<a href='www.yahoo.com'>Yahoo!</a>";
+            replacement = @"<a href=' https://tas-yahoo.taleo.net/careersection/yahoo_us_cs/jobdetail.ftl?lang=en&amp;job=1448872'>Application Link</a>";
+        }
+        else if ([keyword isEqualToString:@"{applicationLinkNCG}"])
+        {
+            //replacelink
+            replacement = @"<a href='https://tas-yahoo.taleo.net/careersection/yahoo_us_cs/jobdetail.ftl?lang=en&amp;job=1448866'>Application Link</a>";
         }
         
         if (replacement != nil) {
@@ -188,6 +182,10 @@
             defaultForm = [defaultForm stringByReplacingOccurrencesOfString:keyword withString:replacement];
         }
     }
+    //switch to HTML file
+    defaultForm = [defaultForm stringByReplacingOccurrencesOfString:@"\n" withString:@"<br />"];
+    
+    self.selectedCandidate = nil;
     
     NSDictionary* result = nil;
     

@@ -255,10 +255,16 @@
     
     if (state != MCSessionStateConnecting) {
         if (state == MCSessionStateConnected) {
+            
+            [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
             [self.yrarrayConnectedDevices addObject:@{@"displayName" : peerDisplayName, @"confirmedName" : @"connnecting..."}];
 
             //send ACK back
             [[self.appDelegate dataManager] sendACKBack:peerID];
+            
+            
             
             [[self.appDelegate dataManager] sendNameList:peerID];
         }
@@ -272,10 +278,9 @@
                     }
                 }
                 [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
-                
-                [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
             }
+            [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{

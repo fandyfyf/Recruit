@@ -1049,7 +1049,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkbox.png" id="B4I-i7-I17">
-                                <rect key="frame" x="628" y="145" width="50" height="50"/>
+                                <rect key="frame" x="633" y="151" width="40" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check.png" id="d6E-W0-sO8">
@@ -1140,6 +1140,16 @@
                                                     <rect key="frame" x="30" y="33" width="25" height="22"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                                                 </imageView>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="RQn-LY-yFB">
+                                                    <rect key="frame" x="718" y="17" width="30" height="30"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Button" image="E-mail.png">
+                                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="emailEngineerSchedule:" destination="3tv-Bw-sfM" eventType="touchUpInside" id="1Md-KK-mfv"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
@@ -1445,6 +1455,7 @@
     </scenes>
     <resources>
         <image name="Columbia_engineering.jpg" width="600" height="600"/>
+        <image name="E-mail.png" width="512" height="512"/>
         <image name="Edit-icon.png" width="512" height="512"/>
         <image name="camera3.png" width="512" height="512"/>
         <image name="check.png" width="512" height="512"/>
