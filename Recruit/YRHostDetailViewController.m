@@ -153,6 +153,7 @@
     
     UITapGestureRecognizer* tapToApprove = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(approveYDay)];
     [self.checkBoxView addGestureRecognizer:tapToApprove];
+    [self.checkBoxView setUserInteractionEnabled:YES];
     
     [self.yrCommentTextView setDelegate:self];
     [[self.yrCommentTextView layer] setCornerRadius:10];
@@ -1282,6 +1283,7 @@
 
 -(void)approveYDay
 {
+    NSLog(@"Tapped");
     if (![self.dataSource.approved boolValue]) {
         //approve
         self.checkView.hidden = NO;

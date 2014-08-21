@@ -907,6 +907,13 @@
                                 <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="YDay: " textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="diH-2U-OLa">
+                                <rect key="frame" x="617" y="107" width="73" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" name="Helvetica-Bold" family="Helvetica" pointSize="20"/>
+                                <color key="textColor" red="0.49680656934306572" green="0.083422849389999998" blue="0.61675980839416056" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=".5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="4rW-zv-Yxi">
                                 <rect key="frame" x="550" y="112" width="42" height="42"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -1042,11 +1049,11 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkbox.png" id="B4I-i7-I17">
-                                <rect key="frame" x="625" y="113" width="50" height="50"/>
+                                <rect key="frame" x="628" y="145" width="50" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="check.png" id="d6E-W0-sO8">
-                                <rect key="frame" x="634" y="107" width="50" height="50"/>
+                                <rect key="frame" x="637" y="139" width="50" height="50"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
                         </subviews>
@@ -1057,7 +1064,7 @@
                     </view>
                     <connections>
                         <outlet property="YRCommentLabel" destination="hs4-Yw-dJU" id="dkc-dJ-UUO"/>
-                        <outlet property="checkBoxView" destination="d6E-W0-sO8" id="YJM-Fg-wlS"/>
+                        <outlet property="checkBoxView" destination="B4I-i7-I17" id="jdP-OY-02B"/>
                         <outlet property="checkInterviewButton" destination="KZX-gs-SbI" id="3Ii-8y-Sj1"/>
                         <outlet property="checkView" destination="d6E-W0-sO8" id="Juz-hb-plt"/>
                         <outlet property="nextStudentButton" destination="Q99-mr-IAa" id="Rwv-wb-bbb"/>

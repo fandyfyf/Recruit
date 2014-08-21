@@ -1826,11 +1826,18 @@
         
         NSString* dataEntry = [NSString new];
         
-        dataEntry = [dataEntry stringByAppendingString:@"School,First Name,Last Name,E-mail,GPA,Rank,Candidate Type,Profile,BU 1, BU 2,YDay 1,YDay 2,Notes,\n"];
+        dataEntry = [dataEntry stringByAppendingString:@"School,First Name,Last Name,E-mail,GPA,Rank,Candidate Type,Profile,BU 1, BU 2,YDay 1,YDay 2,YDay,Notes,\n"];
         
         for (CandidateEntry* candidate in FetchResults) {
+            NSString* yday = @"";
+            
+            if ([candidate.approved boolValue]) {
+                yday = @"X";
+            }
+            
+            
             NSString* scannedNote = [candidate.notes stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
-            dataEntry = [dataEntry stringByAppendingString:[NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,\n",candidate.code,candidate.firstName,candidate.lastName,candidate.emailAddress,[candidate.gpa stringValue],[candidate.rank stringValue],candidate.position,candidate.preference,candidate.businessUnit1,candidate.businessUnit2,candidate.yday1,candidate.yday2,scannedNote]];
+            dataEntry = [dataEntry stringByAppendingString:[NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,\n",candidate.code,candidate.firstName,candidate.lastName,candidate.emailAddress,[candidate.gpa stringValue],[candidate.rank stringValue],candidate.position,candidate.preference,candidate.businessUnit1,candidate.businessUnit2,candidate.yday1,candidate.yday2,yday,scannedNote]];
         }
         
         [dataEntry writeToFile:fullPath atomically:YES encoding:NSUTF8StringEncoding error:&error];
