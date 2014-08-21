@@ -199,6 +199,16 @@
     self.yrCommentTextView.inputAccessoryView = doneToolbar;
     
     [self loadInfo];
+    
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
+        self.nextStudentButton.hidden = NO;
+        self.prevStudentButton.hidden = NO;
+    }
+    else
+    {
+        self.nextStudentButton.hidden = YES;
+        self.prevStudentButton.hidden = YES;
+    }
  }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -270,9 +280,35 @@
 }
 
 - (IBAction)LoadNextStudentData:(id)sender {
+    if ([self.currentCandidateIndex intValue] + 1 >= [self.candidateList count]) {
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Last candidate" message:@"There are no more candidate in the list" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alertView show];
+    }
+    else
+    {
+        //increment the current candidate index in the student list
+        self.currentCandidateIndex = [NSNumber numberWithInteger:([self.currentCandidateIndex intValue] + 1)];
+        //load the next candidate into dataSource
+        self.dataSource = [self.candidateList objectAtIndex:[self.currentCandidateIndex intValue]];
+    
+        [self loadInfo];
+    }
 }
 
 - (IBAction)loadPrevStudentData:(id)sender {
+    if ([self.currentCandidateIndex intValue] - 1 < 0) {
+        UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"First candidate" message:@"This is the first candidate in the list" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
+        [alertView show];
+    }
+    else
+    {
+        //decrement the current candidate index in the student list
+        self.currentCandidateIndex = [NSNumber numberWithInteger:([self.currentCandidateIndex intValue] - 1)];
+        //load the prev candidate into dataSource
+        self.dataSource = [self.candidateList objectAtIndex:[self.currentCandidateIndex intValue]];
+        
+        [self loadInfo];
+    }
 }
 
 - (IBAction)takeAnImage:(id)sender {
@@ -1217,6 +1253,9 @@
             break;
         case MFMailComposeResultSent:
             NSLog(@"Mail send: the email message is queued in the outbox. It is ready to send.");
+            //======changing the status of the candidate after specific email is sent======//
+            
+            //========//
             break;
         case MFMailComposeResultFailed:
             NSLog(@"Mail failed: the email message was not saved or queued, possibly due to an error.");

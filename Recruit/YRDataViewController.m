@@ -14,6 +14,7 @@
 @interface YRDataViewController ()
 
 @property (strong, nonatomic) CandidateEntry* currentEntry;
+@property (strong, nonatomic) NSNumber* currentCandidateIndex;
 @property (strong, nonatomic) NSArray* fileNames;
 
 -(void)needUpdateTableNotification:(NSNotification *)notification;
@@ -48,6 +49,9 @@
 {
     if ([segue.identifier isEqualToString:@"ListToDetail"]) {
         [segue.destinationViewController setValue:self.currentEntry forKey:@"dataSource"];
+        [segue.destinationViewController setValue:self.yrdataEntry forKey:@"candidateList"];
+        [segue.destinationViewController setValue:self.currentCandidateIndex forKey:@"currentCandidateIndex"];
+        
         if (checkScheduleMode) {
             [segue.destinationViewController setValue:[NSNumber numberWithBool:YES] forKey:@"checkScheduleFlag"];
         }
@@ -584,6 +588,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     self.currentEntry = (CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row];
+    self.currentCandidateIndex = [NSNumber numberWithInteger:indexPath.row];
     [self performSegueWithIdentifier:@"ListToDetail" sender:self];
     
     //broadcast the current entry: could just move the folloing code to detail view after the info got loaded

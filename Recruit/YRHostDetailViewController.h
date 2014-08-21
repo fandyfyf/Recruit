@@ -17,6 +17,11 @@
 @interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate, UITableViewDataSource, UITableViewDelegate,UIGestureRecognizerDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) CandidateEntry *dataSource;
+//next and prev student button
+@property (strong, nonatomic) NSMutableArray *candidateList;
+@property (strong, nonatomic) NSNumber * currentCandidateIndex;
+
+
 @property (strong, nonatomic) NSNumber *checkScheduleFlag;
 @property (strong, nonatomic) NSMutableArray *formList;
 @property (strong, nonatomic) YRAppDelegate* appDelegate;

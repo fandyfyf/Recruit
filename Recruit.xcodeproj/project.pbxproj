@@ -34,6 +34,8 @@
 		D290360C19A258B4007D354B /* upload2.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360B19A258B4007D354B /* upload2.png */; };
 		D290360F19A28E47007D354B /* YRYDayPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = D290360E19A28E47007D354B /* YRYDayPickerView.m */; };
 		D290361919A38CBE007D354B /* Guile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D290361819A38CBE007D354B /* Guile.framework */; };
+		D290361C19A65236007D354B /* prevCandidate.png in Resources */ = {isa = PBXBuildFile; fileRef = D290361A19A65236007D354B /* prevCandidate.png */; };
+		D290361D19A65236007D354B /* nextCandidate.png in Resources */ = {isa = PBXBuildFile; fileRef = D290361B19A65236007D354B /* nextCandidate.png */; };
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
 		D2B2CAAB1987F2A70078C5B3 /* YRFormDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D2B2CAAA1987F2A70078C5B3 /* YRFormDataCell.m */; };
@@ -138,6 +140,8 @@
 		D290360D19A28E47007D354B /* YRYDayPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRYDayPickerView.h; sourceTree = "<group>"; };
 		D290360E19A28E47007D354B /* YRYDayPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRYDayPickerView.m; sourceTree = "<group>"; };
 		D290361819A38CBE007D354B /* Guile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Guile.framework; sourceTree = "<group>"; };
+		D290361A19A65236007D354B /* prevCandidate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = prevCandidate.png; sourceTree = "<group>"; };
+		D290361B19A65236007D354B /* nextCandidate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = nextCandidate.png; sourceTree = "<group>"; };
 		D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostSettingViewController.h; path = Recruit/YRHostSettingViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostSettingViewController.m; path = Recruit/YRHostSettingViewController.m; sourceTree = SOURCE_ROOT; };
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
@@ -325,6 +329,8 @@
 				D2B2CAAC19885B490078C5B3 /* Edit-icon.png */,
 				D25E489C198FCCBD0005A466 /* left.png */,
 				D25E489E198FCCCA0005A466 /* right.png */,
+				D290361A19A65236007D354B /* prevCandidate.png */,
+				D290361B19A65236007D354B /* nextCandidate.png */,
 				D25268A9194F4B4B00EBE43E /* iPad */,
 				D2F818A119478777006E88FD /* YRClient */,
 				D2F818A219478777006E88FD /* YRHost */,
@@ -526,6 +532,7 @@
 				D2B6245D1981617C006A385B /* Recruit_Icon.png in Resources */,
 				D2B6245619805232006A385B /* 60x60.png in Resources */,
 				D2B623B8197EAB74006A385B /* upload.png in Resources */,
+				D290361C19A65236007D354B /* prevCandidate.png in Resources */,
 				D25268B619507E5300EBE43E /* gear.png in Resources */,
 				D25268B419507DE400EBE43E /* wifi.png in Resources */,
 				D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */,
@@ -542,6 +549,7 @@
 				D2B8C39A197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg in Resources */,
 				D2B53141196C994B0019C7D7 /* camera3.png in Resources */,
 				D251C65F196CA8B8003E86FD /* goldStar.png in Resources */,
+				D290361D19A65236007D354B /* nextCandidate.png in Resources */,
 				D2B5313D196B0AFE0019C7D7 /* Camera1.png in Resources */,
 				D2D1E5771961BE2B0084D8DA /* camera.png in Resources */,
 				D2B6245519805232006A385B /* 57x57.png in Resources */,

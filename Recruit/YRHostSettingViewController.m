@@ -1815,7 +1815,9 @@
         
         NSString* fileName = [NSString stringWithFormat:@"%@-Data",[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]];
         
-        NSString *fullPath = [dataPath stringByAppendingPathComponent:[fileName stringByAppendingPathExtension:@"csv"]];
+        fileName = [fileName stringByAppendingPathExtension:@"csv"];
+        
+        NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
         
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
@@ -1823,6 +1825,9 @@
         NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
         
         NSString* dataEntry = [NSString new];
+        
+        dataEntry = [dataEntry stringByAppendingString:@"School,First Name,Last Name,E-mail,GPA,Rank,Candidate Type,Profile,BU 1, BU 2,Notes,\n"];
+        
         for (CandidateEntry* candidate in FetchResults) {
             NSString* scannedNote = [candidate.notes stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
             dataEntry = [dataEntry stringByAppendingString:[NSString stringWithFormat:@"%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,%@,\n",candidate.code,candidate.firstName,candidate.lastName,candidate.emailAddress,[candidate.gpa stringValue],[candidate.rank stringValue],candidate.position,candidate.preference,candidate.businessUnit1,candidate.businessUnit2,scannedNote]];
