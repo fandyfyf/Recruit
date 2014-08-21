@@ -15,7 +15,7 @@
 
 @class AutoSuggestTextField;
 
-@interface YRHostSettingViewController : UIViewController <AutoSuggestTextFieldDelegate, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate, UITextViewDelegate,MFMailComposeViewControllerDelegate, YREventDataCellDelegate,YRYDayPickerViewDelegate>
+@interface YRHostSettingViewController : UIViewController <AutoSuggestTextFieldDelegate, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate, UITextViewDelegate,MFMailComposeViewControllerDelegate, YREventDataCellDelegate,YRYDayPickerViewDelegate, UIGestureRecognizerDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *userNameTextField;
 @property (weak, nonatomic) IBOutlet AutoSuggestTextField *emailTextField;
 @property (weak, nonatomic) IBOutlet UITableView *interviewerList;

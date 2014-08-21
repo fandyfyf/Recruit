@@ -114,9 +114,13 @@
     
     self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showDatePicker)];
     
+    self.tapGestureRecognizer.delegate = self;
+    
     [self.interviewStartDate addGestureRecognizer:self.tapGestureRecognizer];
     
     self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showDatePicker)];
+    
+    self.tapGestureRecognizer.delegate = self;
     
     [self.interviewEndDate addGestureRecognizer:self.tapGestureRecognizer];
     
@@ -1943,6 +1947,12 @@
 -(void)reloadYDayList
 {
     [self.interviewerList performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
 }
 
 @end
