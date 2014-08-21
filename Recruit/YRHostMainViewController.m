@@ -82,6 +82,7 @@
     
     //tap gesture recognizer
     UITapGestureRecognizer* gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showEventCode)];
+    gestureRecognizer.delegate = self;
     [self.yrPrefixTextField addGestureRecognizer:gestureRecognizer];
 }
 
@@ -527,4 +528,11 @@
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
+}
+
 @end
