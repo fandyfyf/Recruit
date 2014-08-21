@@ -70,6 +70,13 @@
 @property (strong, nonatomic) MFMailComposeViewController* yrMailViewController;
 @property (strong, nonatomic) UIImage* chosenImage;
 
+@property (weak, nonatomic) IBOutlet UIButton *nextStudentButton;
+@property (weak, nonatomic) IBOutlet UIButton *prevStudentButton;
+
+- (IBAction)LoadNextStudentData:(id)sender;
+- (IBAction)loadPrevStudentData:(id)sender;
+
+
 - (IBAction)takeAnImage:(id)sender;
 - (IBAction)goBack:(id)sender;
 - (IBAction)checkImage:(id)sender;

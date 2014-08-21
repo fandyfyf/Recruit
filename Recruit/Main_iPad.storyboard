@@ -988,6 +988,26 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Q99-mr-IAa">
+                                <rect key="frame" x="707" y="960" width="32" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Next">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="LoadNextStudentData:" destination="Mqb-of-Yub" eventType="touchUpInside" id="vYR-34-H5G"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="IXR-gK-4BY">
+                                <rect key="frame" x="41" y="960" width="31" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Prev">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="loadPrevStudentData:" destination="Mqb-of-Yub" eventType="touchUpInside" id="r10-lw-Jal"/>
+                                </connections>
+                            </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" text="Notes go here!" id="4iG-Kf-Fma">
                                 <rect key="frame" x="84" y="654" width="600" height="281"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
@@ -1004,6 +1024,8 @@
                     <connections>
                         <outlet property="YRCommentLabel" destination="hs4-Yw-dJU" id="dkc-dJ-UUO"/>
                         <outlet property="checkInterviewButton" destination="KZX-gs-SbI" id="3Ii-8y-Sj1"/>
+                        <outlet property="nextStudentButton" destination="Q99-mr-IAa" id="Rwv-wb-bbb"/>
+                        <outlet property="prevStudentButton" destination="IXR-gK-4BY" id="t4T-oI-0kC"/>
                         <outlet property="yrBusinessUnit1" destination="XPv-wC-MjD" id="bEG-Il-U4b"/>
                         <outlet property="yrBusinessUnit2" destination="FK8-mW-eMj" id="YDj-lq-gqs"/>
                         <outlet property="yrCodeLabel" destination="KVt-hf-U6Y" id="ouH-32-wfq"/>

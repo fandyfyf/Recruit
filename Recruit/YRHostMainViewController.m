@@ -495,6 +495,11 @@
     }
 }
 
+-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    return NO;
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [self.yrPrefixTextField resignFirstResponder];
