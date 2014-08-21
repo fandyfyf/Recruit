@@ -1,20 +1,19 @@
 //
-//  YRYDayPickerView.m
+//  YRYDaySelecterView.m
 //  Recruit
 //
-//  Created by Yifan Fu on 8/18/14.
+//  Created by Yifan Fu on 8/21/14.
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
-#import "YRYDayPickerView.h"
+#import "YRYDaySelecterView.h"
 
-@implementation YRYDayPickerView
+@implementation YRYDaySelecterView
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
-        // Initialization code
         UILabel* title;
         
         UIButton* cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -23,17 +22,16 @@
         [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
         [doneButton setTitle:@"Done" forState:UIControlStateNormal];
         
-        
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-            
             title = [[UILabel alloc] initWithFrame:CGRectMake(self.center.x - 100, 10, 200, 30)];
             title.textColor = [UIColor purpleColor];
             title.font = [UIFont fontWithName:@"Helvetica-Bold" size:25];
             title.text = @"YDay";
             title.textAlignment = NSTextAlignmentCenter;
             
-            self.datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 40, self.frame.size.width, 300)];
-            self.datePicker.datePickerMode = UIDatePickerModeDate;
+            self.yDayPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 40, self.frame.size.width, 300)];
+            self.yDayPicker.dataSource = self;
+            self.yDayPicker.delegate = self;
             
             cancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
             doneButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 20];
@@ -43,7 +41,7 @@
         }
         
         self.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0];
-        [self addSubview:self.datePicker];
+        [self addSubview:self.yDayPicker];
         [self addSubview:title];
         
         [cancelButton setTintColor:[UIColor purpleColor]];
@@ -70,42 +68,11 @@
 -(void)saveDetail
 {
     //save
+    self.tappedTextField.text = self.selectedYDate;
     
-    NSDateFormatter* format = [[NSDateFormatter alloc] init];
-    [format setDateFormat:@"MM/dd/yyy"];
+    [self.delegate uploadCoreDate];
     
-    NSMutableArray* yDateList = [[[NSUserDefaults standardUserDefaults] objectForKey:@"YdayList"] mutableCopy];
-    
-    if (yDateList == nil) {
-        yDateList = [NSMutableArray new];
-    }
-    
-    BOOL exist = NO;
-    for (NSString* string in yDateList) {
-        if ([string isEqualToString:[format stringFromDate:self.datePicker.date]]) {
-            exist = YES;
-            break;
-        }
-    }
-   
-    if (exist) {
-        UIAlertView* alerView = [[UIAlertView alloc] initWithTitle:@"YDay existed" message:@"The Date is already existing in the list." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-        
-        [alerView show];
-    }
-    else
-    {
-        [yDateList addObject:[format stringFromDate:self.datePicker.date]];
-    
-        [[NSUserDefaults standardUserDefaults] setObject:yDateList forKey:@"YdayList"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        
-        //reload
-        [self.delegate reloadYDayList];
-        
-        [self cancelDetail];
-    }
+    [self cancelDetail];
 }
 
 -(void)cancelDetail
@@ -127,5 +94,41 @@
     // Drawing code
 }
 */
+
+#pragma mark - UIPickerViewDataSource
+
+-(NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
+{
+    if (self.yDayList == nil) {
+        return 0;
+    }
+    else
+    {
+        return [self.yDayList count];
+    }
+}
+
+-(NSString*)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+    if (self.yDayList == nil) {
+        return @"--Pending--";
+    }
+    else
+    {
+        return [self.yDayList objectAtIndex:row];
+    }
+}
+
+-(NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+    return 1;
+}
+
+#pragma mark - UIPickerViewDelegate
+
+-(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+{
+    self.selectedYDate = [self.yDayList objectAtIndex:row];
+}
 
 @end

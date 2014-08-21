@@ -9,6 +9,7 @@
         <relationship name="interviewers" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Interviewer" inverseName="appointments" inverseEntity="Interviewer" syncable="YES"/>
     </entity>
     <entity name="CandidateEntry" representedClassName="CandidateEntry" syncable="YES">
+        <attribute name="approved" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="businessUnit1" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="businessUnit2" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="code" optional="YES" attributeType="String" syncable="YES"/>
@@ -27,6 +28,8 @@
         <attribute name="resumeCounter" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="tagList" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="yday1" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="yday2" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="appointments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Appointment" inverseName="candidate" inverseEntity="Appointment" syncable="YES"/>
     </entity>
     <entity name="Event" representedClassName="Event" syncable="YES">

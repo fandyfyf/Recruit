@@ -459,6 +459,9 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
     [item setBusinessUnit1:@""];
     [item setBusinessUnit2:@""];
     [item setResumeCounter:[NSNumber numberWithInt:0]];
+    [item setYday1:@""];
+    [item setYday2:@""];
+    [item setApproved:[NSNumber numberWithBool:NO]];
     
     
     if ([infoData[@"tagList"] count] != 0) {

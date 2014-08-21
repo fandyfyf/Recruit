@@ -11,16 +11,18 @@
 #import <Guile/AutoSuggestDelegate.h>
 #import "YRAppDelegate.h"
 #import <MessageUI/MFMailComposeViewController.h>
+#import "YRYDaySelecterView.h"
 
 @class AutoSuggestTextField;
 
-@interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate, UITableViewDataSource, UITableViewDelegate,UIGestureRecognizerDelegate, UIAlertViewDelegate>
+@interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate, UITableViewDataSource, UITableViewDelegate,UIGestureRecognizerDelegate, UIAlertViewDelegate, YRYDaySelecterViewDelegate>
 
 @property (strong, nonatomic) CandidateEntry *dataSource;
 //next and prev student button
 @property (strong, nonatomic) NSMutableArray *candidateList;
 @property (strong, nonatomic) NSNumber * currentCandidateIndex;
 
+@property (strong, nonatomic) YRYDaySelecterView* yDaySelectorView;
 
 @property (strong, nonatomic) NSNumber *checkScheduleFlag;
 @property (strong, nonatomic) NSMutableArray *formList;
@@ -33,6 +35,11 @@
 @property (weak, nonatomic) IBOutlet AutoSuggestTextField *yrEmailTextField;
 @property (weak, nonatomic) IBOutlet UITextField *yrBusinessUnit1;
 @property (weak, nonatomic) IBOutlet UITextField *yrBusinessUnit2;
+@property (weak, nonatomic) IBOutlet UITextField *yrYDay1;
+@property (weak, nonatomic) IBOutlet UITextField *yrYDay2;
+@property (weak, nonatomic) IBOutlet UIImageView *checkView;
+@property (weak, nonatomic) IBOutlet UIImageView *checkBoxView;
+
 
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionSegmentControl;
 @property (weak, nonatomic) IBOutlet UILabel *yrGPALabel;

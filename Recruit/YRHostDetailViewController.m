@@ -31,6 +31,11 @@
 -(void)updateTagInformation:(NSNotification*)notification;
 -(void)broadcast:(NSNotification*)notification;
 
+-(void)showYDay1Picker:(UIGestureRecognizer*)gestureRecognizer;
+-(void)showYDay2Picker:(UIGestureRecognizer*)gestureRecognizer;
+
+-(void)approveYDay;
+
 @end
 
 @implementation YRHostDetailViewController
@@ -48,6 +53,16 @@
     self.yrPreferenceTextField.text = self.dataSource.preference;
     self.yrBusinessUnit1.text = self.dataSource.businessUnit1;
     self.yrBusinessUnit2.text = self.dataSource.businessUnit2;
+    self.yrYDay1.text = self.dataSource.yday1;
+    self.yrYDay2.text = self.dataSource.yday2;
+    
+    if ([self.dataSource.approved boolValue]) {
+        self.checkView.hidden = NO;
+    }
+    else
+    {
+        self.checkView.hidden = YES;
+    }
     
     self.yrFirstNameTextField.text = self.dataSource.firstName;
     self.yrLastNameTextField.text = self.dataSource.lastName;
@@ -133,17 +148,39 @@
     self.yrEmailTextField.suggestionDelegate = self;
     self.yrBusinessUnit1.delegate = self;
     self.yrBusinessUnit2.delegate = self;
+    self.yrYDay1.delegate = self;
+    self.yrYDay2.delegate = self;
+    
+    UITapGestureRecognizer* tapToApprove = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(approveYDay)];
+    [self.checkBoxView addGestureRecognizer:tapToApprove];
     
     [self.yrCommentTextView setDelegate:self];
     [[self.yrCommentTextView layer] setCornerRadius:10];
-    
-    
     
     UITapGestureRecognizer* tapAction = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnLabel:)];
     tapAction.delegate = self;
     [self.yrRankLabel setUserInteractionEnabled:YES];
     [self.yrRankLabel addGestureRecognizer:tapAction];
     
+    UITapGestureRecognizer* tapOnTextField = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showYDay1Picker:)];
+    
+    tapOnTextField.delegate = self;
+    
+    [self.yrYDay1 addGestureRecognizer:tapOnTextField];
+    
+    tapOnTextField = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showYDay2Picker:)];
+    
+    tapOnTextField.delegate = self;
+    
+    [self.yrYDay2 addGestureRecognizer:tapOnTextField];
+    
+    self.yDaySelectorView =  [[YRYDaySelecterView alloc] initWithFrame:CGRectMake(0, 600, self.view.frame.size.width, 300)];
+    [[self.yDaySelectorView layer] setCornerRadius:10];
+    
+    self.yDaySelectorView.yDayList = [[NSUserDefaults standardUserDefaults] objectForKey:@"YdayList"];
+    
+    self.yDaySelectorView.selectedYDate = [self.yDaySelectorView.yDayList objectAtIndex:0];
+    self.yDaySelectorView.delegate = self;
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrScheduleButton layer] setCornerRadius:35];
@@ -268,7 +305,7 @@
     }
     else
     {
-        [self.yrCommentTextView setFrame:CGRectMake(84, 654, 600, 281)];
+        [self.yrCommentTextView setFrame:CGRectMake(84, 710, 600, 225)];
         [self.YRCommentLabel setFrame:CGRectMake(304, 572, 160, 30)];
     }
 }
@@ -379,7 +416,7 @@
     [UIView setAnimationDuration:0.2];
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrCommentTextView.frame = CGRectMake(84, 654, 600, 281);
+        self.yrCommentTextView.frame = CGRectMake(84, 710, 600, 225);
     }
     else{
         self.yrCommentTextView.frame = CGRectMake(10, 443, 300, 94);
@@ -612,6 +649,8 @@
     [selected setNotes:self.yrCommentTextView.text];
     [selected setBusinessUnit1:self.yrBusinessUnit1.text];
     [selected setBusinessUnit2:self.yrBusinessUnit2.text];
+    [selected setYday1:self.yrYDay1.text];
+    [selected setYday2:self.yrYDay2.text];
     [selected setGpa:[NSNumber numberWithFloat:[self.yrGPATextField.text floatValue]]];
     [selected setPreference:self.yrPreferenceTextField.text];
     
@@ -755,17 +794,17 @@
         [self.rankFourButton addTarget:self action:@selector(changeRank:) forControlEvents:UIControlEventTouchUpInside];
         self.rankFourButton.alpha = 1.0;
         
-        [self.rankOneButton setFrame:CGRectMake(603, 157, 80, 80)];
-        [self.rankTwoButton setFrame:CGRectMake(603, 157, 85, 85)];
-        [self.rankThreeButton setFrame:CGRectMake(603, 157, 90, 90)];
-        [self.rankThreeHalfButton setFrame:CGRectMake(603, 157, 95, 95)];
-        [self.rankFourButton setFrame:CGRectMake(603, 157, 100, 100)];
+        [self.rankOneButton setFrame:CGRectMake(533, 157, 80, 80)];
+        [self.rankTwoButton setFrame:CGRectMake(533, 157, 85, 85)];
+        [self.rankThreeButton setFrame:CGRectMake(53, 157, 90, 90)];
+        [self.rankThreeHalfButton setFrame:CGRectMake(533, 157, 95, 95)];
+        [self.rankFourButton setFrame:CGRectMake(533, 157, 100, 100)];
         
-        [self.rankOneButton setCenter:CGPointMake(603, 157)];
-        [self.rankTwoButton setCenter:CGPointMake(603, 157)];
-        [self.rankThreeButton setCenter:CGPointMake(603, 157)];
-        [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
-        [self.rankFourButton setCenter:CGPointMake(603, 157)];
+        [self.rankOneButton setCenter:CGPointMake(533, 157)];
+        [self.rankTwoButton setCenter:CGPointMake(533, 157)];
+        [self.rankThreeButton setCenter:CGPointMake(533, 157)];
+        [self.rankThreeHalfButton setCenter:CGPointMake(533, 157)];
+        [self.rankFourButton setCenter:CGPointMake(533, 157)];
         
         
         [self.view addSubview:self.rankOneButton];
@@ -775,11 +814,11 @@
         [self.view addSubview:self.rankFourButton];
         
         [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            [self.rankOneButton setFrame:CGRectMake(555, 7, 60, 60)];
-            [self.rankTwoButton setFrame:CGRectMake(470, 42, 70, 70)];
-            [self.rankThreeButton setFrame:CGRectMake(434, 131, 80, 80)];
-            [self.rankThreeHalfButton setFrame:CGRectMake(482, 229, 90, 90)];
-            [self.rankFourButton setFrame:CGRectMake(604, 237, 100, 100)];
+            [self.rankOneButton setFrame:CGRectMake(485, 7, 60, 60)];
+            [self.rankTwoButton setFrame:CGRectMake(400, 42, 70, 70)];
+            [self.rankThreeButton setFrame:CGRectMake(364, 131, 80, 80)];
+            [self.rankThreeHalfButton setFrame:CGRectMake(412, 229, 90, 90)];
+            [self.rankFourButton setFrame:CGRectMake(534, 237, 100, 100)];
             self.grayView.alpha = 0.4;
         } completion:^(BOOL finished){spin = NO;}];
         spin = YES;
@@ -892,7 +931,7 @@
     
     self.grayView.alpha = 0;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrCommentTextView.frame = CGRectMake(84, 654, 600, 281);
+        self.yrCommentTextView.frame = CGRectMake(84, 710, 600, 225);
     }
     else{
         self.yrCommentTextView.frame = CGRectMake(10, 443, 300, 94);
@@ -937,11 +976,11 @@
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            [self.rankOneButton setCenter:CGPointMake(603, 157)];
-            [self.rankTwoButton setCenter:CGPointMake(603, 157)];
-            [self.rankThreeButton setCenter:CGPointMake(603, 157)];
-            [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
-            [self.rankFourButton setCenter:CGPointMake(603, 157)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
+            [self.rankOneButton setCenter:CGPointMake(533, 157)];
+            [self.rankTwoButton setCenter:CGPointMake(533, 157)];
+            [self.rankThreeButton setCenter:CGPointMake(533, 157)];
+            [self.rankThreeHalfButton setCenter:CGPointMake(533, 157)];
+            [self.rankFourButton setCenter:CGPointMake(533, 157)];} completion:^(BOOL finished){[self.grayView removeFromSuperview];
                 [self.rankOneButton removeFromSuperview];
                 [self.rankTwoButton removeFromSuperview];
                 [self.rankThreeButton removeFromSuperview];
@@ -968,11 +1007,11 @@
 {
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            [self.rankOneButton setCenter:CGPointMake(603, 157)];
-            [self.rankTwoButton setCenter:CGPointMake(603, 157)];
-            [self.rankThreeButton setCenter:CGPointMake(603, 157)];
-            [self.rankThreeHalfButton setCenter:CGPointMake(603, 157)];
-            [self.rankFourButton setCenter:CGPointMake(603, 157)];
+            [self.rankOneButton setCenter:CGPointMake(533, 157)];
+            [self.rankTwoButton setCenter:CGPointMake(533, 157)];
+            [self.rankThreeButton setCenter:CGPointMake(533, 157)];
+            [self.rankThreeHalfButton setCenter:CGPointMake(533, 157)];
+            [self.rankFourButton setCenter:CGPointMake(533, 157)];
             self.grayView.alpha = 0.0;
             self.rankOneButton.alpha = 0.0;
             self.rankTwoButton.alpha = 0.0;
@@ -1203,6 +1242,92 @@
     [self.appDelegate.dataManager broadCastData:packet];
 }
 
+-(void)showYDay1Picker:(UIGestureRecognizer*)gestureRecognizer
+{
+    //bring the picker view
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
+    self.yDaySelectorView.alpha = 0.0;
+    self.yDaySelectorView.tappedTextField = self.yrYDay1;
+    self.yDaySelectorView.grayView = self.grayView;
+    
+    [self.view addSubview:self.grayView];
+    [self.view addSubview:self.yDaySelectorView];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.grayView.alpha = 0.4;
+        self.yDaySelectorView.alpha = 1.0;
+    }];
+}
+
+-(void)showYDay2Picker:(UIGestureRecognizer*)gestureRecognizer
+{
+    //bring the picker view
+    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+    self.grayView.backgroundColor = [UIColor blackColor];
+    self.grayView.alpha = 0.0;
+    self.yDaySelectorView.alpha = 0.0;
+    self.yDaySelectorView.tappedTextField = self.yrYDay2;
+    self.yDaySelectorView.grayView = self.grayView;
+    
+    [self.view addSubview:self.grayView];
+    [self.view addSubview:self.yDaySelectorView];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.grayView.alpha = 0.4;
+        self.yDaySelectorView.alpha = 1.0;
+    }];
+}
+
+-(void)approveYDay
+{
+    if (![self.dataSource.approved boolValue]) {
+        //approve
+        self.checkView.hidden = NO;
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+        
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@ and lastName = %@",self.dataSource.code,self.dataSource.firstName,self.dataSource.lastName]];
+        
+        NSError* error = nil;
+        NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
+        
+        CandidateEntry* selected = mutableFetchResults[0];
+        
+        [selected setApproved:[NSNumber numberWithBool:YES]];
+        
+        //save
+        self.dataSource = selected;
+        if (![[self.appDelegate managedObjectContext] save:&error]) {
+            NSLog(@"ERROR -- saving coredata");
+        }
+    }
+    else
+    {
+        //disapprove
+        self.checkView.hidden = YES;
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:[self.appDelegate managedObjectContext]]];
+        
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@ and firstName = %@ and lastName = %@",self.dataSource.code,self.dataSource.firstName,self.dataSource.lastName]];
+        
+        NSError* error = nil;
+        NSMutableArray* mutableFetchResults = [[[self.appDelegate managedObjectContext] executeFetchRequest:fetchRequest error:&error] mutableCopy];
+        
+        CandidateEntry* selected = mutableFetchResults[0];
+        
+        [selected setApproved:[NSNumber numberWithBool:NO]];
+        
+        //save
+        self.dataSource = selected;
+        if (![[self.appDelegate managedObjectContext] save:&error]) {
+            NSLog(@"ERROR -- saving coredata");
+        }
+    }
+}
 
 #pragma mark - UIScrollViewDelegate
 
@@ -1281,6 +1406,17 @@
     [self.yrBusinessUnit2 resignFirstResponder];
     [self.yrGPATextField resignFirstResponder];
     [self.yrPreferenceTextField resignFirstResponder];
+}
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    if (textField == self.yrYDay1 || textField == self.yrYDay2) {
+        return NO;
+    }
+    else
+    {
+        return YES;
+    }
 }
 
 #pragma mark - AutoSuggestDelegate
@@ -1796,6 +1932,19 @@
         
         [self presentViewController:picker animated:YES completion:NULL];
     }
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
+}
+
+#pragma mark - YRYDaySelecterViewDelegate
+
+-(void)uploadCoreDate
+{
+    [self updateCoreData];
 }
 
 @end
