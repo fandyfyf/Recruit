@@ -78,5 +78,6 @@
 - (IBAction)changeDebriefStatus:(id)sender;
 
 - (IBAction)uploadData:(id)sender;
+- (IBAction)deleteData:(id)sender;
 
 @end

@@ -18,6 +18,7 @@ FOUNDATION_EXPORT NSString* const kYRScheduleStartTimeKey;
 FOUNDATION_EXPORT NSString* const kYRScheduleStartDateKey;
 FOUNDATION_EXPORT NSString* const kYRScheduleNumberOfDayKey;
 FOUNDATION_EXPORT NSString* const kYREmailFormsKey;
+FOUNDATION_EXPORT NSString* const kYREngineerEmailFormsKey;
 
 @interface YRAppDelegate : UIResponder <UIApplicationDelegate>
 

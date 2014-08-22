@@ -77,6 +77,92 @@
     return image;
 }
 
+-(void)loadSettingSections
+{
+    [self fetchEventInfo];
+    
+    if ([self.eventArray count] != 0) {
+        //there is event, return interviewer info for the first event
+        
+        self.selectedEvent = [(Event*)[self.eventArray firstObject] eventCode];
+        self.selectedEventName = [(Event*)[self.eventArray firstObject] eventName];
+        [self fetchInterviewerInfoWithCode:self.selectedEvent];
+        //select
+        [self.interviewerList selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
+    }
+    else
+    {
+        [self.interviewerArray removeAllObjects];
+    }
+    
+    self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
+    
+    int interviewCount = [self.interviewerArray count];
+    int eventCount = [self.eventArray count];
+    
+    //set background image fail
+    //[self.uploadButton setBackgroundImage:[self colorImage:[UIImage imageNamed:@"upload2.png"] withColor:[UIColor redColor]] forState:UIControlStateNormal];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        [[self.yrRemoveButton layer] setCornerRadius:20];
+        [[self.yrRemoveButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveButton layer] setBorderWidth:5];
+        [[self.yrAddButton layer] setCornerRadius:20];
+        [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddButton layer] setBorderWidth:5];
+        
+        //set the button to a correct place
+        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, 260 + interviewCount*60 + eventCount*60 + 100, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, 260 + eventCount*60 + 52, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        
+        self.yrRemoveButton.hidden = YES;
+        
+        [[self.yrRemoveFormButton layer] setCornerRadius:20];
+        [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveFormButton layer] setBorderWidth:5];
+        [[self.yrAddFormButton layer] setCornerRadius:20];
+        [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddFormButton layer] setBorderWidth:5];
+        
+        [[self.yrAddEventButton layer] setCornerRadius:20];
+        [[self.yrAddEventButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddEventButton layer] setBorderWidth:5];
+    }
+    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+    {
+        [[self.yrRemoveButton layer] setCornerRadius:12.5];
+        [[self.yrRemoveButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveButton layer] setBorderWidth:2];
+        [[self.yrAddButton layer] setCornerRadius:12.5];
+        [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddButton layer] setBorderWidth:2];
+        
+        //set the button to a correct place
+        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y + interviewCount*50 + eventCount*50 + 90, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
+        
+        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + eventCount*50 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
+        
+        self.yrRemoveButton.hidden = YES;
+        
+        [[self.yrRemoveFormButton layer] setCornerRadius:12.5];
+        [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrRemoveFormButton layer] setBorderWidth:2];
+        [[self.yrAddFormButton layer] setCornerRadius:12.5];
+        [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddFormButton layer] setBorderWidth:2];
+        
+        [[self.yrAddEventButton layer] setCornerRadius:12.5];
+        [[self.yrAddEventButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+        [[self.yrAddEventButton layer] setBorderWidth:2];
+    }
+    
+    add_origin_y = self.yrAddButton.frame.origin.y;
+    remove_origin_y = self.yrRemoveButton.frame.origin.y;
+    add_form_origin_y = self.yrAddFormButton.frame.origin.y;
+    remove_form_origin_y = self.yrRemoveFormButton.frame.origin.y;
+    add_event_origin_y = self.yrAddEventButton.frame.origin.y;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -143,86 +229,8 @@
         //ydaypicker
     }
     
-    [self fetchEventInfo];
-    
-    if ([self.eventArray count] != 0) {
-        //there is event, return interviewer info for the first event
-        
-        self.selectedEvent = [(Event*)[self.eventArray firstObject] eventCode];
-        self.selectedEventName = [(Event*)[self.eventArray firstObject] eventName];
-        [self fetchInterviewerInfoWithCode:self.selectedEvent];
-        //select
-        [self.interviewerList selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:YES scrollPosition:UITableViewScrollPositionNone];
-    }
-    
-    self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
-    //int formListCount = [self.formList count];
-    int interviewCount = [self.interviewerArray count];
-    int eventCount = [self.eventArray count];
-    
-    
-    //set background image fail
-    //[self.uploadButton setBackgroundImage:[self colorImage:[UIImage imageNamed:@"upload2.png"] withColor:[UIColor redColor]] forState:UIControlStateNormal];
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [[self.yrRemoveButton layer] setCornerRadius:20];
-        [[self.yrRemoveButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrRemoveButton layer] setBorderWidth:5];
-        [[self.yrAddButton layer] setCornerRadius:20];
-        [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrAddButton layer] setBorderWidth:5];
-        
-        //set the button to a correct place
-        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y + interviewCount*60 + eventCount*60 + 100, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
-        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + eventCount*60 + 52, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
-        
-        self.yrRemoveButton.hidden = YES;
-        
-        [[self.yrRemoveFormButton layer] setCornerRadius:20];
-        [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrRemoveFormButton layer] setBorderWidth:5];
-        [[self.yrAddFormButton layer] setCornerRadius:20];
-        [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrAddFormButton layer] setBorderWidth:5];
-        
-        [[self.yrAddEventButton layer] setCornerRadius:20];
-        [[self.yrAddEventButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrAddEventButton layer] setBorderWidth:5];
-    }
-    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-    {
-        [[self.yrRemoveButton layer] setCornerRadius:12.5];
-        [[self.yrRemoveButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrRemoveButton layer] setBorderWidth:2];
-        [[self.yrAddButton layer] setCornerRadius:12.5];
-        [[self.yrAddButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrAddButton layer] setBorderWidth:2];
-        
-        //set the button to a correct place
-        [self.yrAddFormButton setFrame:CGRectMake(self.yrAddFormButton.frame.origin.x, self.yrAddFormButton.frame.origin.y + interviewCount*50 + eventCount*50 + 90, self.yrAddFormButton.frame.size.width, self.yrAddFormButton.frame.size.height)];
-        
-        [self.yrAddButton setFrame:CGRectMake(self.yrAddButton.frame.origin.x, self.yrAddButton.frame.origin.y + eventCount*50 + 45, self.yrAddButton.frame.size.width, self.yrAddButton.frame.size.height)];
-        
-        self.yrRemoveButton.hidden = YES;
-        
-        [[self.yrRemoveFormButton layer] setCornerRadius:12.5];
-        [[self.yrRemoveFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrRemoveFormButton layer] setBorderWidth:2];
-        [[self.yrAddFormButton layer] setCornerRadius:12.5];
-        [[self.yrAddFormButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrAddFormButton layer] setBorderWidth:2];
-        
-        [[self.yrAddEventButton layer] setCornerRadius:12.5];
-        [[self.yrAddEventButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrAddEventButton layer] setBorderWidth:2];
-    }
-    
-    add_origin_y = self.yrAddButton.frame.origin.y;
-    remove_origin_y = self.yrRemoveButton.frame.origin.y;
-    add_form_origin_y = self.yrAddFormButton.frame.origin.y;
-    remove_form_origin_y = self.yrRemoveFormButton.frame.origin.y;
-    add_event_origin_y = self.yrAddEventButton.frame.origin.y;
-    
+    [self loadSettingSections];
+
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
     
     doneToolbar.items = [NSArray arrayWithObjects:
@@ -682,6 +690,12 @@
     [alertView show];
 }
 
+- (IBAction)deleteData:(id)sender {
+    
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Delete Data" message:@"Please make sure the data is exported before proceed" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Proceed", nil];
+    [alertView show];
+}
+
 -(void)yrCardViewCancel
 {
     modifyModeON = NO;
@@ -1050,6 +1064,11 @@
     [temp setObject:self.yrEditingView.text forKey:[self.formList[currentSelected] allKeys][0]];
     
     [self.formList replaceObjectAtIndex:currentSelected withObject:temp];
+    
+    if ([[self.formList[currentSelected] allKeys][0] isEqualToString:@"Engineer Confirm"]) {
+        //update engineer Email Form
+        [[NSUserDefaults standardUserDefaults] setObject:@[temp] forKey:kYREngineerEmailFormsKey];
+    }
     
     [[NSUserDefaults standardUserDefaults] setObject:self.formList forKey:kYREmailFormsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1863,6 +1882,31 @@
 
     }
     
+    if ([buttonTitle isEqualToString:@"Proceed"]) {
+        //pop up alert again
+        NSString* string = [[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"];
+        if (string != nil) {
+            NSFetchRequest* request = [NSFetchRequest new];
+            [request setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+            [request setPredicate:[NSPredicate predicateWithFormat:@"eventCode = %@",string]];
+            
+            NSError* error = nil;
+            NSArray* result = [self.managedObjectContext executeFetchRequest:request error:&error];
+            
+            Event* targetEvent = [result firstObject];
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Final Alert" message:[NSString stringWithFormat:@"All the data regarding Event \"%@\" will be deleted, are you sure?",targetEvent.eventName] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Delete",nil];
+            
+            [alert show];
+        }
+        else
+        {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Deletion Fail" message:@"There is no ongoing event." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+            
+            [alert show];
+        }
+    }
+    
     if ([buttonTitle isEqualToString:@"Debrief!"]) {
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DebriefModeOn"];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1872,6 +1916,65 @@
     }
     if ([buttonTitle isEqualToString:@"Cancel"]) {
         self.yrDebriefSegCtrl.selectedSegmentIndex = 0;
+    }
+    
+    if ([buttonTitle isEqualToString:@"Delete"]) {
+        
+        NSString* string = [[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"];
+        
+        [[NSUserDefaults standardUserDefaults] setValue:nil forKey:@"eventCode"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        //delete all the appointments
+        NSFetchRequest* appFetch = [[NSFetchRequest alloc] init];
+        [appFetch setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
+        NSError* error = nil;
+        NSArray* allAppointments = [self.managedObjectContext executeFetchRequest:appFetch error:&error];
+        
+        for (Appointment* app in allAppointments) {
+            [self.managedObjectContext deleteObject:app];
+        }
+        
+        //delete all the engineers in the event
+        NSFetchRequest* interviewerFetch = [[NSFetchRequest alloc] init];
+        [interviewerFetch setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
+        [interviewerFetch setPredicate:[NSPredicate predicateWithFormat:@"code = %@",string]];
+        NSArray* allInterviewers = [self.managedObjectContext executeFetchRequest:interviewerFetch error:&error];
+        
+        for (Interviewer* interviewer in allInterviewers) {
+            [self.managedObjectContext deleteObject:interviewer];
+        }
+        
+        //delete all the students in the event
+        NSFetchRequest* candidateFetch = [[NSFetchRequest alloc] init];
+        [candidateFetch setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+        
+        NSArray* allCandidates = [self.managedObjectContext executeFetchRequest:candidateFetch error:&error];
+        
+        for (CandidateEntry* candidate in allCandidates) {
+            [self.managedObjectContext deleteObject:candidate];
+        }
+        
+        //delete event
+        
+        NSFetchRequest *eventFetch = [[NSFetchRequest alloc] init];
+        [eventFetch setEntity:[NSEntityDescription entityForName:@"Event" inManagedObjectContext:self.managedObjectContext]];
+        [eventFetch setPredicate:[NSPredicate predicateWithFormat:@"eventCode = %@",string]];
+        
+        NSArray* event = [self.managedObjectContext executeFetchRequest:eventFetch error:&error];
+        
+        Event* targetEvent = [event firstObject];
+        [self.managedObjectContext deleteObject:targetEvent];
+        
+        if (![self.managedObjectContext save:&error]) {
+            NSLog(@"ERROR -- saving coredata");
+        }
+        
+        //reset the room configuration
+        [self loadSettingSections];
+        
+        [self.interviewerList reloadData];
+        
     }
 }
 
@@ -1962,15 +2065,72 @@
     Interviewer* selectedInterviewer = [self.interviewerArray objectAtIndex:indexPath.row];
     
     if ([MFMailComposeViewController canSendMail]) {
-        NSString *emailTitle = @"Upcoming Interview Schedule";        //NSString *messageBody = @"Message goes here!";
         
+        NSArray* engineerForm = [[NSUserDefaults standardUserDefaults] objectForKey:kYREngineerEmailFormsKey];
+        
+        //set target interviewer
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] emailGenerator] setSelectedInterviewer:selectedInterviewer];
+        
+        NSDictionary* result = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] emailGenerator] generateEmail:[[engineerForm objectAtIndex:0] allValues][0]];
+                                
+        NSArray *toRecipents = [NSArray arrayWithObject:selectedInterviewer.email];
+        
+        
+        NSString *emailTitle = result[@"subject"];        //NSString *messageBody = @"Message goes here!";
         
         self.yrMailViewController = [[MFMailComposeViewController alloc] init];
         self.yrMailViewController.mailComposeDelegate = self;
         [self.yrMailViewController setSubject:emailTitle];
-        [self.yrMailViewController setToRecipients:@[selectedInterviewer.email]];
+        [self.yrMailViewController setToRecipients:toRecipents];
         
-        //[self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"csv" fileName:fileName];
+        [self.yrMailViewController setMessageBody:result[@"message"] isHTML:YES];
+        
+        //attach corressponding resume
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        
+        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
+        NSError *error;
+        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+        
+        
+        NSMutableArray* attachedStudents = [NSMutableArray new];
+        
+        for (Appointment* app in selectedInterviewer.appointments) {
+            CandidateEntry* candidate = app.candidate;
+            
+            if ([attachedStudents count] == 0) {
+                for (NSString* fileName in candidate.fileNames) {
+                    
+                    NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+                    
+                    [self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"jpg" fileName:fileName];
+                }
+                [attachedStudents addObject:candidate.code];
+            }
+            else
+            {
+                BOOL exist = NO;
+                for (NSString* code in attachedStudents) {
+                    if ([code isEqualToString:candidate.code]) {
+                        exist = YES;
+                        break;
+                    }
+                }
+                if(!exist)
+                {
+                    for (NSString* fileName in candidate.fileNames) {
+                        
+                        NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
+                        
+                        [self.yrMailViewController addAttachmentData:[NSData dataWithContentsOfFile:fullPath] mimeType:@"jpg" fileName:fileName];
+                    }
+                    [attachedStudents addObject:candidate.code];
+                }
+            }
+        }
         
         // Present mail view controller on screen
         [self presentViewController:self.yrMailViewController animated:YES completion:NULL];

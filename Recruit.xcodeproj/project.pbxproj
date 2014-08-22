@@ -41,6 +41,8 @@
 		D290362619A67C4D007D354B /* checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = D290362419A67C4D007D354B /* checkbox.png */; };
 		D290362719A67C4D007D354B /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = D290362519A67C4D007D354B /* check.png */; };
 		D290362919A69D2F007D354B /* E-mail.png in Resources */ = {isa = PBXBuildFile; fileRef = D290362819A69D2F007D354B /* E-mail.png */; };
+		D298CE6719A7B6EE00D475DC /* delete.png in Resources */ = {isa = PBXBuildFile; fileRef = D298CE6619A7B6EE00D475DC /* delete.png */; };
+		D298CE6919A7B76300D475DC /* file_delete.png in Resources */ = {isa = PBXBuildFile; fileRef = D298CE6819A7B76300D475DC /* file_delete.png */; };
 		D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */; };
 		D2A68076194CB4CA0091B768 /* YRHostDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D2A68075194CB4CA0091B768 /* YRHostDetailViewController.m */; };
 		D2B2CAAB1987F2A70078C5B3 /* YRFormDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D2B2CAAA1987F2A70078C5B3 /* YRFormDataCell.m */; };
@@ -153,6 +155,8 @@
 		D290362419A67C4D007D354B /* checkbox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = checkbox.png; sourceTree = "<group>"; };
 		D290362519A67C4D007D354B /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = check.png; sourceTree = "<group>"; };
 		D290362819A69D2F007D354B /* E-mail.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "E-mail.png"; sourceTree = "<group>"; };
+		D298CE6619A7B6EE00D475DC /* delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = delete.png; sourceTree = "<group>"; };
+		D298CE6819A7B76300D475DC /* file_delete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = file_delete.png; sourceTree = "<group>"; };
 		D2A6806C194B83AA0091B768 /* YRHostSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostSettingViewController.h; path = Recruit/YRHostSettingViewController.h; sourceTree = SOURCE_ROOT; };
 		D2A6806D194B83AA0091B768 /* YRHostSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRHostSettingViewController.m; path = Recruit/YRHostSettingViewController.m; sourceTree = SOURCE_ROOT; };
 		D2A68074194CB4CA0091B768 /* YRHostDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRHostDetailViewController.h; path = Recruit/YRHostDetailViewController.h; sourceTree = SOURCE_ROOT; };
@@ -343,6 +347,8 @@
 				D290362419A67C4D007D354B /* checkbox.png */,
 				D290362519A67C4D007D354B /* check.png */,
 				D290362819A69D2F007D354B /* E-mail.png */,
+				D298CE6619A7B6EE00D475DC /* delete.png */,
+				D298CE6819A7B76300D475DC /* file_delete.png */,
 				D25268A9194F4B4B00EBE43E /* iPad */,
 				D2F818A119478777006E88FD /* YRClient */,
 				D2F818A219478777006E88FD /* YRHost */,
@@ -532,12 +538,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D298CE6919A7B76300D475DC /* file_delete.png in Resources */,
 				D25E489D198FCCBD0005A466 /* left.png in Resources */,
 				D290360C19A258B4007D354B /* upload2.png in Resources */,
 				D2D1E57519611BC90084D8DA /* Columbia_engineering.jpg in Resources */,
 				D251C661196F209A003E86FD /* flag.jpg in Resources */,
 				D2B6245719805232006A385B /* 72x72.png in Resources */,
 				D2B6245119805232006A385B /* 114x114.png in Resources */,
+				D298CE6719A7B6EE00D475DC /* delete.png in Resources */,
 				D2B6245419805232006A385B /* 152x152.png in Resources */,
 				D25268B019507D7700EBE43E /* document.png in Resources */,
 				D2B6245319805232006A385B /* 144x144.png in Resources */,

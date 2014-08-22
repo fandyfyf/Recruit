@@ -168,10 +168,6 @@
     if (![self.yrPrefixTextField.text isEqualToString:@""]) {
         self.yrPrefix = self.yrPrefixTextField.text;
         
-        //set the event code in the user default
-        
-        [[NSUserDefaults standardUserDefaults] setValue:self.yrPrefix forKey:@"eventCode"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
         
         if (self.yrOnOffControl.selectedSegmentIndex == 1) {
             NSLog(@"On");
@@ -483,6 +479,12 @@
             self.yrPrefix = [(Event*)[self.eventArray objectAtIndex:indexPath.row] eventCode];
         
             self.yrPrefixTextField.text = self.yrPrefix;
+            
+            
+            //set the event code in the user default
+            
+            [[NSUserDefaults standardUserDefaults] setValue:self.yrPrefix forKey:@"eventCode"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
         }
         [self dismissEventList];
     }

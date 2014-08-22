@@ -15,6 +15,7 @@ NSString* const kYRScheduleDurationKey = @"scheduleDuration";
 NSString* const kYRScheduleStartDateKey = @"scheduleStartDate";
 NSString* const kYRScheduleNumberOfDayKey = @"scheduleNumberOfDay";
 NSString* const kYREmailFormsKey = @"emailForms";
+NSString* const kYREngineerEmailFormsKey = @"engineerEmailForms";
 
 @implementation YRAppDelegate
 
@@ -47,6 +48,8 @@ NSString* const kYREmailFormsKey = @"emailForms";
                          @{@"appLinkIntern" : @"{applicationLinkIntern}"},
                          @{@"appLinkNCG" : @"{applicationLinkNCG}"},
                          @{@"interviewDuration" : @"{interviewDuration}"},
+                         @{@"engineerName" : @"{engineerName}"},
+                         @{@"scheduleGrid" : @"{ScheduleGrid}"},
                          @{@"resume" : @"{resume}"}];
         
         [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailKeyWordsKey];
@@ -61,6 +64,11 @@ NSString* const kYREmailFormsKey = @"emailForms";
                          @{@"NCG Confirm" : @"<subject:Yahoo is Interested in Speaking with You! - {studentFirstName} {studentLastName}>\nHello {studentFirstName}!\n\nWe are excited to have you interview with Yahoo on your school Campus. You will meet with members of our hiring team, who are eager to learn more about you and your professional goals.\n\nYour interview has been confirmed. Specific details can be found below along with application instructions and job description. We hope that you have a wonderful interivew experience with Yahoo. And of course, don't hesitate to email or call me if you have any questions.\n\n\nBest of luck!\n\nsignature\n\nINTERVIEW DETAILS:\n\n{appointments}\nAPPLICATION INSTRUCTIONS:\n\nPrior to your interview, please review the job description and apply online via the following link: {applicationLinkNCG}"},
                          @{@"Engineer Confirm" : @"<subject:Upcoming Interview Schedule>\nHello {engineerName}!\n\nAttached you will find the resumes for your upcoming interviews. The interview schedule is as follows:\n\n{ScheduleGrid}\n\nDon't hesitate to email me if you have any questions.\n\nThanks!\n\nSignature"}];
         [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREmailFormsKey];
+    }
+    
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:kYREngineerEmailFormsKey] == nil) {
+        NSArray* dic = @[@{@"Engineer Confirm" : @"<subject:Upcoming Interview Schedule>\nHello {engineerName}!\n\nAttached you will find the resumes for your upcoming interviews. The interview schedule is as follows:\n\n{ScheduleGrid}Don't hesitate to email me if you have any questions.\n\nThanks!\n\nSignature"}];
+        [[NSUserDefaults standardUserDefaults] setObject:dic forKey:kYREngineerEmailFormsKey];
     }
     
     //save all the setting

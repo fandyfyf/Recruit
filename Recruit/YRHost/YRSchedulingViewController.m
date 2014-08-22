@@ -56,7 +56,7 @@
         roomNumberTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 120, 200, 30)];
         roomNumberTitleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 23];
         
-        self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 70, 100, 30)];
+        self.startTimeLabel = [[UILabel alloc] initWithFrame:CGRectMake(30, 70, 150, 30)];
         self.startTimeLabel.font = [UIFont fontWithName:@"Helvetica" size: 23];
         
         self.roomLabel = [[UILabel alloc] initWithFrame:CGRectMake(50, 150, 100, 30)];

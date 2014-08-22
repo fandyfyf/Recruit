@@ -121,7 +121,8 @@
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
+    
+    //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
     
     NSError* error = nil;
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -165,7 +166,7 @@
         self.toLeft = [NSNumber numberWithInt:100];
     }
     
-    self.yrRowNumber = [NSNumber numberWithInt:20];
+    self.yrRowNumber = [NSNumber numberWithInt:15];
     self.yrColumNumber = [[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleColumsKey];
     
     //======================Basic UI=========================//
@@ -235,16 +236,18 @@
     int min = 0;
     int period = [[[NSUserDefaults standardUserDefaults] valueForKey:kYRScheduleDurationKey] intValue];
     
+    NSString* AMPM = @"AM";
+    
     for (int i=0; i<[self.yrRowNumber intValue] ; i++) {
         
         //=============set up time label for each row============//
         UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, i*([self.cardHeight intValue]+5)+[self.toTop intValue], [self.toLeft intValue], 20)];
         if (min < 10) {
-            [timeLabel setText:[NSString stringWithFormat:@"%d : 0%d",hour,min]];
+            [timeLabel setText:[NSString stringWithFormat:@"%d : 0%d %@",hour,min,AMPM]];
         }
         else
         {
-            [timeLabel setText:[NSString stringWithFormat:@"%d : %d",hour,min]];
+            [timeLabel setText:[NSString stringWithFormat:@"%d : %d %@",hour,min,AMPM]];
         }
         min = min + period;
         if (min >= 60) {
@@ -255,6 +258,10 @@
         
         if (hour > 12) {
             hour = hour%12;
+        }
+        
+        if (hour >= 12) {
+            AMPM = @"PM";
         }
         
         timeLabel.textColor = [UIColor whiteColor];
@@ -300,19 +307,25 @@
     
     //================load Data in==================//(iterate through all the data entry)
     
+    NSDateFormatter* format = [[NSDateFormatter alloc] init];
+    [format setDateFormat:@"MM/dd/yyy"];
+    
     if ([self.yrAppointmentInfo count] != 0) {
         for (Appointment* ap in self.yrAppointmentInfo) {
-            int index = [ap.apIndex_y intValue] * [self.yrColumNumber intValue] + [ap.apIndex_x intValue];
             
-            if (index < [self.views count]) {
-                YRTimeCardView* targetCell = [self.views objectAtIndex:index];
-                targetCell.candidateNameLabel.text = [NSString stringWithFormat:@"%@ %@",ap.candidate.firstName,ap.candidate.lastName];
-                targetCell.interviewerNameLabel.text = ap.interviewers.name;
-                targetCell.codeLabel.text = ap.candidate.code;
-            }
-            else
-            {
-                NSLog(@"index out of range");
+            if ([[format stringFromDate:ap.date] isEqualToString:[format stringFromDate:self.currentDate]]) {
+                int index = [ap.apIndex_y intValue] * [self.yrColumNumber intValue] + [ap.apIndex_x intValue];
+                
+                if (index < [self.views count]) {
+                    YRTimeCardView* targetCell = [self.views objectAtIndex:index];
+                    targetCell.candidateNameLabel.text = [NSString stringWithFormat:@"%@ %@",ap.candidate.firstName,ap.candidate.lastName];
+                    targetCell.interviewerNameLabel.text = ap.interviewers.name;
+                    targetCell.codeLabel.text = ap.candidate.code;
+                }
+                else
+                {
+                    NSLog(@"index out of range");
+                }
             }
         }
     }
@@ -616,7 +629,7 @@
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
+    //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
     
     NSError* error = nil;
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -638,7 +651,7 @@
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-    [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
+    //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
     
     NSError* error = nil;
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -752,7 +765,7 @@
             
             NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"Appointment" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
+            //[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"date = %@",self.currentDate]];
             NSError* error = nil;
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
