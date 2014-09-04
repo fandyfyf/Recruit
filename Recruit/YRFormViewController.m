@@ -11,6 +11,12 @@
 #import "YRDataManager.h"
 #import "YRClientSignInViewController.h"
 
+typedef NS_ENUM(NSInteger, yRFormAlertType)
+{
+    formAlertTypeProceed,
+    formAlertTypeSend
+};
+
 @interface YRFormViewController ()
 
 -(BOOL)checkReady;
@@ -25,6 +31,9 @@
 -(void)showPlatformSeg;
 -(void)doneWithPad;
 -(void)removeListView;
+
+
+@property (nonatomic) UIView *overlayView;
 
 @end
 
@@ -92,6 +101,26 @@
                            nil];
     self.yrGPATextField.inputAccessoryView = doneToolbar;
     self.yrNoteTextView.inputAccessoryView = doneToolbar;
+    
+    self.overlayView = [[UIView alloc] initWithFrame:CGRectZero];
+    [self.overlayView setBackgroundColor:[UIColor purpleColor]];
+    self.overlayView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    [self.view addSubview:self.overlayView];
+    [self.overlayView setFrame:self.view.bounds];
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    self.overlayView.alpha = 1.0;
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    [self.overlayView setFrame:self.view.bounds];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Registration" message: @"Please tap OK to proceed if you are a Yahoo engineer" delegate: nil cancelButtonTitle: @"OK" otherButtonTitles: nil];
+    alert.delegate = self;
+    alert.tag = formAlertTypeProceed;
+    [alert show];
 }
 
 - (void)didReceiveMemoryWarning
@@ -107,12 +136,14 @@
 - (IBAction)sendInformation:(id)sender {
     if ([self checkReady]) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Send Now?" message:@"Please write down the resume ID on the back of resume!" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send",@"Send and Flag!", nil];
+        alert.tag = formAlertTypeSend;
         [alert show];
     }
     else
     {
         //wait until GPA is filled out
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please enter GPA!" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        alert.tag = formAlertTypeSend;
         [alert show];
     }
 }
@@ -300,47 +331,53 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (![[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Cancel"]) {
-        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"tempBackUp"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        NSString* preference;
-        if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 3) {
-            preference = [NSString stringWithFormat:@"%@ - %@",[self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex],[self.yrPlatformSegCtrl titleForSegmentAtIndex:self.yrPlatformSegCtrl.selectedSegmentIndex]];
+    if (alertView.tag == formAlertTypeSend) {
+        if (![[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Cancel"]) {
+            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"tempBackUp"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+            NSString* preference;
+            if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 3) {
+                preference = [NSString stringWithFormat:@"%@ - %@",[self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex],[self.yrPlatformSegCtrl titleForSegmentAtIndex:self.yrPlatformSegCtrl.selectedSegmentIndex]];
+            }
+            else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 0)
+            {
+                preference = @"Front End";
+            }
+            else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 1)
+            {
+                preference = @"Back End";
+            }
+            else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 2)
+            {
+                preference = @"Service Engineering";
+            }
+            else
+            {
+                preference = [self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex];
+            }
+            NSDictionary *dataDic = @{@"firstName" : [[(YRClientSignInViewController*)self.source yrFirstNameTextField] text], @"lastName" : [[(YRClientSignInViewController*)self.source yrLastNameTextField] text], @"email" : [[(YRClientSignInViewController*)self.source yrEmailTextField] text], @"code" : self.yrcodeLabel.text,  @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : preference, @"position" : [self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex], @"date" : [NSDate date], @"note" : [self.yrNoteTextView text], @"gpa" : self.yrGPATextField.text, @"rank" : [self.yrRankingSegmentControl titleForSegmentAtIndex:self.yrRankingSegmentControl.selectedSegmentIndex], @"interviewer" : self.appDelegate.mcManager.userName, @"tagList" : [NSArray new]};
+            
+            NSMutableDictionary *newDic = [NSMutableDictionary new];
+            [newDic addEntriesFromDictionary:dataDic];
+            
+            if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Flag!"]) {
+                newDic[@"tagList"] = @[self.appDelegate.mcManager.userName];
+            }
+            //change NSDictionary to NSMutableDictionary
+            NSDictionary *dic = @{@"msg" : @"data", @"data" : newDic};
+            
+            [(YRClientSignInViewController*)self.source setCodeLabel:@"Offline"];
+            [self.appDelegate.dataManager sendData:dic];
+            
+            [self refresh];
+            
+            [self dismissViewControllerAnimated:YES completion:nil];
         }
-        else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 0)
-        {
-            preference = @"Front End";
-        }
-        else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 1)
-        {
-            preference = @"Back End";
-        }
-        else if (self.yrPreferenceSegmentControl.selectedSegmentIndex == 2)
-        {
-            preference = @"Service Engineering";
-        }
-        else
-        {
-            preference = [self.yrPreferenceSegmentControl titleForSegmentAtIndex:self.yrPreferenceSegmentControl.selectedSegmentIndex];
-        }
-        NSDictionary *dataDic = @{@"firstName" : [[(YRClientSignInViewController*)self.source yrFirstNameTextField] text], @"lastName" : [[(YRClientSignInViewController*)self.source yrLastNameTextField] text], @"email" : [[(YRClientSignInViewController*)self.source yrEmailTextField] text], @"code" : self.yrcodeLabel.text,  @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : preference, @"position" : [self.yrPositionSegmentControl titleForSegmentAtIndex:self.yrPositionSegmentControl.selectedSegmentIndex], @"date" : [NSDate date], @"note" : [self.yrNoteTextView text], @"gpa" : self.yrGPATextField.text, @"rank" : [self.yrRankingSegmentControl titleForSegmentAtIndex:self.yrRankingSegmentControl.selectedSegmentIndex], @"interviewer" : self.appDelegate.mcManager.userName, @"tagList" : [NSArray new]};
-        
-        NSMutableDictionary *newDic = [NSMutableDictionary new];
-        [newDic addEntriesFromDictionary:dataDic];
-        
-        if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send and Flag!"]) {
-            newDic[@"tagList"] = @[self.appDelegate.mcManager.userName];
-        }
-        //change NSDictionary to NSMutableDictionary
-        NSDictionary *dic = @{@"msg" : @"data", @"data" : newDic};
-        
-        [(YRClientSignInViewController*)self.source setCodeLabel:@"Offline"];
-        [self.appDelegate.dataManager sendData:dic];
-        
-        [self refresh];
-        
-        [self dismissViewControllerAnimated:YES completion:nil];
+    } else if (alertView.tag == formAlertTypeProceed) {
+        [UIView animateWithDuration:1.0 animations:^{
+            self.overlayView.alpha = 0.0f;
+        }];
     }
 }
 

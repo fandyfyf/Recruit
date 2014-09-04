@@ -661,7 +661,24 @@
     }
     //broadcast
     //broadcast again.
-    NSDictionary* dic = @{@"firstName":selected.firstName,@"lastName":selected.lastName,@"email":selected.emailAddress,@"interviewer":selected.interviewer,@"code":selected.code,@"status":selected.status,@"pdf":selected.pdf,@"position":selected.position,@"preference":selected.preference,@"date":selected.date,@"note":selected.notes,@"rank":[selected.rank stringValue],@"gpa":[selected.gpa stringValue],@"BU1" : selected.businessUnit1, @"BU2" : selected.businessUnit2, @"fileNames" : selected.fileNames, @"tagList" : selected.tagList};
+    NSDictionary* dic = @{@"firstName":selected.firstName ?: @"",
+                          @"lastName":selected.lastName ?: @"",
+                          @"email":selected.emailAddress ?: @"",
+                          @"interviewer":selected.interviewer ?: @"",
+                          @"code":selected.code ?: @"",
+                          @"status":selected.status ?: @"",
+                          @"pdf":selected.pdf ?: @"",
+                          @"position":selected.position ?: @"",
+                          @"preference":selected.preference ?: @"",
+                          @"date":selected.date ?: @"",
+                          @"note":selected.notes ?: @"",
+                          @"rank":[selected.rank stringValue],
+                          @"gpa":[selected.gpa stringValue],
+                          @"BU1" : selected.businessUnit1 ?: @"",
+                          @"BU2" : selected.businessUnit2 ?: @"",
+                          @"fileNames" : selected.fileNames ?: @"",
+                          @"tagList" : selected.tagList ?: @""};
+    
     NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
     
     [self.appDelegate.dataManager broadCastData:packet];
@@ -1391,7 +1408,7 @@
             NSLog(@"Mail send: the email message is queued in the outbox. It is ready to send.");
         {
             NSString *emailTemplateName = [[[self.appDelegate emailGenerator] class] emailFormNameForIndex:currentSelectedEmailForm];
-            if ([emailTemplateName rangeOfString:@"Confirm"].location != NSNotFound) {
+            if ([emailTemplateName isEqualToString:@"Intern Confirm"] || [emailTemplateName isEqualToString:@"NCG Confirm"]) {
                 [self confirmCandidate:self.dataSource];
             }
         }
