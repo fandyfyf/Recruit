@@ -26,6 +26,24 @@
     return self;
 }
 
++(NSString *)emailFormNameForIndex:(NSUInteger)index{
+    NSString *emailForm = nil;
+    NSArray *formlist = [[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey];
+    if (index < [formlist count]) {
+        
+        // TODO: This dictionary is a bit weird in that the key is actually the name of the template
+        // It would make more sense for the key to be standard "templateName" and then the value be varied
+        
+        NSDictionary *emailFormDict = [formlist objectAtIndex:index];
+        NSArray *emailFormDictKeys = [emailFormDict allKeys];
+        if (emailFormDictKeys && [emailFormDictKeys count] > 0) {
+            emailForm = [emailFormDictKeys firstObject]; // The dictionary should only have one key
+        }
+    }
+    return emailForm;
+}
+
+
 -(NSDictionary*) generateEmail:(NSString*)defaultForm
 {
     NSNumber* pdfFlag = [NSNumber numberWithBool:NO];

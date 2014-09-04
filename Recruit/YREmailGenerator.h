@@ -22,5 +22,6 @@
 -(id)init;
 
 -(NSDictionary*)generateEmail:(NSString*)defaultForm;
++(NSString *)emailFormNameForIndex:(NSUInteger)index;
 
 @end

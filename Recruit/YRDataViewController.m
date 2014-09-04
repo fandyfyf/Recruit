@@ -206,6 +206,7 @@
 {
     [self.yrdataEntry removeAllObjects];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    fetchRequest.shouldRefreshRefetchedObjects = YES;
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
     
     if(self.yrSortingSegmentControl.selectedSegmentIndex == 1)
@@ -546,9 +547,11 @@
     {
         cell.yrstatusLabel.textColor = [UIColor colorWithRed:110.0/255.0 green:163.0/255.0 blue:41.0/255.0 alpha:1.0];
     }
-    else
+    else if ([current.status isEqualToString:@"confirmed"])
     {
-        //
+        cell.yrstatusLabel.textColor = [UIColor purpleColor];
+    } else {
+        
     }
     cell.yrGPALabel.text = [NSString stringWithFormat:@"%@",current.gpa];
     
