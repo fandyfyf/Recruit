@@ -667,6 +667,15 @@
     [self.appDelegate.dataManager broadCastData:packet];
 }
 
+- (void)confirmCandidate:(CandidateEntry *)candidate{
+    [candidate setStatus:@"confirmed"];
+    NSError *error = nil;
+    BOOL success =[[self appDelegate].managedObjectContext save:&error];
+    if (!success) {
+        NSLog(@"Error saving to Core Data: %@", error);
+    }
+}
+
 - (void) spinWithOptions: (UIViewAnimationOptions) options onView:(UIView*)view withDuration:(NSTimeInterval)duration withAngle:(CGFloat)angle{
     [UIView animateWithDuration: duration
                           delay: 0.0f
@@ -1380,9 +1389,12 @@
             break;
         case MFMailComposeResultSent:
             NSLog(@"Mail send: the email message is queued in the outbox. It is ready to send.");
-            //======changing the status of the candidate after specific email is sent======//
-            
-            //========//
+        {
+            NSString *emailTemplateName = [[[self.appDelegate emailGenerator] class] emailFormNameForIndex:currentSelectedEmailForm];
+            if ([emailTemplateName rangeOfString:@"Confirm"].location != NSNotFound) {
+                [self confirmCandidate:self.dataSource];
+            }
+        }
             break;
         case MFMailComposeResultFailed:
             NSLog(@"Mail failed: the email message was not saved or queued, possibly due to an error.");
