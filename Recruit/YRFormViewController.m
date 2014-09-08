@@ -276,7 +276,11 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
         self.yrNoteTextView.frame = CGRectMake(70, 531, 627, 280);
     }
     else{
-        self.yrNoteTextView.frame = CGRectMake(20, 298, 280, 150);
+        // This is a hack to support various iPhone sizes.
+        // We should use layoutSubviews!! Or use Auto Layout.
+        
+        CGFloat height = (CGRectGetMinY(self.sendButton.frame) - 298) - 8; // 8 is the margin between UI elements
+        self.yrNoteTextView.frame = CGRectMake(20, 298, 280, height);
     }
     //self.yrNoteTextView.frame = noteRect;
     
@@ -295,7 +299,8 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
         self.yrNoteTextView.frame = CGRectMake(70, 531, 627, 280);
     }
     else{
-        self.yrNoteTextView.frame = CGRectMake(20, 298, 280, 150);
+        CGFloat height = (CGRectGetMinY(self.sendButton.frame) - 298) - 8; // 8 is the margin between UI elements
+        self.yrNoteTextView.frame = CGRectMake(20, 298, 280, height);
     }
     //self.yrNoteTextView.frame = noteRect;
     

@@ -16,6 +16,8 @@
 
 @interface YRClientSignInViewController ()
 
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+
 @property (nonatomic, strong) NSMutableArray *yrarrayConnectedDevices;
 
 -(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
@@ -58,10 +60,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
     self.yrIDCode = [NSMutableString new];
-    
     
     //reset session and make the connect
     [self.appDelegate.mcManager.session disconnect];
@@ -140,8 +143,14 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
     self.clientUserName = [self.appDelegate.mcManager userName];
     [self.yrnameLabel setText:self.clientUserName];
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    self.scrollView.contentSize = self.view.bounds.size;
 }
 
 - (void)didReceiveMemoryWarning
@@ -389,6 +398,10 @@
 
 #pragma mark - UITextFieldDelegate
 
+- (void)textFieldDidBeginEditing:(UITextField *)textField{
+    [self.scrollView scrollRectToVisible:textField.frame animated:YES];
+}
+
 -(void)textFieldDidEndEditing:(UITextField *)textField
 {
     [self.yrFirstNameTextField resignFirstResponder];
@@ -556,6 +569,7 @@
         self.yrarrayConnectedDevices = nil;
         
         //stop listening to notifications
+        // TODO: We shouldn't stop listening for all notification, right? We lose the keyboard notifications....
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         
         [self.appDelegate.dataManager stopListeningForData];
@@ -569,5 +583,19 @@
     }
 }
 
+#pragma mark - Keyboard
+
+- (void)keyboardDidShow:(NSNotification *)notif{
+    NSValue *endFrame = [[notif userInfo] objectForKey: UIKeyboardFrameEndUserInfoKey];
+    if (endFrame) {
+        CGRect convertedFrame = [self.view convertRect:[endFrame CGRectValue] fromView:nil];
+        UIEdgeInsets contentInsets = UIEdgeInsetsMake(0.0, 0.0, convertedFrame.size.height, 0.0);
+        self.scrollView.contentInset = contentInsets;
+    }
+}
+
+- (void)keyboardWillHide:(NSNotification *)notif{
+    self.scrollView.contentInset = UIEdgeInsetsZero;
+}
 
 @end
