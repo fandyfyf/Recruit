@@ -569,6 +569,7 @@
         self.yrarrayConnectedDevices = nil;
         
         //stop listening to notifications
+        // TODO: We shouldn't stop listening for all notification, right? We lose the keyboard notifications....
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         
         [self.appDelegate.dataManager stopListeningForData];
