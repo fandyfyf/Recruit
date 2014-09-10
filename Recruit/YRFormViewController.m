@@ -168,9 +168,14 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
 -(void)reconnectNotification:(NSNotification *)notification
 {
     //NSLog(@"Name is %@",[[[[self tabBarController] viewControllers] objectAtIndex: 0] valueForKey:@"clientUserName"]);
-    [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:[[[self.tabBarController viewControllers] objectAtIndex: 0] valueForKey:@"clientUserName"]];
-    MCNearbyServiceBrowser *browser = [[MCNearbyServiceBrowser alloc] initWithPeer:[self.appDelegate mcManager].peerID serviceType:@"files"];
-    [browser invitePeer:[self.appDelegate mcManager].lastConnectionPeerID toSession:[self.appDelegate mcManager].session withContext:nil timeout:10];
+    if ([self.presentingViewController isKindOfClass:[YRClientSignInViewController class]]) {
+        NSString *clientUserName = [(YRClientSignInViewController *)self.presentingViewController clientUserName];
+        if (clientUserName) {
+            [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:clientUserName];
+            MCNearbyServiceBrowser *browser = [[MCNearbyServiceBrowser alloc] initWithPeer:[self.appDelegate mcManager].peerID serviceType:@"files"];
+            [browser invitePeer:[self.appDelegate mcManager].lastConnectionPeerID toSession:[self.appDelegate mcManager].session withContext:nil timeout:10];
+        }
+    }
 }
 
 -(void)needEndSessionNotification:(NSNotification *)notification
