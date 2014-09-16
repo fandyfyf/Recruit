@@ -849,11 +849,11 @@
             self.grayView.alpha = 0.4;
         } completion:^(BOOL finished){spin = NO;}];
         spin = YES;
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeHalfButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankFourButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeHalfButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankFourButton withDuration:0.1f withAngle:M_PI/2];
         
     }
     else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
@@ -941,11 +941,11 @@
             self.grayView.alpha = 0.4;
         } completion:^(BOOL finished){spin = NO;}];
         spin = YES;
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeHalfButton withDuration:0.1f withAngle:M_PI/2];
-        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankFourButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankOneButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankTwoButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankThreeHalfButton withDuration:0.1f withAngle:M_PI/2];
+//        [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.rankFourButton withDuration:0.1f withAngle:M_PI/2];
     }
 //    self.yrRankTextLabel.hidden = NO;
 //    [self.yrRankTextLabel becomeFirstResponder];
