@@ -858,6 +858,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
 
 -(void)sendBackUp:(NSDictionary *)localBackUp
 {
+    NSLog(@"sending backups");
     NSError* error = [self sendToHostWithData:localBackUp];
     
     if(error){

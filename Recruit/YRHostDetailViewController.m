@@ -276,24 +276,24 @@
     {
         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(621, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
-            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
+            //[self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
             
             [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(548, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
-            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
+            //[self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
             
             [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(475, 20, 70, 70);} completion:^(BOOL finish){ spin = NO;}];
-            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+            //[self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
         }
         else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
         {
             [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrEmailButton.frame = CGRectMake(260, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
-            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
+            //[self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrEmailButton withDuration:0.15f withAngle:M_PI/2];
             
             [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.yrScheduleButton.frame = CGRectMake(208, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
-            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
+            //[self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.yrScheduleButton withDuration:0.15f withAngle:M_PI/2];
             
             [UIView animateWithDuration:0.5 delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{self.checkInterviewButton.frame = CGRectMake(156, 20, 50, 50);} completion:^(BOOL finish){ spin = NO;}];
-            [self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
+            //[self spinWithOptions:UIViewAnimationOptionCurveEaseIn onView:self.checkInterviewButton withDuration:0.15f withAngle:M_PI/2];
         }
     }
 }

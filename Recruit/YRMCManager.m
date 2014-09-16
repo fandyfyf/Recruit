@@ -51,6 +51,7 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 
 -(void)advertiseSelf:(BOOL)shouldAdvertise
 {
+    NSLog(@"advertising...");
     if (shouldAdvertise) {
         if (self.activeSessions == nil) {
             self.activeSessions = [NSMutableArray new];
