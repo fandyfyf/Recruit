@@ -79,9 +79,26 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
         
         [yrunarchiver finishDecoding];
         
-        NSLog(@"message is %@; I AM %@",dic[@"msg"], self);
+        //NSLog(@"message is %@; I AM %@",dic[@"msg"], self);
         
-        if ([dic[@"msg"] isEqualToString:@"backup"] && self.isHost)
+        
+        if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
+        {
+            if ([self isNotDuplicateData:dic[@"data"]]){
+                [self sendACKBack:peerID];
+                
+                CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+                NSDictionary *dict = @{@"entry" : curr};
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTableNotification object:nil userInfo:dict];
+            }
+            else
+            {
+                [self sendACKBack:peerID];
+                NSLog(@"duplicate code and firstName found");
+            }
+        }
+        else if ([dic[@"msg"] isEqualToString:@"backup"] && self.isHost)
         {
             if ([self isNotDuplicateData:dic[@"data"]]) {
                 CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
@@ -96,24 +113,77 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
                 NSLog(@"duplicate code and firstName found");
             }
         }
-        else if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
+        else if([dic[@"msg"] isEqualToString:@"ack"])
         {
-            if ([self isNotDuplicateData:dic[@"data"]]){
-                [self sendACKBack:peerID];
+            [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
+            NSDictionary *dict = @{@"recruitID": dic[@"code"]};
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateCodeNotification object:nil userInfo:dict];
+#if Debug
+            //==================================debug========================================//
+            //[self debugSenderActiveWithCode:dic[@"code"]];
+            //===============================================================================//
+#endif
+        }
+        else if([dic[@"msg"] isEqualToString:@"nameList"])
+        {
+            NSLog(@"The receiving list is %@",dic[@"data"]);
+            self.nameList = dic[@"data"];
+            
+            BOOL signIn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedInAlready"] boolValue];
+            
+            if (signIn) {
+                [self sendIdentityConfirmation:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
                 
-                CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
-                NSDictionary *dict = @{@"entry" : curr};
+                NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+                [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
+                NSError* error = nil;
+                NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTableNotification
-                                                                    object:nil
-                                                                  userInfo:dict];
+                for (CandidateEntry* backedUpCandidate in FetchResults)
+                {
+                    NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":[backedUpCandidate tagList]};
+                    NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+                    [self sendBackUp:packet];
+                    NSLog(@"sending one entry");
+                }
+                
+                //reset the core data
+                for (CandidateEntry* backedUpCandidate in FetchResults)
+                {
+                    [self.managedObjectContext deleteObject:backedUpCandidate];
+                    NSLog(@"deleting one coredata entry");
+                }
+                
+                if (![self.managedObjectContext save:&error]) {
+                    NSLog(@"ERROR -- saving coredata");
+                }
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"removeNameListNotification" object:nil];
             }
             else
             {
-                [self sendACKBack:peerID];
-                NSLog(@"duplicate code and firstName found");
+                [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"SignedInAlready"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedPromptNameListNotification object:nil userInfo:nil];
             }
         }
+        else if([dic[@"msg"] isEqualToString:@"identityConfirm"] && self.isHost)
+        {
+            NSLog(@"Receiving update username: %@ from %@",peerID.displayName,dic[@"data"]);
+            
+            NSDictionary* dict = @{@"displayName": peerID.displayName, @"confirmedName" : dic[@"data"]};
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateConnectionListNotification object:nil userInfo:dict];
+            
+            //===================send to new connected user====================//
+            if ([(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isDebriefing) {
+                [self sendDebriefInvitationToPeer:peerID];
+            }
+            //=================================================================//
+        }
+        //========================Debrif message ==========================//
         else if([dic[@"msg"] isEqualToString:@"broadcast"] && !self.isHost)
         {
             //receive debrief invitation
@@ -329,81 +399,15 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
         }
         else if([dic[@"msg"] isEqualToString:@"debriefTermination"] && !self.isHost)
         {
-            //receive debrief invitation
+            //receive debrief termination
             NSLog(@"receiving debrief termination");
+            [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].debriefing = NO;
+            
             UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Termination" message:@"The host is closing the session" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
             //or post notification to observers
-        }
-        else if([dic[@"msg"] isEqualToString:@"identityConfirm"] && self.isHost)
-        {
-            NSLog(@"Receiving update username: %@ from %@",peerID.displayName,dic[@"data"]);
-            
-            NSDictionary* dict = @{@"displayName": peerID.displayName, @"confirmedName" : dic[@"data"]};
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateConnectionListNotification object:nil userInfo:dict];
-            
-            //===================send to new connected user====================//
-            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
-                [self sendDebriefInvitationToPeer:peerID];
-            }
-            
-        }
-        else if([dic[@"msg"] isEqualToString:@"ack"])
-        {
-            [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
-            NSDictionary *dict = @{@"recruitID": dic[@"code"]};
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateCodeNotification object:nil userInfo:dict];
-#if Debug
-            //==================================debug========================================//
-            //[self debugSenderActiveWithCode:dic[@"code"]];
-            //===============================================================================//
-#endif
-        }
-        else if([dic[@"msg"] isEqualToString:@"nameList"])
-        {
-            NSLog(@"The receiving list is %@",dic[@"data"]);
-            self.nameList = dic[@"data"];
-            
-            BOOL signIn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedInAlready"] boolValue];
-            
-            if (signIn) {
-                [self sendIdentityConfirmation:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
-                
-                NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-                [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
-                NSError* error = nil;
-                NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-                
-                for (CandidateEntry* backedUpCandidate in FetchResults)
-                {
-                    NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":[backedUpCandidate tagList]};
-                    NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
-                    [self sendBackUp:packet];
-                    NSLog(@"sending one entry");
-                }
-                
-                //reset the core data
-                for (CandidateEntry* backedUpCandidate in FetchResults)
-                {
-                    [self.managedObjectContext deleteObject:backedUpCandidate];
-                    NSLog(@"deleting one coredata entry");
-                }
-                
-                if (![self.managedObjectContext save:&error]) {
-                    NSLog(@"ERROR -- saving coredata");
-                }
-            }
-            else
-            {
-                [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"SignedInAlready"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedPromptNameListNotification object:nil userInfo:nil];
-            }
         }
         else
         {
@@ -593,15 +597,19 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
     [self sendToALLClientsWithData:data];
 }
 
--(void)sendDataRequestForFile:(NSString*)fileName
+-(NSError*)sendDataRequestForFile:(NSString*)fileName
 {
     NSDictionary* dic = @{@"msg" : @"resumeRequest", @"data" : fileName};
     
     NSError* error = [self sendToHostWithData:dic];
     
-    if(error){
-        NSLog(@"%@", [error localizedDescription]);
-    }
+    return error;
+    
+//    if(error){
+//        NSLog(@"%@", [error localizedDescription]);
+//        
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"connectionDropNotification" object:nil];
+//    }
 }
 
 -(void)pullData
@@ -763,14 +771,17 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
     [self sendToALLClientsWithData:dic];
 }
 
--(void)sendSearchQuery:(NSDictionary*)dic
+-(NSError*)sendSearchQuery:(NSDictionary*)dic
 {
     NSDictionary* data = @{@"msg" : @"searchQuery", @"data" : dic};
     NSError* error = [self sendToHostWithData:data];
     
-    if(error){
-        NSLog(@"%@", [error localizedDescription]);
-    }
+    
+    return error;
+//    if(error){
+//        NSLog(@"%@", [error localizedDescription]);
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"connectionDropNotification" object:nil];
+//    }
 }
 
 -(void)sendSearchResult:(NSArray*)array toPeer:(MCPeerID*)peer
@@ -845,15 +856,18 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
     }
 }
 
--(void)tagCandidate:(NSString*)ID withOption:(NSString*)option from:(NSString*)viewer
+-(NSError*)tagCandidate:(NSString*)ID withOption:(NSString*)option from:(NSString*)viewer
 {
     NSDictionary* dic = @{@"msg" : option, @"data" : ID, @"viewer" : viewer};
     
     NSError* error = [self sendToHostWithData:dic];
     
-    if(error){
-        NSLog(@"%@", [error localizedDescription]);
-    }
+    return error;
+    
+//    if(error){
+//        NSLog(@"%@", [error localizedDescription]);
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"connectionDropNotification" object:nil];
+//    }
 }
 
 -(void)sendBackUp:(NSDictionary *)localBackUp
@@ -933,8 +947,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
 {
     if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Accept"]) {
         //accept the debrief mode
-        //send acknowledge back?
-        
+        [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].debriefing = YES;
         //bring up new view controller to show broadcast
         [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
     }

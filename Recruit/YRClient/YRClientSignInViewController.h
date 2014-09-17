@@ -15,9 +15,10 @@
 
 @interface YRClientSignInViewController : UIViewController <UITextFieldDelegate, AutoSuggestTextFieldDelegate,UITableViewDataSource,UITableViewDelegate,MCNearbyServiceBrowserDelegate, UIAlertViewDelegate>
 
+
+@property (weak, nonatomic) IBOutlet UILabel *queuingNumberLabel;
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 @property (strong, nonatomic) NSMutableString *yrIDCode;
-@property (strong, nonatomic) NSString* clientUserName;
 @property (strong, nonatomic) YRDebriefViewController* debriefingViewController;
 @property (strong, nonatomic) UIView * yrNameListView;
 @property (strong, nonatomic) UITableView *yrNameList;

@@ -241,8 +241,12 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
 {
     if (self.debriefingViewController == nil) {
         self.debriefingViewController = [YRDebriefViewController new];
+        [self.view addSubview:self.debriefingViewController.view];
     }
-    [self.view addSubview:self.debriefingViewController.view];
+    else
+    {
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] pullData];
+    }
 }
 
 -(void)debriefingModeOffNotification:(NSNotification *)notification

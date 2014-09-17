@@ -19,6 +19,7 @@
 
 -(void)showBusy;
 -(void)dismissBusy;
+
 @end
 
 @implementation YRDebriefSearchModeDetailViewController
@@ -552,10 +553,17 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     //send request to host
-    [self showBusy];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDataRequestForFile:self.currentDataEntry[@"fileNames"][indexPath.row]];
-    [tableView setUserInteractionEnabled:NO];
+    NSError* error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDataRequestForFile:self.currentDataEntry[@"fileNames"][indexPath.row]];
+    if (error) {
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+    }
+    else
+    {
+        [tableView setUserInteractionEnabled:NO];
+        [self showBusy];
+    }
 }
 
 #pragma mark - UIScrollViewDelegate

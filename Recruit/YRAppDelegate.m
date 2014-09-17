@@ -87,32 +87,42 @@ NSString* const kYREngineerEmailFormsKey = @"engineerEmailForms";
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-
-    
-    //    if (!self.mcManager.isHost) {
-//        [self.mcManager.session disconnect];
-//    }
+    if (self.mcManager.isHost) {
+        //Host enter background
+        for (NSDictionary *peerSession in self.mcManager.activeSessions) {
+            [[peerSession valueForKey:@"session"] disconnect];
+        }
+        [self.mcManager.activeSessions removeAllObjects];
+        //stop advertising
+        [self.mcManager advertiseSelf:NO];
+    }
+    else
+    {
+        //Client enter background
+        [self.mcManager.session disconnect];
+    }
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    NSLog(@"will enter foreground");
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-    
-//    if (!self.mcManager.isHost) {
-//        NSLog(@"entering...");
-//        //[[self mcManager] setupMCBrowser];
-//        
-//        
-//        [self.mcManager.browser.browser startBrowsingForPeers];
-//        
-//        [self.mcManager.browser.browser invitePeer:self.mcManager.lastConnectionPeerID toSession:self.mcManager.session withContext:nil timeout:10];
-//        //MCNearbyServiceBrowser* browser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.mcManager.peerID serviceType:@"files"];
-//        
-//        //[browser invitePeer:self.mcManager.lastConnectionPeerID toSession:self.mcManager.session withContext:nil timeout:10];
-//    }
+    if (self.mcManager.isHost) {
+        NSLog(@"Host entering...");
+        
+        if (self.mcManager.isAdvertising) {
+            [self.mcManager advertiseSelf:YES];
+        }
+    }
+    else
+    {
+        NSLog(@"Client entering...");
+        //don't need to do anything since the client will try to reconnect upon failure in sending the packets
+        
+        if (self.mcManager.isDebriefing)
+        {
+            [self.mcManager.autoBrowser startBrowsingForPeers];
+            [self.mcManager setBrowsing:YES];
+        }
+    }
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application

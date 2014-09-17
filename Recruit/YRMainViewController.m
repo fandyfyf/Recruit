@@ -81,9 +81,6 @@
         [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setUserEmail:[self.userName stringByAppendingString:@"@yahoo-inc.com"]];
         
         if (self.yrsegmentedControl.selectedSegmentIndex == 0) {
-            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"DebriefModeOn"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
             [self performSegueWithIdentifier:@"MainToHost" sender:self];
         }
         else

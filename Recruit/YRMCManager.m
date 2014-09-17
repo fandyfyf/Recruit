@@ -19,13 +19,14 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     if (self) {
         _peerID = nil;
         _session = nil;
-        _browser = nil;
         _autoBrowser = nil;
         _activeSessions = nil;
         _Nadvertiser = nil;
         _userEmail = nil;
         _userName = nil;
         _browsing = NO;
+        _advertising = NO;
+        _debriefing = NO;
     }
     return self;
 }
@@ -33,39 +34,40 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 
 -(void)setupPeerAndSessionWithDisplayName:(NSString *)displayName
 {
+    //set peer with provided string
     self.peerID = [[MCPeerID alloc] initWithDisplayName:displayName];
     
+    //clients only have one session
     if (!self.isHost) {
         self.session = [[MCSession alloc] initWithPeer:self.peerID];
         self.session.delegate = self;
+    }
+    //host have array of session
+    else
+    {
+        if (self.activeSessions == nil) {
+            self.activeSessions = [NSMutableArray new];
+        }
+        [self.activeSessions removeAllObjects];
     }
 }
 
 -(void)setupMCBrowser
 {
     //the service type should be limited to 1 to 15 characters long
-    self.browser = [[MCBrowserViewController alloc] initWithServiceType:@"files" session:self.session];
-    
     self.autoBrowser = [[MCNearbyServiceBrowser alloc] initWithPeer:self.peerID serviceType:@"files"];
 }
 
 -(void)advertiseSelf:(BOOL)shouldAdvertise
 {
-    NSLog(@"advertising...");
     if (shouldAdvertise) {
-        if (self.activeSessions == nil) {
-            self.activeSessions = [NSMutableArray new];
-        }
-        [self.activeSessions removeAllObjects];
-        
-        //self.advertiser = [[MCAdvertiserAssistant alloc] initWithServiceType:@"files" discoveryInfo:nil session:self.session];
-        
+        NSLog(@"advertising...");
         self.Nadvertiser = [[MCNearbyServiceAdvertiser alloc] initWithPeer:self.peerID discoveryInfo:nil serviceType:@"files"];
-        
         [self.Nadvertiser setDelegate:self];
         [self.Nadvertiser startAdvertisingPeer];
     }
     else{
+        NSLog(@"stop advertising...");
         [self.Nadvertiser stopAdvertisingPeer];
         self.Nadvertiser = nil;
     }
@@ -105,7 +107,7 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     NSDictionary *dict = @{@"peerID": peerID,
                            @"state" : [NSNumber numberWithInt:state]
                            };
-    
+    NSLog(@"State: %ld",state);
     [[NSNotificationCenter defaultCenter] postNotificationName:kYRMCManagerDidChangeStateNotification
                                                         object:nil
                                                       userInfo:dict];

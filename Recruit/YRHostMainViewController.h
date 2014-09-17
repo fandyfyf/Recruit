@@ -10,10 +10,9 @@
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "YRAppDelegate.h"
 
-@interface YRHostMainViewController : UIViewController <MCBrowserViewControllerDelegate,UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate>
+@interface YRHostMainViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate>
 
 @property (strong, nonatomic) UIViewController* source;
-@property (strong, nonatomic) NSString* hostUserName;
 @property (weak, nonatomic) IBOutlet UILabel *yrnameLabel;
 @property (weak, nonatomic) IBOutlet UITableView *yrtableView;
 @property (strong, nonatomic) UITableView *eventList;
@@ -32,9 +31,6 @@
 
 @property (strong, nonatomic) YRAppDelegate *appDelegate;
 
-
-- (IBAction)browseForDevices:(id)sender;
-- (IBAction)disconnectConnection:(id)sender;
 - (IBAction)signOut:(id)sender;
 - (IBAction)backgroundTapped:(id)sender;
 - (IBAction)onOffSwitch:(id)sender;

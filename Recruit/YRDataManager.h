@@ -58,7 +58,7 @@ FOUNDATION_EXPORT NSString* const kYRDataManagerNeedPromptNameListNotification;
 
 -(void)broadCastData:(NSDictionary*)data;
 
--(void)sendDataRequestForFile:(NSString*)fileName;
+-(NSError*)sendDataRequestForFile:(NSString*)fileName;
 
 -(void)pullData;
 
@@ -74,7 +74,7 @@ FOUNDATION_EXPORT NSString* const kYRDataManagerNeedPromptNameListNotification;
 
 -(void)sendDebriefInvitation;
 
--(void)sendSearchQuery:(NSDictionary*)dic;
+-(NSError*)sendSearchQuery:(NSDictionary*)dic;
 
 -(void)sendSearchResult:(NSArray*)array toPeer:(MCPeerID*)peer;
 
@@ -82,7 +82,7 @@ FOUNDATION_EXPORT NSString* const kYRDataManagerNeedPromptNameListNotification;
 
 -(void)sendTagList:(NSDictionary*)data toPeer:(MCPeerID*)peer;
 
--(void)tagCandidate:(NSString*)ID withOption:(NSString*)option from:(NSString*)interviewer;
+-(NSError*)tagCandidate:(NSString*)ID withOption:(NSString*)option from:(NSString*)interviewer;
 
 -(void)sendBackUp:(NSDictionary* )localBackUp;
 

@@ -162,8 +162,15 @@
     NSDictionary* dic = @{@"option" : self.option, @"ranking" : self.ranking, @"position" : self.position};
     
     //send search Query
-    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendSearchQuery:dic];
-    [self showBusy];
+    NSError*error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendSearchQuery:dic];
+    if (error) {
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+    }
+    else
+    {
+        [self showBusy];
+    }
 }
 
 -(void)receiveResultAndUpdate:(NSNotification*)notification

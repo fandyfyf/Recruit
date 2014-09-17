@@ -731,9 +731,18 @@
 {
     //send request to host
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDataRequestForFile:self.currentDataEntry[@"fileNames"][indexPath.row]];
-    [tableView setUserInteractionEnabled:NO];
-    [self showBusy];
+    NSError* error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDataRequestForFile:self.currentDataEntry[@"fileNames"][indexPath.row]];
+    
+    if (error) {
+        //re-establish
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+    }
+    else
+    {
+        [tableView setUserInteractionEnabled:NO];
+        [self showBusy];
+    }
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -752,6 +761,7 @@
     }
     if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Yes"]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"debriefModeOffNotification" object:nil];
+        [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].debriefing = NO;
     }
 }
 

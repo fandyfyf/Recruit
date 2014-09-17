@@ -26,7 +26,10 @@
 -(void)removeNameListNotification:(NSNotification *)notification;
 -(void)debriefingModeOnNotification:(NSNotification *)notification;
 -(void)debriefingModeOffNotification:(NSNotification *)notification;
--(void)reconnectNotification:(NSNotification *)notification;
+//-(void)reconnectNotification:(NSNotification *)notification;
+-(void)willEnterBackgroundNotification:(NSNotification *)notification;
+
+
 -(void)removeListView;
 -(BOOL)checkReady;
 -(void)nextCandidateField;
@@ -47,10 +50,9 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
-    self.clientUserName = [self.appDelegate.mcManager userName];
     
-    NSLog(@"Hello: %@ as a client",self.clientUserName);
-    [self.yrnameLabel setText:self.clientUserName];
+    NSLog(@"Hello: %@ as a client",[self.appDelegate.mcManager userName]);
+    [self.yrnameLabel setText:[self.appDelegate.mcManager userName]];
     
     //Listen to notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
@@ -59,21 +61,19 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
     self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
     self.yrIDCode = [NSMutableString new];
     
-    //reset session and make the connect
-    [self.appDelegate.mcManager.session disconnect];
-    self.appDelegate.mcManager.session = nil;
-    self.appDelegate.mcManager.autoBrowser = nil;
-    self.appDelegate.mcManager.peerID = nil;
-    [self.yrarrayConnectedDevices removeAllObjects];
-    [self.appDelegate.dataManager stopListeningForData];
-    
+    //=====================session related code ======================//
+    //create dataManager
     if ([self.appDelegate dataManager] == nil) {
         [self.appDelegate setDataManager:[YRDataManager new]];
     }
@@ -81,12 +81,14 @@
     [[self.appDelegate dataManager] startListeningForData];
     
     [self.appDelegate.mcManager setHost:NO];//set host identity first, in order to initialize the session
-    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:self.clientUserName];
+    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:[self.appDelegate.mcManager userName]];
     [self.appDelegate.mcManager setupMCBrowser];
     
     self.appDelegate.mcManager.autoBrowser.delegate = self;
     [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
     [self.appDelegate.mcManager setBrowsing:YES];
+    
+    //=================================================================//
 
     self.yrFirstNameTextField.delegate = self;
     self.yrLastNameTextField.delegate = self;
@@ -103,11 +105,8 @@
         [[self.yrSignOutButton layer] setCornerRadius:30];
         [[self.yrSignOutButton layer] setBorderColor:[[UIColor lightGrayColor] CGColor]];
         [[self.yrSignOutButton layer] setBorderWidth:2];
-        
-//        [[self.yrContinueButton layer] setCornerRadius:30];
-//        [[self.yrContinueButton layer] setBorderColor:[[UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0] CGColor]];
-//        [[self.yrContinueButton layer] setBorderWidth:2];
     }
+    
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
     
     doneToolbar.items = [NSArray arrayWithObjects:
@@ -144,8 +143,14 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.clientUserName = [self.appDelegate.mcManager userName];
-    [self.yrnameLabel setText:self.clientUserName];
+    [self.yrnameLabel setText:[self.appDelegate.mcManager userName]];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];
+    NSError* error = nil;
+    NSArray* FetchResults = [self.appDelegate.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    self.queuingNumberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[FetchResults count]];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -210,6 +215,11 @@
                     }
                 }
                 [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
+                //if the connection drops during the debrief mode then browse for Host
+                if (self.appDelegate.mcManager.isDebriefing) {
+                    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
+                    [self.appDelegate.mcManager setBrowsing:YES];
+                }
             }
         }
     }
@@ -271,6 +281,13 @@
 {
     [self.yrnameLabel setText:self.appDelegate.mcManager.userName];
     [self.yrNameListView removeFromSuperview];
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];
+    NSError* error = nil;
+    NSArray* FetchResults = [self.appDelegate.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    
+    self.queuingNumberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[FetchResults count]];
 }
 
 -(void)removeListView
@@ -285,13 +302,17 @@
 {
     if (self.debriefingViewController == nil) {
         self.debriefingViewController = [YRDebriefViewController new];
+        self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
+        self.grayView.backgroundColor = [UIColor blackColor];
+        self.grayView.alpha = 0.9;
+        
+        [self.view addSubview:self.grayView];
+        [self.view addSubview:self.debriefingViewController.view];
     }
-    self.grayView = [[UIControl alloc] initWithFrame:self.view.frame];
-    self.grayView.backgroundColor = [UIColor blackColor];
-    self.grayView.alpha = 0.9;
-    
-    [self.view addSubview:self.grayView];
-    [self.view addSubview:self.debriefingViewController.view];
+    else
+    {
+        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] pullData];
+    }
 }
 
 -(void)debriefingModeOffNotification:(NSNotification *)notification
@@ -319,28 +340,34 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
--(void)reconnectNotification:(NSNotification *)notification
+//-(void)reconnectNotification:(NSNotification *)notification
+//{
+//    [self.appDelegate.mcManager.session disconnect];
+//    self.appDelegate.mcManager.session = nil;
+//    self.appDelegate.mcManager.autoBrowser = nil;
+//    self.appDelegate.mcManager.peerID = nil;
+//    [self.yrarrayConnectedDevices removeAllObjects];
+//    [self.appDelegate.dataManager stopListeningForData];
+//    
+//    if ([self.appDelegate dataManager] == nil) {
+//        [self.appDelegate setDataManager:[YRDataManager new]];
+//    }
+//    [[self.appDelegate dataManager] setHost:NO];
+//    [[self.appDelegate dataManager] startListeningForData];
+//    
+//    [self.appDelegate.mcManager setHost:NO];//set host identity first, in order to initialize the session
+//    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:[self.appDelegate.mcManager userName]];
+//    [self.appDelegate.mcManager setupMCBrowser];
+//    
+//    self.appDelegate.mcManager.autoBrowser.delegate = self;
+//    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
+//    [self.appDelegate.mcManager setBrowsing:YES];
+//}
+
+-(void)willEnterBackgroundNotification:(NSNotification *)notification
 {
-    [self.appDelegate.mcManager.session disconnect];
-    self.appDelegate.mcManager.session = nil;
-    self.appDelegate.mcManager.autoBrowser = nil;
-    self.appDelegate.mcManager.peerID = nil;
     [self.yrarrayConnectedDevices removeAllObjects];
-    [self.appDelegate.dataManager stopListeningForData];
-    
-    if ([self.appDelegate dataManager] == nil) {
-        [self.appDelegate setDataManager:[YRDataManager new]];
-    }
-    [[self.appDelegate dataManager] setHost:NO];
-    [[self.appDelegate dataManager] startListeningForData];
-    
-    [self.appDelegate.mcManager setHost:NO];//set host identity first, in order to initialize the session
-    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:self.clientUserName];
-    [self.appDelegate.mcManager setupMCBrowser];
-    
-    self.appDelegate.mcManager.autoBrowser.delegate = self;
-    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
-    [self.appDelegate.mcManager setBrowsing:YES];
+    NSLog(@"Client Enter Background");
 }
 
 -(BOOL)checkReady
@@ -559,9 +586,13 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Yes"]) {
+        
+        //disconnect session and release session
         [[self.appDelegate mcManager].session disconnect];
         [self.appDelegate mcManager].session = nil;
+        //release browser
         [[self.appDelegate mcManager].autoBrowser stopBrowsingForPeers];
+        [[self.appDelegate mcManager] setBrowsing:NO];
         [self.appDelegate mcManager].autoBrowser = nil;
         
         self.yrIDCode = nil;

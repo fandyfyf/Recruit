@@ -593,16 +593,6 @@
     self.currentEntry = (CandidateEntry*)[self.yrdataEntry objectAtIndex:indexPath.row];
     self.currentCandidateIndex = [NSNumber numberWithInteger:indexPath.row];
     [self performSegueWithIdentifier:@"ListToDetail" sender:self];
-    
-    //broadcast the current entry: could just move the folloing code to detail view after the info got loaded
-    
-//    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
-//        //send out broadCast with self.currentEntry
-//        NSDictionary* dic = @{@"firstName":self.currentEntry.firstName,@"lastName":self.currentEntry.lastName,@"email":self.currentEntry.emailAddress,@"interviewer":self.currentEntry.interviewer,@"code":self.currentEntry.code,@"status":self.currentEntry.status,@"pdf":self.currentEntry.pdf,@"position":self.currentEntry.position,@"preference":self.currentEntry.preference,@"date":self.currentEntry.date,@"note":self.currentEntry.notes,@"rank":[self.currentEntry.rank stringValue],@"gpa":[self.currentEntry.gpa stringValue],@"BU1" : self.currentEntry.businessUnit1, @"BU2" : self.currentEntry.businessUnit2, @"fileNames" : self.currentEntry.fileNames, @"tagList" : self.currentEntry.tagList};
-//        NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
-//        
-//        [self.appDelegate.dataManager broadCastData:packet];
-//    }
 }
 
 #pragma mark - UIScrollViewDelegate

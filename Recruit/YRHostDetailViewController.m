@@ -124,7 +124,7 @@
     }
     
     //broad cast when loading the data, instead of when the entry is clicked in the table view
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
+    if ([self.appDelegate mcManager].isDebriefing) {
         //send out broadCast with self.currentEntry
         NSDictionary* dic = @{@"firstName":self.dataSource.firstName,@"lastName":self.dataSource.lastName,@"email":self.dataSource.emailAddress,@"interviewer":self.dataSource.interviewer,@"code":self.dataSource.code,@"status":self.dataSource.status,@"pdf":self.dataSource.pdf,@"position":self.dataSource.position,@"preference":self.dataSource.preference,@"date":self.dataSource.date,@"note":self.dataSource.notes,@"rank":[self.dataSource.rank stringValue],@"gpa":[self.dataSource.gpa stringValue],@"BU1" : self.dataSource.businessUnit1, @"BU2" : self.dataSource.businessUnit2, @"fileNames" : self.dataSource.fileNames, @"tagList" : self.dataSource.tagList};
         NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
@@ -238,7 +238,7 @@
     
     [self loadInfo];
     
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"DebriefModeOn"] boolValue]) {
+    if ([self.appDelegate mcManager].isDebriefing) {
         self.nextStudentButton.hidden = NO;
         self.prevStudentButton.hidden = NO;
     }

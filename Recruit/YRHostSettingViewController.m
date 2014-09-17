@@ -676,8 +676,7 @@
     else
     {
         //turn off debrief stuff
-        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"DebriefModeOn"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].debriefing = NO;
         
         [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDebriefTermination];
     }
@@ -1908,8 +1907,8 @@
     }
     
     if ([buttonTitle isEqualToString:@"Debrief!"]) {
-        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DebriefModeOn"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].debriefing = YES;
         
         //do debrief stuff
         [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDebriefInvitation];
