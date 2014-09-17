@@ -28,6 +28,7 @@
 -(void)debriefingModeOffNotification:(NSNotification *)notification;
 //-(void)reconnectNotification:(NSNotification *)notification;
 -(void)willEnterBackgroundNotification:(NSNotification *)notification;
+-(void)renewQueuingNotification:(NSNotification*)notification;
 
 
 -(void)removeListView;
@@ -65,6 +66,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(renewQueueingNotification:) name:@"renewQueuingNotification" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
@@ -281,7 +283,10 @@
 {
     [self.yrnameLabel setText:self.appDelegate.mcManager.userName];
     [self.yrNameListView removeFromSuperview];
-    
+}
+
+-(void)renewQueueingNotification:(NSNotification *)notification
+{
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];
     NSError* error = nil;

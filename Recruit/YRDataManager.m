@@ -159,7 +159,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
                     NSLog(@"ERROR -- saving coredata");
                 }
                 
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"removeNameListNotification" object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"renewQueuingNotification" object:nil];
             }
             else
             {
