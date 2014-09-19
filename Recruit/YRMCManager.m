@@ -124,25 +124,27 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     //NSLog(@"Invitation received");
     NSMutableArray* deletedSession = [NSMutableArray new];
     
-    for (NSDictionary* peerSession in self.activeSessions) {
-        if ([[(MCPeerID*)peerSession[@"peer"] displayName] isEqualToString:peerID.displayName]) {
-            [deletedSession addObject:peerSession];
+    for (int i=0; i< [self.activeSessions count] ;i++)
+    {
+        if ([[(MCPeerID*)[self.activeSessions objectAtIndex:i][@"peer"] displayName] isEqualToString:peerID.displayName]) {
+            [deletedSession addObject:[NSNumber numberWithInt:i]];
         }
     }
     
-    for (NSDictionary* peerSession in deletedSession) {
-        [self.activeSessions removeObject:peerSession];
+    for (NSNumber* index in deletedSession) {
+        [self.activeSessions removeObjectAtIndex:[index intValue]];
     }
     
     NSMutableArray* deletedDevice = [NSMutableArray new];
-    for (NSDictionary* connected in self.connectedDevices) {
-        if ([connected[@"displayName"] isEqualToString:peerID.displayName]) {
-            [deletedDevice addObject:connected];
+    
+    for (int i = 0; i< [self.connectedDevices count]; i++) {
+        if ([[self.connectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerID.displayName]) {
+            [deletedDevice addObject:[NSNumber numberWithInt:i]];
         }
     }
     
-    for (NSDictionary* connected in deletedDevice) {
-        [self.connectedDevices removeObject:connected];
+    for (NSNumber* index in deletedDevice) {
+        [self.connectedDevices removeObjectAtIndex:[index intValue]];
     }
     
     MCSession *newSession = [[MCSession alloc] initWithPeer: self.peerID];
@@ -169,6 +171,7 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     //create new session
     self.session = [[MCSession alloc] initWithPeer:self.peerID];
     self.session.delegate = self;
+    
     
     //since the host will be the only one we advertise, so there are only one
     [browser invitePeer:peerID toSession:self.session withContext:nil timeout:30.0];
