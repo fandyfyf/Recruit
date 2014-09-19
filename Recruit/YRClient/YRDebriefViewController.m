@@ -651,26 +651,35 @@
 
 -(void)tagCandidates
 {
-    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] tagCandidate:self.currentDataEntry[@"code"] withOption:self.tagButton.titleLabel.text from:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
+    NSError* error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] tagCandidate:self.currentDataEntry[@"code"] withOption:self.tagButton.titleLabel.text from:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
     
-    //update title make sure the same request won't happen continously
-    if ([self.tagButton.titleLabel.text isEqualToString:@"Flag"]) {
-        [self.tagButton setTitle:@"unFlag" forState:UIControlStateNormal];
-        [self.tagList addObject:self.currentDataEntry[@"code"]];
+    if (error) {
+        if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
+            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
+            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        }
     }
     else
     {
-        [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
-        if ([self.tagList count] != 0) {
-            int index = -1;
-            for (int i = 0; i<[self.tagList count]; i++) {
-                if ([[self.tagList objectAtIndex:i] isEqualToString:self.currentDataEntry[@"code"]]) {
-                    index = i;
-                    break;
+        //update title make sure the same request won't happen continously
+        if ([self.tagButton.titleLabel.text isEqualToString:@"Flag"]) {
+            [self.tagButton setTitle:@"unFlag" forState:UIControlStateNormal];
+            [self.tagList addObject:self.currentDataEntry[@"code"]];
+        }
+        else
+        {
+            [self.tagButton setTitle:@"Flag" forState:UIControlStateNormal];
+            if ([self.tagList count] != 0) {
+                int index = -1;
+                for (int i = 0; i<[self.tagList count]; i++) {
+                    if ([[self.tagList objectAtIndex:i] isEqualToString:self.currentDataEntry[@"code"]]) {
+                        index = i;
+                        break;
+                    }
                 }
-            }
-            if (index >=0) {
-                [self.tagList removeObjectAtIndex:index];
+                if (index >=0) {
+                    [self.tagList removeObjectAtIndex:index];
+                }
             }
         }
     }
@@ -735,8 +744,11 @@
     
     if (error) {
         //re-establish
-        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
-        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing)
+        {
+            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
+            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        }
     }
     else
     {

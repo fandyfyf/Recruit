@@ -6,9 +6,11 @@
 //  Copyright (c) 2014 Yahoo-inc. All rights reserved.
 //
 
-#import "YRMCManager.h"
+#import "YRAppDelegate.h"
 
-NSString* const kYRMCManagerDidChangeStateNotification = @"DidChangeStateNotification";
+//NSString* const kYRMCManagerDidChangeStateNotification = @"DidChangeStateNotification";
+
+NSString* const kYRMCManagerNeedUpdateConnectionListNotification = @"MCManagerNeedUpdateConnectionListNotification";
 NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotification";
 
 @implementation YRMCManager
@@ -19,11 +21,14 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     if (self) {
         _peerID = nil;
         _session = nil;
-        _autoBrowser = nil;
         _activeSessions = nil;
+        _connectedDevices = nil;
+        _autoBrowser = nil;
         _Nadvertiser = nil;
+//property
         _userEmail = nil;
         _userName = nil;
+//status
         _browsing = NO;
         _advertising = NO;
         _debriefing = NO;
@@ -34,8 +39,9 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 
 -(void)setupPeerAndSessionWithDisplayName:(NSString *)displayName
 {
-    //set peer with provided string
     self.peerID = [[MCPeerID alloc] initWithDisplayName:displayName];
+    //set up array of connected devices
+    self.connectedDevices = [[NSMutableArray alloc] init];
     
     //clients only have one session
     if (!self.isHost) {
@@ -49,6 +55,8 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
             self.activeSessions = [NSMutableArray new];
         }
         [self.activeSessions removeAllObjects];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateConnectionListNotification:) name:kYRDataManagerNeedUpdateConnectionListNotification object:nil];
     }
 }
 
@@ -73,11 +81,69 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     }
 }
 
+-(void)setupSessionManagerForHost:(BOOL)isHost
+{
+    //set up session with host username
+    [self setHost:isHost];
+    [self setupPeerAndSessionWithDisplayName:self.userName];
+    
+    if (!self.isHost)
+    {
+        [self setupMCBrowser];
+        self.autoBrowser.delegate = self;
+        [self.autoBrowser startBrowsingForPeers];
+        [self setBrowsing:YES];
+    }
+    else
+    {
+        //browser is not needed for host
+    }
+}
+
+-(void)needUpdateConnectionListNotification:(NSNotification*)notification
+{
+    NSString* displayName = [[notification userInfo] objectForKey:@"displayName"];
+    
+    for (unsigned long i = 0; i < [self.connectedDevices count] ; i++) {
+        if ([[self.connectedDevices objectAtIndex:i][@"displayName"] isEqualToString:displayName]) {
+            [self.connectedDevices replaceObjectAtIndex:i withObject:[notification userInfo]];
+            
+            NSLog(@"%@ connected",[self.connectedDevices objectAtIndex:i][@"confirmedName"]);
+            break;
+        }
+    }
+    
+    //update table here!!
+    [[NSNotificationCenter defaultCenter] postNotificationName:kYRMCManagerNeedUpdateConnectionListNotification object:nil];
+}
+
 #pragma mark - MCNearbyServiceAdvertiserDelegate
 
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void(^)(BOOL accept, MCSession *session))invitationHandler
 {
     //NSLog(@"Invitation received");
+    NSMutableArray* deletedSession = [NSMutableArray new];
+    
+    for (NSDictionary* peerSession in self.activeSessions) {
+        if ([[(MCPeerID*)peerSession[@"peer"] displayName] isEqualToString:peerID.displayName]) {
+            [deletedSession addObject:peerSession];
+        }
+    }
+    
+    for (NSDictionary* peerSession in deletedSession) {
+        [self.activeSessions removeObject:peerSession];
+    }
+    
+    NSMutableArray* deletedDevice = [NSMutableArray new];
+    for (NSDictionary* connected in self.connectedDevices) {
+        if ([connected[@"displayName"] isEqualToString:peerID.displayName]) {
+            [deletedDevice addObject:connected];
+        }
+    }
+    
+    for (NSDictionary* connected in deletedDevice) {
+        [self.connectedDevices removeObject:connected];
+    }
     
     MCSession *newSession = [[MCSession alloc] initWithPeer: self.peerID];
     newSession.delegate = self;
@@ -88,7 +154,32 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     invitationHandler(YES, newSession);
     
     [self.activeSessions addObject:peerSession];
+    NSLog(@"new session created for peer : %@",peerID.displayName);
+}
+
+#pragma mark - MCNearByServiceBrowserDelegate
+
+-(void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary *)info
+{
+    NSString *remotePeerName = peerID.displayName;
     
+    NSLog(@"Browser found %@", remotePeerName);
+    NSLog(@"Inviting %@", remotePeerName);
+    
+    //create new session
+    self.session = [[MCSession alloc] initWithPeer:self.peerID];
+    self.session.delegate = self;
+    
+    //since the host will be the only one we advertise, so there are only one
+    [browser invitePeer:peerID toSession:self.session withContext:nil timeout:30.0];
+    
+    [browser stopBrowsingForPeers];
+    [self setBrowsing:NO];
+}
+
+- (void)browser:(MCNearbyServiceBrowser *)browser lostPeer:(MCPeerID *)peerID
+{
+    //
 }
 
 #pragma mark - MCSessionDelegate
@@ -103,14 +194,72 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 }
 
 -(void)session:(MCSession *)session peer:(MCPeerID *)peerID didChangeState:(MCSessionState)state{
-    //new connection take place
-    NSDictionary *dict = @{@"peerID": peerID,
-                           @"state" : [NSNumber numberWithInt:state]
-                           };
-    NSLog(@"State: %ld",state);
-    [[NSNotificationCenter defaultCenter] postNotificationName:kYRMCManagerDidChangeStateNotification
-                                                        object:nil
-                                                      userInfo:dict];
+    //new connection happen
+    if (self.isHost) {
+        if (state != MCSessionStateConnecting) {
+            if (state == MCSessionStateConnected) {
+                
+                [self.connectedDevices addObject:@{@"displayName" : peerID.displayName, @"confirmedName" : @"connnecting..."}];
+                
+                NSLog(@"%@ connecting...",peerID.displayName);
+                
+                //send ACK back
+                [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendACKBack:peerID];
+                [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendNameList:peerID];
+            }
+            else if (state == MCSessionStateNotConnected){
+                if ([self.connectedDevices count] > 0) {
+                    unsigned long indexOfPeer = 0;
+                    for (unsigned long i = 0; i < [self.connectedDevices count] ; i++) {
+                        if ([[self.connectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerID.displayName]) {
+                            indexOfPeer = i;
+                            break;
+                        }
+                    }
+                    NSLog(@"%@ disconnected",[self.connectedDevices objectAtIndex:indexOfPeer][@"confirmedName"]);
+                    
+                    [self.connectedDevices removeObjectAtIndex:indexOfPeer];
+                }
+            }
+            else
+            {
+                NSLog(@"missing state");
+            }
+            
+            //reload table notification
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRMCManagerNeedUpdateConnectionListNotification object:nil];
+        }
+        else
+        {
+            NSLog(@"is connecting");
+        }
+    }
+    else
+    {
+        if (state != MCSessionStateConnecting) {
+            if (state == MCSessionStateConnected) {
+                [self.connectedDevices addObject:@{@"displayName" : peerID.displayName, @"confirmedName" : @"connnecting..."}];
+            }
+            else if (state == MCSessionStateNotConnected){
+                if ([self.connectedDevices count] > 0) {
+                    unsigned long indexOfPeer = 0;
+                    for (unsigned long i = 0; i < [self.connectedDevices count] ; i++) {
+                        if ([[self.connectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerID.displayName]) {
+                            indexOfPeer = i;
+                            break;
+                        }
+                    }
+                    [self.connectedDevices removeObjectAtIndex:indexOfPeer];
+                    //if the connection drops during the debrief mode then browse for Host
+                    
+                    if (self.isDebriefing) {
+                        [self.autoBrowser startBrowsingForPeers];
+                        [self setBrowsing:YES];
+                    }
+                }
+            }
+        }
+    }
 }
 
 //message data arrives from one of the peer
@@ -118,8 +267,10 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     NSDictionary *dict = @{@"data": data,
                            @"peerID": peerID
                            };
-    //NSLog(@"receive data once!! with %@; I AM %@",dict, self);
-    NSLog(@"I AM %@",self);
+    
+    //notify dataManager
+    
+    //TODO: if the data is identityConfirm, then there is no need to send to dataManager
     [[NSNotificationCenter defaultCenter] postNotificationName:kYRMCManagerDidReceiveDataNotification
                                                         object:nil
                                                       userInfo:dict];

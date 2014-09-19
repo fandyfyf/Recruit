@@ -18,15 +18,13 @@
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
-@property (nonatomic, strong) NSMutableArray *yrarrayConnectedDevices;
-
--(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
 -(void)needUpdateCodeNotification:(NSNotification *)notification;
 -(void)popUpNameListNotification:(NSNotification*)notification;
 -(void)removeNameListNotification:(NSNotification *)notification;
+
 -(void)debriefingModeOnNotification:(NSNotification *)notification;
 -(void)debriefingModeOffNotification:(NSNotification *)notification;
-//-(void)reconnectNotification:(NSNotification *)notification;
+
 -(void)willEnterBackgroundNotification:(NSNotification *)notification;
 -(void)renewQueuingNotification:(NSNotification*)notification;
 
@@ -56,7 +54,6 @@
     [self.yrnameLabel setText:[self.appDelegate.mcManager userName]];
     
     //Listen to notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateCodeNotification:) name:kYRDataManagerNeedUpdateCodeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(popUpNameListNotification:) name:kYRDataManagerNeedPromptNameListNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
@@ -66,12 +63,12 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(renewQueueingNotification:) name:@"renewQueuingNotification" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(renewQueuingNotification:) name:@"renewQueuingNotification" object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
-    self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
+    
     self.yrIDCode = [NSMutableString new];
     
     //=====================session related code ======================//
@@ -82,14 +79,7 @@
     [[self.appDelegate dataManager] setHost:NO];
     [[self.appDelegate dataManager] startListeningForData];
     
-    [self.appDelegate.mcManager setHost:NO];//set host identity first, in order to initialize the session
-    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:[self.appDelegate.mcManager userName]];
-    [self.appDelegate.mcManager setupMCBrowser];
-    
-    self.appDelegate.mcManager.autoBrowser.delegate = self;
-    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
-    [self.appDelegate.mcManager setBrowsing:YES];
-    
+    [self.appDelegate.mcManager setupSessionManagerForHost:NO];
     //=================================================================//
 
     self.yrFirstNameTextField.delegate = self;
@@ -198,35 +188,6 @@
     self.yrEmailTextField.text = @"";
 }
 
--(void)peerDidChangeStateWithNotification:(NSNotification *)notification{
-    MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
-    NSString *peerDisplayName = peerID.displayName;
-    MCSessionState state = [[[notification userInfo] objectForKey:@"state"] intValue];
-    
-    if (state != MCSessionStateConnecting) {
-        if (state == MCSessionStateConnected) {
-            [self.yrarrayConnectedDevices addObject:@{@"displayName" : peerDisplayName, @"confirmedName" : @"connnecting..."}];
-        }
-        else if (state == MCSessionStateNotConnected){
-            if ([self.yrarrayConnectedDevices count] > 0) {
-                unsigned long indexOfPeer = 0;
-                for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
-                    if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerDisplayName]) {
-                        indexOfPeer = i;
-                        break;
-                    }
-                }
-                [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
-                //if the connection drops during the debrief mode then browse for Host
-                if (self.appDelegate.mcManager.isDebriefing) {
-                    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
-                    [self.appDelegate.mcManager setBrowsing:YES];
-                }
-            }
-        }
-    }
-}
-
 -(void)needUpdateCodeNotification:(NSNotification *)notification
 {
     NSMutableString *code = [[notification userInfo] objectForKey:@"recruitID"];
@@ -285,14 +246,16 @@
     [self.yrNameListView removeFromSuperview];
 }
 
--(void)renewQueueingNotification:(NSNotification *)notification
+-(void)renewQueuingNotification:(NSNotification *)notification
 {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.appDelegate.managedObjectContext]];
     NSError* error = nil;
     NSArray* FetchResults = [self.appDelegate.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
-    self.queuingNumberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[FetchResults count]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.queuingNumberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[FetchResults count]];
+    });
 }
 
 -(void)removeListView
@@ -330,10 +293,9 @@
     
     [[self.appDelegate mcManager].session disconnect];
     [self.appDelegate mcManager].session = nil;
-    [self.yrarrayConnectedDevices removeAllObjects];
+    [self.appDelegate.mcManager.connectedDevices removeAllObjects];
     
     [self.appDelegate.dataManager stopListeningForData];
-    
     [self.appDelegate setDataManager:nil];
     
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -345,33 +307,9 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-//-(void)reconnectNotification:(NSNotification *)notification
-//{
-//    [self.appDelegate.mcManager.session disconnect];
-//    self.appDelegate.mcManager.session = nil;
-//    self.appDelegate.mcManager.autoBrowser = nil;
-//    self.appDelegate.mcManager.peerID = nil;
-//    [self.yrarrayConnectedDevices removeAllObjects];
-//    [self.appDelegate.dataManager stopListeningForData];
-//    
-//    if ([self.appDelegate dataManager] == nil) {
-//        [self.appDelegate setDataManager:[YRDataManager new]];
-//    }
-//    [[self.appDelegate dataManager] setHost:NO];
-//    [[self.appDelegate dataManager] startListeningForData];
-//    
-//    [self.appDelegate.mcManager setHost:NO];//set host identity first, in order to initialize the session
-//    [self.appDelegate.mcManager setupPeerAndSessionWithDisplayName:[self.appDelegate.mcManager userName]];
-//    [self.appDelegate.mcManager setupMCBrowser];
-//    
-//    self.appDelegate.mcManager.autoBrowser.delegate = self;
-//    [self.appDelegate.mcManager.autoBrowser startBrowsingForPeers];
-//    [self.appDelegate.mcManager setBrowsing:YES];
-//}
-
 -(void)willEnterBackgroundNotification:(NSNotification *)notification
 {
-    [self.yrarrayConnectedDevices removeAllObjects];
+    [self.appDelegate.mcManager.connectedDevices removeAllObjects];
     NSLog(@"Client Enter Background");
 }
 
@@ -402,30 +340,6 @@
 {
     [self.yrEmailTextField resignFirstResponder];
 }
-
-
-#pragma mark - MCNearByServiceBrowserDelegate
-
--(void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary *)info
-{
-    NSString *remotePeerName = peerID.displayName;
-    
-    NSLog(@"Browser found %@", remotePeerName);
-    
-    NSLog(@"Inviting %@", remotePeerName);
-    
-    //since the host will be the only one we advertise, so there are only one
-    [browser invitePeer:peerID toSession:self.appDelegate.mcManager.session withContext:nil timeout:30.0];
-    
-    [browser stopBrowsingForPeers];
-    [self.appDelegate.mcManager setBrowsing:NO];
-}
-
-- (void)browser:(MCNearbyServiceBrowser *)browser lostPeer:(MCPeerID *)peerID
-{
-    //
-}
-
 
 
 #pragma mark - UITextFieldDelegate
@@ -517,10 +431,6 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"nameListCell"];
     }
     
-    //        Interviewer* current = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row];
-    //
-    //        cell.textLabel.text = current.name;
-    //        cell.detailTextLabel.text = current.email;
     NSDictionary* current = [self.appDelegate.dataManager.nameList objectAtIndex:indexPath.row];
     
     cell.textLabel.text = current[@"name"];
@@ -601,8 +511,8 @@
         [self.appDelegate mcManager].autoBrowser = nil;
         
         self.yrIDCode = nil;
-        [self.yrarrayConnectedDevices removeAllObjects];
-        self.yrarrayConnectedDevices = nil;
+        [self.appDelegate.mcManager.connectedDevices removeAllObjects];
+        self.appDelegate.mcManager.connectedDevices = nil;
         
         //stop listening to notifications
         // TODO: We shouldn't stop listening for all notification, right? We lose the keyboard notifications....

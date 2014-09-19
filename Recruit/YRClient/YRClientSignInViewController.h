@@ -13,7 +13,7 @@
 
 @class AutoSuggestTextField;
 
-@interface YRClientSignInViewController : UIViewController <UITextFieldDelegate, AutoSuggestTextFieldDelegate,UITableViewDataSource,UITableViewDelegate,MCNearbyServiceBrowserDelegate, UIAlertViewDelegate>
+@interface YRClientSignInViewController : UIViewController <UITextFieldDelegate, AutoSuggestTextFieldDelegate,UITableViewDataSource,UITableViewDelegate, UIAlertViewDelegate>
 
 
 @property (weak, nonatomic) IBOutlet UILabel *queuingNumberLabel;

@@ -117,7 +117,7 @@ NSString* const kYREngineerEmailFormsKey = @"engineerEmailForms";
         NSLog(@"Client entering...");
         //don't need to do anything since the client will try to reconnect upon failure in sending the packets
         
-        if (self.mcManager.isDebriefing)
+        if (self.mcManager.isDebriefing && !self.mcManager.isBrowsing)
         {
             [self.mcManager.autoBrowser startBrowsingForPeers];
             [self.mcManager setBrowsing:YES];

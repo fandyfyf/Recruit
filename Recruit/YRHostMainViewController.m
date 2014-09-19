@@ -14,12 +14,8 @@
 
 @interface YRHostMainViewController ()
 
-@property (nonatomic, strong) NSMutableArray *yrarrayConnectedDevices;
-
 -(void)debuggerFunction;
--(void)peerDidChangeStateWithNotification:(NSNotification *)notification;
--(void)needUpdateTableNotification:(NSNotification *)notification;
--(void)needUpdateConnectionListNotification:(NSNotification *)notification;
+-(void)updateConnectionListNotification:(NSNotification *)notification;
 -(void)willEnterBackgroundNotification:(NSNotification *)notification;
 -(void)doneWithPad;
 -(void)showEventCode;
@@ -33,15 +29,20 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(peerDidChangeStateWithNotification:) name:kYRMCManagerDidChangeStateNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateTableNotification:) name:kYRDataManagerNeedUpdateTableNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needUpdateConnectionListNotification:) name:kYRDataManagerNeedUpdateConnectionListNotification object:nil];
+    //============verified notification============//
+    //update connection list
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateConnectionListNotification:) name:kYRMCManagerNeedUpdateConnectionListNotification object:nil];
     
+    
+    
+    //enter background
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterBackgroundNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    
+    //=================================
+
     
     //initialization
     self.yrPrefix = [[NSString alloc] init];
-    self.yrarrayConnectedDevices = [[NSMutableArray alloc] init];
     
     //property set up
     self.appDelegate = (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
@@ -51,14 +52,8 @@
     [self debuggerFunction];
     [self.yrnameLabel setText:self.appDelegate.mcManager.userName];
     
-    //=====================session related code ======================//
-    
-    //set up session with host username
-    [[self.appDelegate mcManager] setHost:YES];
-    [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:self.appDelegate.mcManager.userName];
-    
-    //=====================mcManager set to Host, active session and PeerId is set ==========================//
-    
+    //initial setup for Host Manager
+    [[self.appDelegate mcManager] setupSessionManagerForHost:YES];
     
     [self.yrtableView setDelegate:self];
     [self.yrtableView setDataSource:self];
@@ -151,7 +146,8 @@
             [[self.appDelegate mcManager] advertiseSelf:NO];
             self.appDelegate.mcManager.advertising = NO;
             
-            [self.yrarrayConnectedDevices removeAllObjects];
+            [self.appDelegate.mcManager.connectedDevices removeAllObjects];
+            
             [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
         }
     }
@@ -192,88 +188,17 @@
     }
 }
 
--(void)peerDidChangeStateWithNotification:(NSNotification *)notification{
-    MCPeerID *peerID = [[notification userInfo] objectForKey:@"peerID"];
-    NSString *peerDisplayName = peerID.displayName;
-    MCSessionState state = [[[notification userInfo] objectForKey:@"state"] intValue];
-    
-    if (state != MCSessionStateConnecting) {
-        if (state == MCSessionStateConnected) {
-            
-            [self.yrarrayConnectedDevices addObject:@{@"displayName" : peerDisplayName, @"confirmedName" : @"connnecting..."}];
-
-            NSLog(@"%@ connecting...",peerDisplayName);
-            
-            [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
-            //send ACK back
-            [[self.appDelegate dataManager] sendACKBack:peerID];
-            [[self.appDelegate dataManager] sendNameList:peerID];
-        }
-        else if (state == MCSessionStateNotConnected){
-            if ([self.yrarrayConnectedDevices count] > 0) {
-                unsigned long indexOfPeer = 0;
-                for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
-                    if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:peerDisplayName]) {
-                        indexOfPeer = i;
-                        break;
-                    }
-                }
-                NSLog(@"%@ disconnected",[self.yrarrayConnectedDevices objectAtIndex:indexOfPeer][@"confirmedName"]);
-                
-                [self.yrarrayConnectedDevices removeObjectAtIndex:indexOfPeer];
-            }
-            [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }
-        else
-        {
-            NSLog(@"missing state");
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.yrtableView reloadData];
-            
-            BOOL peersNotExist = ([[self.appDelegate mcManager].activeSessions count] == 0);
-            [self.yrdisconnectButton setEnabled:!peersNotExist];
-        });
-    }
-    else
-    {
-        NSLog(@"is connecting");
-    }
-}
-
--(void)needUpdateTableNotification:(NSNotification *)notification
+-(void)updateConnectionListNotification:(NSNotification *)notification
 {
-    //
-}
-
--(void)needUpdateConnectionListNotification:(NSNotification *)notification
-{
-    NSString* displayName = [[notification userInfo] objectForKey:@"displayName"];
-    
-    for (unsigned long i = 0; i < [self.yrarrayConnectedDevices count] ; i++) {
-        if ([[self.yrarrayConnectedDevices objectAtIndex:i][@"displayName"] isEqualToString:displayName]) {
-            [self.yrarrayConnectedDevices replaceObjectAtIndex:i withObject:[notification userInfo]];
-            
-            NSLog(@"%@ connected",[self.yrarrayConnectedDevices objectAtIndex:i][@"confirmedName"]);
-            break;
-        }
-    }
-    
-    //remember the connected
-    [[NSUserDefaults standardUserDefaults] setObject:self.yrarrayConnectedDevices forKey:@"connectedList"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    //update table here!!
-    [self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.yrtableView reloadData];
+    });
+    //[self.yrtableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 }
 
 -(void)willEnterBackgroundNotification:(NSNotification *)notification
 {
-    [self.yrarrayConnectedDevices removeAllObjects];
+    [self.appDelegate.mcManager.connectedDevices removeAllObjects];
     [self.yrtableView reloadData];
     NSLog(@"Host entered background");
 }
@@ -373,7 +298,7 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     if (tableView == self.yrtableView) {
-        return [self.yrarrayConnectedDevices count];
+        return [self.appDelegate.mcManager.connectedDevices count];
     }
     else if (tableView == self.eventList)
     {
@@ -394,7 +319,7 @@
     }
     
     if (tableView == self.yrtableView) {
-        cell.textLabel.text = [self.yrarrayConnectedDevices objectAtIndex:indexPath.row][@"confirmedName"];
+        cell.textLabel.text = [self.appDelegate.mcManager.connectedDevices objectAtIndex:indexPath.row][@"confirmedName"];
     }
     else if (tableView == self.eventList)
     {

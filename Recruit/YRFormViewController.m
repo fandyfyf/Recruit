@@ -63,7 +63,6 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
     self.yrcodeLabel.text = [(YRClientSignInViewController*)self.source yrcodeLabel].text;
     
     self.yrGPATextField.delegate = self;
-    
     self.yrNoteTextView.delegate = self;
     [[self.yrNoteTextView layer] setCornerRadius:10];
     

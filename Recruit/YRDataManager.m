@@ -11,19 +11,35 @@
 #import "YRMCManager.h"
 #import "Interviewer.h"
 
+
+
+//=========verified notification========
+
+//=========observer: YRDataViewController
+NSString* const kYRDataManagerNeedUpdateTableNotification = @"NeedUpdateTableNotification";
+
+//=========observer: YRMCManager
+NSString* const kYRDataManagerNeedUpdateConnectionListNotification = @"NeedUpdateConnectionListNotification";
+
+//=========observer: YRClientSignIn & YRFormView
+NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNotification";
+
+//=========observer: YRClientSignIn & YRFormView
+NSString* const kYRDataManagerNeedUpdateCodeNotification = @"NeedUpdateCodeNotification";
+
+
+
 NSString* const kYRDataManagerReceiveBroadcastNotification = @"receiveBroadcastNotification";
 NSString* const kYRDataManagerReceiveResumeNotification = @"receiveResumeNotification";
 NSString* const kYRDataManagerReceiveTagListNotification = @"receiveTagListNotification";
 NSString* const kYRDataManagerReceiveSearchResultNotification = @"receiveSearchResultNotification";
 NSString* const kYRDataManagerReceiveDebriefTerminationNotification = @"debriefModeOffNotification";
 NSString* const kYRDataManagerReceiveDebriefInitiationNotification = @"debriefModeOnNotification";
-
-NSString* const kYRDataManagerNeedUpdateTableNotification = @"NeedUpdateTableNotification";
 NSString* const kYRDataManagerNeedStartBroadcastNotification = @"broadcastNotification";
 NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInformationNotification";
-NSString* const kYRDataManagerNeedUpdateCodeNotification = @"NeedUpdateCodeNotification";
-NSString* const kYRDataManagerNeedUpdateConnectionListNotification = @"NeedUpdateConnectionListNotification";
-NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNotification";
+
+
+
 
 @implementation YRDataManager
 
@@ -171,7 +187,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
         }
         else if([dic[@"msg"] isEqualToString:@"identityConfirm"] && self.isHost)
         {
-            NSLog(@"Receiving update username: %@ from %@",peerID.displayName,dic[@"data"]);
+            NSLog(@"Receiving confirmed name : %@",dic[@"data"]);
             
             NSDictionary* dict = @{@"displayName": peerID.displayName, @"confirmedName" : dic[@"data"]};
             
@@ -666,7 +682,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
 
     NSMutableArray* currentList = [NSMutableArray new];
     
-    NSArray* connectedList = [[NSUserDefaults standardUserDefaults] objectForKey:@"connectedList"];
+    NSArray* connectedList = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].connectedDevices;
     
     for (Interviewer* curr in FetchResults) {
         BOOL check = NO;
@@ -707,7 +723,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
     
     [selectedSession sendData:dataToSend toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
     if(error){
-        NSLog(@"%@", [error localizedDescription]);
+        NSLog(@"Error %@", [error localizedDescription]);
     }
 }
 
@@ -908,7 +924,7 @@ NSString* const kYRDataManagerNeedPromptNameListNotification = @"NameListReadyNo
     
     [selectedSession sendData:dataToSend toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
     if(error){
-        NSLog(@"%@", [error localizedDescription]);
+        NSLog(@"Error %@", [error localizedDescription]);
     }
 }
 
