@@ -523,7 +523,7 @@
         
         [self dismissViewControllerAnimated:YES completion:nil];
     }
-    if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Continue"]) {
+    else if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Continue"]) {
         [self.view endEditing:YES];
         [self performSegueWithIdentifier:@"SignInToForm" sender:self];
     }

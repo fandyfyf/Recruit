@@ -1263,10 +1263,13 @@
 -(void)broadcast:(NSNotification*)notification
 {
     CandidateEntry* selected = self.dataSource;
-    NSDictionary* dic = @{@"firstName":selected.firstName,@"lastName":selected.lastName,@"email":selected.emailAddress,@"interviewer":selected.interviewer,@"code":selected.code,@"status":selected.status,@"pdf":selected.pdf,@"position":selected.position,@"preference":selected.preference,@"date":selected.date,@"note":selected.notes,@"rank":[selected.rank stringValue],@"gpa":[selected.gpa stringValue],@"BU1" : selected.businessUnit1, @"BU2" : selected.businessUnit2, @"fileNames" : selected.fileNames, @"tagList" : selected.tagList};
-    NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
     
-    [self.appDelegate.dataManager broadCastData:packet];
+    if (selected != nil) {
+        NSDictionary* dic = @{@"firstName":selected.firstName,@"lastName":selected.lastName,@"email":selected.emailAddress,@"interviewer":selected.interviewer,@"code":selected.code,@"status":selected.status,@"pdf":selected.pdf,@"position":selected.position,@"preference":selected.preference,@"date":selected.date,@"note":selected.notes,@"rank":[selected.rank stringValue],@"gpa":[selected.gpa stringValue],@"BU1" : selected.businessUnit1, @"BU2" : selected.businessUnit2, @"fileNames" : selected.fileNames, @"tagList" : selected.tagList};
+        NSDictionary* packet = @{@"msg" : @"broadcast", @"data":dic};
+        
+        [self.appDelegate.dataManager broadCastData:packet];
+    }
 }
 
 -(void)showYDay1Picker:(UIGestureRecognizer*)gestureRecognizer

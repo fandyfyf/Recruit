@@ -128,6 +128,8 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
     {
         if ([[(MCPeerID*)[self.activeSessions objectAtIndex:i][@"peer"] displayName] isEqualToString:peerID.displayName]) {
             [deletedSession addObject:[NSNumber numberWithInt:i]];
+            //disconnect the session first before deleting them
+            [(MCSession*)[self.activeSessions objectAtIndex:i][@"session"] disconnect];
         }
     }
     

@@ -74,6 +74,9 @@ NSString* const kYREngineerEmailFormsKey = @"engineerEmailForms";
     //save all the setting
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    //keep the screen awake
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+    
     //create email generater
     self.emailGenerator = [[YREmailGenerator alloc] init];
     return YES;

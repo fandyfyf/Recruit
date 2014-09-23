@@ -1972,6 +1972,10 @@
         //reset the room configuration
         [self loadSettingSections];
         
+        //reset code index counter
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:0] forKey:@"codeIndex"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
         [self.interviewerList reloadData];
         
     }
