@@ -416,6 +416,10 @@
     [self.infoDataList reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
+- (IBAction)mannellyEnterStudent:(id)sender {
+    NSLog(@"Recruitor mannally input student");
+}
+
 -(void)scrollLeft
 {
     NSLog(@"Left");

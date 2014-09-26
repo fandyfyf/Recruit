@@ -30,4 +30,6 @@
 - (IBAction)deleteCoreData:(id)sender;
 - (IBAction)cancelSearch:(id)sender;
 
+- (IBAction)mannellyEnterStudent:(id)sender;
+
 @end

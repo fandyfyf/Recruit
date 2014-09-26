@@ -673,7 +673,7 @@
                                 </prototypes>
                             </tableView>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="tFD-fV-gxp">
-                                <rect key="frame" x="40" y="46" width="188" height="29"/>
+                                <rect key="frame" x="40" y="40" width="188" height="29"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES"/>
                                 <segments>
                                     <segment title="All"/>
@@ -682,7 +682,7 @@
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
                             </segmentedControl>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="WRN-iJ-4hq">
-                                <rect key="frame" x="428.00000223200351" y="46" width="300" height="29"/>
+                                <rect key="frame" x="367" y="40" width="300" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES"/>
                                 <segments>
                                     <segment title="All"/>
@@ -692,7 +692,7 @@
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="2KX-1X-QEt">
-                                <rect key="frame" x="301" y="45" width="56" height="30"/>
+                                <rect key="frame" x="270" y="39" width="56" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Delete">
                                     <color key="titleColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -720,6 +720,16 @@
                                     </barButtonItem>
                                 </items>
                             </toolbar>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="RG5-BC-yic">
+                                <rect key="frame" x="708" y="34" width="40" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button" image="file_add.png">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="mannellyEnterStudent:" destination="9nq-bt-2BQ" eventType="touchUpInside" id="UV1-VV-LNz"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -1490,6 +1500,7 @@
         <image name="corporate_en-US_purple_medium_v.jpg" width="500" height="175"/>
         <image name="document.png" width="30" height="30"/>
         <image name="email.png" width="30" height="30"/>
+        <image name="file_add.png" width="128" height="128"/>
         <image name="file_delete.png" width="128" height="128"/>
         <image name="flag.jpg" width="346" height="346"/>
         <image name="folder.png" width="30" height="30"/>
