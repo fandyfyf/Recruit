@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6154.17" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="vXZ-lx-hvc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6153.11"/>
+        <deployment defaultVersion="1792" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Main View Controller-->
@@ -79,7 +80,7 @@
             </objects>
             <point key="canvasLocation" x="-186" y="496"/>
         </scene>
-        <!--Host Main View Controller - Connections-->
+        <!--Connections-->
         <scene sceneID="VWX-ZX-GZg">
             <objects>
                 <viewController id="xxk-EV-0GD" customClass="YRHostMainViewController" sceneMemberID="viewController">
@@ -177,7 +178,7 @@
             </objects>
             <point key="canvasLocation" x="357" y="61"/>
         </scene>
-        <!--Data View Controller - Students-->
+        <!--Students-->
         <scene sceneID="26D-WG-cXw">
             <objects>
                 <viewController id="foz-Ft-zgJ" customClass="YRDataViewController" sceneMemberID="viewController">
@@ -599,7 +600,7 @@
             </objects>
             <point key="canvasLocation" x="1322" y="291"/>
         </scene>
-        <!--Client Connection View Controller - Connection-->
+        <!--Connection-->
         <scene sceneID="guV-MD-xde">
             <objects>
                 <viewController id="m8a-lL-dFC" customClass="YRClientConnectionViewController" sceneMemberID="viewController">
@@ -673,7 +674,7 @@
             </objects>
             <point key="canvasLocation" x="-186" y="1235"/>
         </scene>
-        <!--Host Setting View Controller - Setting-->
+        <!--Setting-->
         <scene sceneID="XSf-nV-hta">
             <objects>
                 <viewController id="xsb-FV-0eJ" customClass="YRHostSettingViewController" sceneMemberID="viewController">
@@ -1005,7 +1006,7 @@
             </objects>
             <point key="canvasLocation" x="895" y="1026"/>
         </scene>
-        <!--Host Time Card View Controller - Schedule-->
+        <!--Schedule-->
         <scene sceneID="ppb-h8-bqK">
             <objects>
                 <viewController id="uFw-Zy-SdN" customClass="YRHostTimeCardViewController" sceneMemberID="viewController">
@@ -1020,7 +1021,7 @@
             </objects>
             <point key="canvasLocation" x="895" y="1668"/>
         </scene>
-        <!--Client Sign In View Controller - Files-->
+        <!--Files-->
         <scene sceneID="yZ7-mp-McK">
             <objects>
                 <viewController id="HjN-Hd-hI6" customClass="YRClientSignInViewController" sceneMemberID="viewController">
@@ -1166,7 +1167,7 @@
             </objects>
             <point key="canvasLocation" x="357" y="831"/>
         </scene>
-        <!--Form View Controller - Form-->
+        <!--Form-->
         <scene sceneID="WE7-TQ-xpN">
             <objects>
                 <viewController id="tbH-fe-ceL" customClass="YRFormViewController" sceneMemberID="viewController">
@@ -1175,7 +1176,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="T6e-VG-JZL">
-                                <rect key="frame" x="20" y="455.99999258303546" width="280" height="40"/>
+                                <rect key="frame" x="20" y="456" width="280" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>

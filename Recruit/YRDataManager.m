@@ -135,11 +135,11 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
             NSDictionary *dict = @{@"recruitID": dic[@"code"]};
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateCodeNotification object:nil userInfo:dict];
-#if Debug
+//#if Debug
             //==================================debug========================================//
-            //[self debugSenderActiveWithCode:dic[@"code"]];
+//            [self debugSenderActiveWithCode:dic[@"code"]];
             //===============================================================================//
-#endif
+//#endif
         }
         else if([dic[@"msg"] isEqualToString:@"nameList"])
         {
@@ -555,12 +555,42 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
     
     NSArray * allPeers = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session.connectedPeers;
     
-    //NSLog(@"%@",allPeers);
+    //TODO: might also send the request to self, need to check
     
     NSError *error;
     
     [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
     return error;
+}
+
+-(void)sendToPeer:(MCPeerID*)peer withData:(NSDictionary*)data
+{
+    //encode data
+    NSMutableData* yrdataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    [yrarchiver encodeObject:data forKey:@"infoDataKey"];
+    [yrarchiver finishEncoding];
+    
+    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+        
+        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
+            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
+            
+            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
+            
+            NSError *error;
+            
+            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+            
+            if(error){
+                NSLog(@"%@", [error localizedDescription]);
+            }
+            else
+            {
+                //
+            }
+        }
+    }
 }
 
 -(void)sendToALLClientsWithData:(NSDictionary*)data
@@ -737,7 +767,7 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
     }
     else
     {
-        //
+            //
     }
 }
 
@@ -794,10 +824,6 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
     
     
     return error;
-//    if(error){
-//        NSLog(@"%@", [error localizedDescription]);
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"connectionDropNotification" object:nil];
-//    }
 }
 
 -(void)sendSearchResult:(NSArray*)array toPeer:(MCPeerID*)peer
@@ -825,7 +851,8 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
             }
             else
             {
-                //
+                //after the search result are securely sent
+                break;
             }
         }
     }
@@ -879,11 +906,6 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
     NSError* error = [self sendToHostWithData:dic];
     
     return error;
-    
-//    if(error){
-//        NSLog(@"%@", [error localizedDescription]);
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"connectionDropNotification" object:nil];
-//    }
 }
 
 -(void)sendBackUp:(NSDictionary *)localBackUp

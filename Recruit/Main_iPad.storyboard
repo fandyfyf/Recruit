@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4511" systemVersion="13E28" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="lzt-P9-zQ4">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="lzt-P9-zQ4">
     <dependencies>
         <deployment defaultVersion="1792" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3745"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Main View Controller-->
@@ -81,7 +81,7 @@
             </objects>
             <point key="canvasLocation" x="-2968" y="124"/>
         </scene>
-        <!--Client Connection View Controller - Connection-->
+        <!--Connection-->
         <scene sceneID="l7i-le-lNb">
             <objects>
                 <viewController id="Vmd-GY-Wk6" customClass="YRClientConnectionViewController" sceneMemberID="viewController">
@@ -151,7 +151,7 @@
             </objects>
             <point key="canvasLocation" x="-3060" y="1874"/>
         </scene>
-        <!--Client Sign In View Controller - Files-->
+        <!--Files-->
         <scene sceneID="bvi-Zg-9Zl">
             <objects>
                 <viewController id="KF1-yu-uiK" customClass="YRClientSignInViewController" sceneMemberID="viewController">
@@ -276,7 +276,7 @@
             </objects>
             <point key="canvasLocation" x="-1976" y="505"/>
         </scene>
-        <!--Host Time Card View Controller - Schedule-->
+        <!--Schedule-->
         <scene sceneID="FgU-JI-kfq">
             <objects>
                 <viewController id="TrZ-wR-U9q" customClass="YRHostTimeCardViewController" sceneMemberID="viewController">
@@ -291,7 +291,7 @@
             </objects>
             <point key="canvasLocation" x="-985" y="918"/>
         </scene>
-        <!--Form View Controller - Form-->
+        <!--Form-->
         <scene sceneID="0xW-X6-4c2">
             <objects>
                 <viewController id="4jR-6C-Txu" customClass="YRFormViewController" sceneMemberID="viewController">
@@ -466,7 +466,7 @@
             </objects>
             <point key="canvasLocation" x="-1976" y="1791"/>
         </scene>
-        <!--Host Main View Controller - Connections-->
+        <!--Connections-->
         <scene sceneID="Evw-3J-in5">
             <objects>
                 <viewController id="r5x-RW-hCK" customClass="YRHostMainViewController" sceneMemberID="viewController">
@@ -565,7 +565,7 @@
             </objects>
             <point key="canvasLocation" x="-1976" y="-903"/>
         </scene>
-        <!--Data View Controller - Students-->
+        <!--Students-->
         <scene sceneID="wQY-mz-wEC">
             <objects>
                 <viewController id="9nq-bt-2BQ" customClass="YRDataViewController" sceneMemberID="viewController">
@@ -682,7 +682,7 @@
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>
                             </segmentedControl>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="WRN-iJ-4hq">
-                                <rect key="frame" x="367" y="40" width="300" height="29"/>
+                                <rect key="frame" x="366.99999715050058" y="40" width="300" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES"/>
                                 <segments>
                                     <segment title="All"/>
@@ -1122,7 +1122,7 @@
             </objects>
             <point key="canvasLocation" x="-35" y="-273"/>
         </scene>
-        <!--Host Setting View Controller - Setting-->
+        <!--Setting-->
         <scene sceneID="mSn-og-Hza">
             <objects>
                 <viewController id="UBD-64-uIi" customClass="YRHostSettingViewController" sceneMemberID="viewController">

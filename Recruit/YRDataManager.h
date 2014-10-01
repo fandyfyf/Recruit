@@ -50,6 +50,8 @@ FOUNDATION_EXPORT NSString* const kYRDataManagerNeedPromptNameListNotification;
 
 -(NSError*)sendToHostWithData:(NSDictionary*)data;
 
+-(void)sendToPeer:(MCPeerID*)peer withData:(NSDictionary*)data;
+
 -(void)sendToALLClientsWithData:(NSDictionary*)data;
 
 -(void)sendACKBack:(MCPeerID*)peerID;

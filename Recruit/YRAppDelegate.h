@@ -30,6 +30,10 @@ FOUNDATION_EXPORT NSString* const kYREngineerEmailFormsKey;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 
++ (YRAppDelegate*)sharedAppDelegate;
+
++ (YRMCManager*)sharedMCManager;
+
 -(void)saveContext;
 -(NSURL *) applicationDocumentsDirectory;
 

@@ -23,6 +23,16 @@ NSString* const kYREngineerEmailFormsKey = @"engineerEmailForms";
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 
++ (YRAppDelegate*)sharedAppDelegate
+{
+    return (YRAppDelegate*)[[UIApplication sharedApplication] delegate];
+}
+
++ (YRMCManager*)sharedMCManager
+{
+    return [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     //create the mcManager at application launch
