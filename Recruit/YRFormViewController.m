@@ -378,10 +378,10 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
                 newDic[@"tagList"] = @[self.appDelegate.mcManager.userName];
             }
             //change NSDictionary to NSMutableDictionary
-            NSDictionary *dic = @{@"msg" : @"data", @"data" : newDic};
+            NSDictionary *packet = @{kYRMessageMessageSection : kYRDataEntryMessage, kYRMessageDataSection : newDic};
             
             [(YRClientSignInViewController*)self.source setCodeLabel:@"Offline"];
-            [self.appDelegate.dataManager sendData:dic];
+            [self.appDelegate.dataManager sendData:packet];
             
             [self refresh];
             
@@ -479,7 +479,9 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
         for (CandidateEntry* backedUpCandidate in FetchResults)
         {
             NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":backedUpCandidate.tagList};
-            NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+            
+            
+            NSDictionary* packet = @{kYRMessageMessageSection : kYRBackupDataEntryMessage, kYRMessageDataSection : dic};
             [self.appDelegate.dataManager sendBackUp:packet];
             NSLog(@"sending one entry");
         }

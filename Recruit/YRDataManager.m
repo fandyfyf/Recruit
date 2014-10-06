@@ -39,6 +39,36 @@ NSString* const kYRDataManagerNeedStartBroadcastNotification = @"broadcastNotifi
 NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInformationNotification";
 
 
+//message Type
+NSString* const kYRMessageMessageSection = @"msg";
+NSString* const kYRMessageDataSection = @"messageData";
+
+
+NSString* const kYRDataEntryMessage = @"data";
+NSString* const kYRBackupDataEntryMessage = @"backup";
+NSString* const kYRAcknowledgeMessage = @"ack";
+NSString* const kYRNameListMessage = @"nameList";
+NSString* const kYRIdentityConfirmMessage = @"identityConfirm";
+
+//Debriefing Mode
+
+NSString* const kYRDebriefBroadcastMessage = @"broadcast";
+NSString* const kYRDebriefResumeRequestMessage = @"resumeRequest";
+NSString* const kYRDebriefTagListRequestMessage = @"tagListRequest";
+NSString* const kYRDebriefLastDiscussedDataRequestMessage = @"pullData";
+NSString* const kYRDebriefSearchRequestMessage = @"searchQuery";
+
+NSString* const kYRDebriefFlagRequestMessage = @"Flag";
+NSString* const kYRDebriefUnflagRequestMessage = @"unFlag";
+
+NSString* const kYRDebriefDataResumeMessage = @"resume";
+NSString* const kYRDebriefDataTagListMessage = @"tagList";
+NSString* const kYRDebriefDataSearchResultMessage = @"searchResult";
+
+
+NSString* const kYRDebriefInvitationMessage = @"debriefInvitation";
+NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
+
 
 
 @implementation YRDataManager
@@ -95,29 +125,32 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
         
         [yrunarchiver finishDecoding];
         
-        //NSLog(@"message is %@; I AM %@",dic[@"msg"], self);
+        NSString* message = dic[kYRMessageMessageSection];
         
         
-        if([dic[@"msg"] isEqualToString:@"data"] && self.isHost)
+        if([message isEqualToString:kYRDataEntryMessage] && self.isHost)
         {
-            if ([self isNotDuplicateData:dic[@"data"]]){
-                [self sendACKBack:peerID];
+            //send acknowledge upone receive data entry
+            [self sendACKBack:peerID];
+            
+            if ([self isNotDuplicateData:dic[kYRMessageDataSection]]){
+                //save data in coredata
+                CandidateEntry* curr = [self saveCandidate:dic[kYRMessageDataSection]];
                 
-                CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+                //update in table via posting notification
                 NSDictionary *dict = @{@"entry" : curr};
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTableNotification object:nil userInfo:dict];
             }
             else
             {
-                [self sendACKBack:peerID];
                 NSLog(@"duplicate code and firstName found");
             }
         }
-        else if ([dic[@"msg"] isEqualToString:@"backup"] && self.isHost)
+        else if ([message isEqualToString:kYRBackupDataEntryMessage] && self.isHost)
         {
-            if ([self isNotDuplicateData:dic[@"data"]]) {
-                CandidateEntry* curr = [self saveCandidate:dic[@"data"]];
+            if ([self isNotDuplicateData:dic[kYRMessageDataSection]]) {
+                CandidateEntry* curr = [self saveCandidate:dic[kYRMessageDataSection]];
                 NSDictionary *dict = @{@"entry" : curr};
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateTableNotification
@@ -129,7 +162,7 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 NSLog(@"duplicate code and firstName found");
             }
         }
-        else if([dic[@"msg"] isEqualToString:@"ack"])
+        else if([message isEqualToString:kYRAcknowledgeMessage])
         {
             [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
             NSDictionary *dict = @{@"recruitID": dic[@"code"]};
@@ -141,10 +174,10 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
             //===============================================================================//
 //#endif
         }
-        else if([dic[@"msg"] isEqualToString:@"nameList"])
+        else if([message isEqualToString:kYRNameListMessage])
         {
-            NSLog(@"The receiving list is %@",dic[@"data"]);
-            self.nameList = dic[@"data"];
+            NSLog(@"The receiving list is %@",dic[kYRMessageDataSection]);
+            self.nameList = dic[kYRMessageDataSection];
             
             BOOL signIn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedInAlready"] boolValue];
             
@@ -159,8 +192,11 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 for (CandidateEntry* backedUpCandidate in FetchResults)
                 {
                     NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":[backedUpCandidate tagList]};
-                    NSDictionary* packet = @{@"msg" : @"backup", @"data":dic};
+                    
+                    NSDictionary* packet = @{kYRMessageMessageSection : kYRBackupDataEntryMessage, kYRMessageDataSection:dic};
+                    
                     [self sendBackUp:packet];
+                    
                     NSLog(@"sending one entry");
                 }
                 
@@ -185,11 +221,11 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedPromptNameListNotification object:nil userInfo:nil];
             }
         }
-        else if([dic[@"msg"] isEqualToString:@"identityConfirm"] && self.isHost)
+        else if([message isEqualToString:kYRIdentityConfirmMessage] && self.isHost)
         {
-            NSLog(@"Receiving confirmed name : %@",dic[@"data"]);
+            NSLog(@"Receiving confirmed name : %@",dic[kYRMessageDataSection]);
             
-            NSDictionary* dict = @{@"displayName": peerID.displayName, @"confirmedName" : dic[@"data"]};
+            NSDictionary* dict = @{@"displayName": peerID.displayName, @"confirmedName" : dic[kYRMessageDataSection]};
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateConnectionListNotification object:nil userInfo:dict];
             
@@ -200,43 +236,39 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
             //=================================================================//
         }
         //========================Debrif message ==========================//
-        else if([dic[@"msg"] isEqualToString:@"broadcast"] && !self.isHost)
+        else if([message isEqualToString:kYRDebriefBroadcastMessage] && !self.isHost)
         {
             //receive debrief invitation
             NSLog(@"receiving one broadcast entry");
             //post notification to observers
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveBroadcastNotification object:nil userInfo:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveBroadcastNotification object:nil userInfo:dic[kYRMessageDataSection]];
         }
-        else if([dic[@"msg"] isEqualToString:@"resumeRequest"] && self.isHost)
+        else if([message isEqualToString:kYRDebriefResumeRequestMessage] && self.isHost)
         {
             NSLog(@"receiving one resume request");
             
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
             NSString *documentsDirectory = [paths objectAtIndex:0];
-            
             NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:@"Candidates_PDF_Folder"];
-            
             NSError *error;
             if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
                 [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
-            
-            NSString* fileName = dic[@"data"];
-            
+            NSString* fileName = dic[kYRMessageDataSection];
             NSString *fullPath = [dataPath stringByAppendingPathComponent:fileName];
             
-            NSDictionary* dic = @{@"msg" : @"resume" , @"data" : [NSData dataWithContentsOfFile:fullPath]};
+            NSDictionary* dic = @{kYRMessageMessageSection : kYRDebriefDataResumeMessage , kYRMessageDataSection : [NSData dataWithContentsOfFile:fullPath]};
             
             [self sendResume:dic toPeer:peerID];
             
         }
-        else if([dic[@"msg"] isEqualToString:@"resume"])
+        else if([message isEqualToString:kYRDebriefDataResumeMessage])
         {
             NSLog(@"receiving one resume");
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveResumeNotification object:nil userInfo:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveResumeNotification object:nil userInfo:dic[kYRMessageDataSection]];
         }
-        else if([dic[@"msg"] isEqualToString:@"debriefInvitation"] && !self.isHost)
+        else if([message isEqualToString:kYRDebriefInvitationMessage] && !self.isHost)
         {
             //receive debrief invitation
             NSLog(@"receiving debrief invitation");
@@ -246,13 +278,13 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
             
             //[self sendTagListRequest:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
         }
-        else if([dic[@"msg"] isEqualToString:@"tagListRequest"] && self.isHost)
+        else if([message isEqualToString:kYRDebriefTagListRequestMessage] && self.isHost)
         {
-            NSLog(@"receive tag list request from %@",dic[@"data"]);
+            NSLog(@"receive tag list request from %@",dic[kYRMessageDataSection]);
             
             NSFetchRequest* fetchRequest = [[NSFetchRequest alloc] init];
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",dic[@"data"],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"name = %@ && code = %@",dic[kYRMessageDataSection],[[NSUserDefaults standardUserDefaults] valueForKey:@"eventCode"]]];
             
             NSError* error = nil;
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -260,7 +292,7 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
             NSArray* tagList;
             if ([FetchResults count] != 0) {
                 tagList = [(Interviewer*)FetchResults[0] tagList];
-                NSDictionary* dic = @{@"msg" : @"tagList" , @"data" : tagList};
+                NSDictionary* dic = @{kYRMessageMessageSection : kYRDebriefDataTagListMessage , kYRMessageDataSection : tagList};
                 
                 [self sendTagList:dic toPeer:peerID];
             }
@@ -269,25 +301,25 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 NSLog(@"interviewer not found");
             }
         }
-        else if([dic[@"msg"] isEqualToString:@"tagList"] && !self.isHost)
+        else if([message isEqualToString:kYRDebriefDataTagListMessage] && !self.isHost)
         {
-            NSLog(@"receiving tag list %@",dic[@"data"]);
+            NSLog(@"receiving tag list %@",dic[kYRMessageDataSection]);
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveTagListNotification object:nil userInfo:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveTagListNotification object:nil userInfo:dic[kYRMessageDataSection]];
         }
-        else if([dic[@"msg"] isEqualToString:@"pullData"] && self.isHost)
+        else if([message isEqualToString:kYRDebriefLastDiscussedDataRequestMessage] && self.isHost)
         {
-            //send notification broadcast
+            //TODO: instead of broadcast to all existing clients, send the requested data to this specific user
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedStartBroadcastNotification object:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedStartBroadcastNotification object:peerID];
         }
-        else if([dic[@"msg"] isEqualToString:@"Flag"] && self.isHost)
+        else if([message isEqualToString:kYRDebriefFlagRequestMessage] && self.isHost)
         {
-            NSLog(@"receiving tag request for Candidate %@ from %@",dic[@"data"],dic[@"viewer"]);
+            NSLog(@"receiving tag request for Candidate %@ from %@",dic[kYRMessageDataSection],dic[@"viewer"]);
             
             NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",dic[@"data"]]];
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",dic[kYRMessageDataSection]]];
             NSError* error = nil;
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
@@ -306,7 +338,7 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 
                 Interviewer* selected_I = FetchResults_I[0];
                 NSMutableArray* tagList_I = [selected_I.tagList mutableCopy];
-                [tagList_I addObject:dic[@"data"]];
+                [tagList_I addObject:dic[kYRMessageDataSection]];
                 [selected_I setTagList:[NSArray arrayWithArray:tagList_I]];
                 //manage taglist for interviewer too
                 //if connection failed then all the tag list will lost on client end.
@@ -323,13 +355,13 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 NSLog(@"target candidate not found");
             }
         }
-        else if([dic[@"msg"] isEqualToString:@"unFlag"] && self.isHost)
+        else if([message isEqualToString:kYRDebriefUnflagRequestMessage] && self.isHost)
         {
-            NSLog(@"receiving untag request for Candidate %@ from %@",dic[@"data"],dic[@"viewer"]);
+            NSLog(@"receiving untag request for Candidate %@ from %@",dic[kYRMessageDataSection],dic[@"viewer"]);
             
             NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",dic[@"data"]]];
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",dic[kYRMessageDataSection]]];
             NSError* error = nil;
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
@@ -364,7 +396,7 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 if ([tagList_I count] != 0) {
                     int index = -1;
                     for (int i=0; i<[tagList_I count]; i++) {
-                        if ([[tagList_I objectAtIndex:i] isEqualToString:dic[@"data"]]) {
+                        if ([[tagList_I objectAtIndex:i] isEqualToString:dic[kYRMessageDataSection]]) {
                             index = i;
                             break;
                         }
@@ -387,13 +419,13 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
                 NSLog(@"target candidate not found");
             }
         }
-        else if ([dic[@"msg"] isEqualToString:@"searchQuery"] && self.isHost)
+        else if ([message isEqualToString:kYRDebriefSearchRequestMessage] && self.isHost)
         {
-            NSLog(@"receiving seach query %@",dic[@"data"]);
+            NSLog(@"receiving seach query %@",dic[kYRMessageDataSection]);
             
             NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
             [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
-            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"preference = %@ && rank >= %@ && position = %@",dic[@"data"][@"option"],dic[@"data"][@"ranking"],dic[@"data"][@"position"]]];
+            [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"preference = %@ && rank >= %@ && position = %@",dic[kYRMessageDataSection][@"option"],dic[kYRMessageDataSection][@"ranking"],dic[kYRMessageDataSection][@"position"]]];
             NSError* error = nil;
             NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
             
@@ -407,13 +439,13 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
             
             [self sendSearchResult:[NSArray arrayWithArray:dataToSend] toPeer:peerID];
         }
-        else if([dic[@"msg"] isEqualToString:@"searchResult"] && !self.isHost)
+        else if([message isEqualToString:kYRDebriefDataSearchResultMessage] && !self.isHost)
         {
-            NSLog(@"receiving search result: %@",dic[@"data"]);
+            NSLog(@"receiving search result: %@",dic[kYRMessageDataSection]);
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveSearchResultNotification object:dic[@"data"]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveSearchResultNotification object:dic[kYRMessageDataSection]];
         }
-        else if([dic[@"msg"] isEqualToString:@"debriefTermination"] && !self.isHost)
+        else if([message isEqualToString:kYRDebriefTerminationMessage] && !self.isHost)
         {
             //receive debrief termination
             NSLog(@"receiving debrief termination");
@@ -566,30 +598,24 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
 -(void)sendToPeer:(MCPeerID*)peer withData:(NSDictionary*)data
 {
     //encode data
-    NSMutableData* yrdataToSend = [NSMutableData new];
-    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    NSMutableData* dataToSend = [NSMutableData new];
+    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:dataToSend];
     [yrarchiver encodeObject:data forKey:@"infoDataKey"];
     [yrarchiver finishEncoding];
+
+    MCSession * selectedSession;
     
     for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
-        
-        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
-            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
-            
-            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
-            
-            NSError *error;
-            
-            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
-            
-            if(error){
-                NSLog(@"%@", [error localizedDescription]);
-            }
-            else
-            {
-                //
-            }
+        if ([[dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
+            selectedSession = dic[@"session"];
+            break;
         }
+    }
+    
+    NSError* error = nil;
+    [selectedSession sendData:dataToSend toPeers:@[peer] withMode:MCSessionSendDataReliable error:&error];
+    if(error){
+        NSLog(@"Error %@", [error localizedDescription]);
     }
 }
 
@@ -643,26 +669,25 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
     [self sendToALLClientsWithData:data];
 }
 
+-(void)broadCastData:(NSDictionary *)data toPeer:(MCPeerID*)peer
+{
+    [self sendToPeer:peer withData:data];
+}
+
 -(NSError*)sendDataRequestForFile:(NSString*)fileName
 {
-    NSDictionary* dic = @{@"msg" : @"resumeRequest", @"data" : fileName};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefResumeRequestMessage, kYRMessageDataSection : fileName};
     
-    NSError* error = [self sendToHostWithData:dic];
+    NSError* error = [self sendToHostWithData:packet];
     
     return error;
-    
-//    if(error){
-//        NSLog(@"%@", [error localizedDescription]);
-//        
-//        [[NSNotificationCenter defaultCenter] postNotificationName:@"connectionDropNotification" object:nil];
-//    }
 }
 
 -(void)pullData
 {
-    NSDictionary* data = @{@"msg" : @"pullData"};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefLastDiscussedDataRequestMessage};
     
-    NSError* error = [self sendToHostWithData:data];
+    NSError* error = [self sendToHostWithData:packet];
     
     if(error){
         NSLog(@"%@", [error localizedDescription]);
@@ -671,45 +696,16 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
 
 -(void)sendResume:(NSDictionary*)data toPeer:(MCPeerID*)peer
 {
-    NSMutableData* yrdataToSend = [NSMutableData new];
-    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
-    
-    [yrarchiver encodeObject:data forKey:@"infoDataKey"];
-    [yrarchiver finishEncoding];
-    
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
-        
-        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
-            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
-            
-            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
-            
-            NSError *error;
-            
-            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
-            
-            if(error){
-                NSLog(@"%@", [error localizedDescription]);
-            }
-            else
-            {
-                //
-            }
-        }
-    }
+    [self sendToPeer:peer withData:data];
 }
 
 -(void)sendNameList:(MCPeerID*)peerID
 {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:[NSEntityDescription entityForName:@"Interviewer" inManagedObjectContext:self.managedObjectContext]];
-    
     [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"code = %@",self.yrPrefix]];
-    
     NSError* error = nil;
-    
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-
     NSMutableArray* currentList = [NSMutableArray new];
     
     NSArray* connectedList = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].connectedDevices;
@@ -732,137 +728,65 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
         }
     }
     
-    NSDictionary* dic = @{@"msg" : @"nameList", @"data" : currentList};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRNameListMessage , kYRMessageDataSection : currentList};
     
     NSLog(@"sending name list");
     
-    NSMutableData* dataToSend = [NSMutableData new];
-    
-    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:dataToSend];
-    
-    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
-    [yrarchiver finishEncoding];
-    
-    MCSession * selectedSession;
-    
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
-        if ([[dic[@"peer"] displayName] isEqualToString:peerID.displayName]) {
-            selectedSession = dic[@"session"];
-        }
-    }
-    
-    [selectedSession sendData:dataToSend toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
-    if(error){
-        NSLog(@"Error %@", [error localizedDescription]);
-    }
+    [self sendToPeer:peerID withData:packet];
 }
 
 -(void)sendIdentityConfirmation:(NSString*)updateUserName
 {
-    NSDictionary* dic = @{@"msg" : @"identityConfirm", @"data" : updateUserName};
-    NSError* error = [self sendToHostWithData:dic];
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRIdentityConfirmMessage, kYRMessageDataSection : updateUserName};
+    NSError* error = [self sendToHostWithData:packet];
     
     if(error){
         NSLog(@"%@", [error localizedDescription]);
-    }
-    else
-    {
-            //
     }
 }
 
 -(void)sendDebriefTermination
 {
-    NSDictionary* dic = @{@"msg" : @"debriefTermination"};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefTerminationMessage};
     
-    [self sendToALLClientsWithData:dic];
+    [self sendToALLClientsWithData:packet];
 }
 
+//send debrief invitation to newly connected user
 -(void)sendDebriefInvitationToPeer:(MCPeerID*)peer
 {
-    NSDictionary* dic = @{@"msg" : @"debriefInvitation"};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefInvitationMessage};
     
-    NSMutableData* yrdataToSend = [NSMutableData new];
-    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
-    
-    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
-    [yrarchiver finishEncoding];
-
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
-        
-        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
-            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
-            
-            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
-            
-            NSError *error;
-            
-            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
-            
-            if(error){
-                NSLog(@"%@", [error localizedDescription]);
-            }
-            else
-            {
-                //
-            }
-        }
-    }
+    [self sendToPeer:peer withData:packet];
 }
 
+//broadcast debrief invitation to all connected users
 -(void)sendDebriefInvitation
 {
-    NSDictionary* dic = @{@"msg" : @"debriefInvitation"};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefInvitationMessage};
     
-    [self sendToALLClientsWithData:dic];
+    [self sendToALLClientsWithData:packet];
 }
 
 -(NSError*)sendSearchQuery:(NSDictionary*)dic
 {
-    NSDictionary* data = @{@"msg" : @"searchQuery", @"data" : dic};
-    NSError* error = [self sendToHostWithData:data];
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefSearchRequestMessage, kYRMessageDataSection : dic};
     
-    
-    return error;
+    return [self sendToHostWithData:packet];
 }
 
 -(void)sendSearchResult:(NSArray*)array toPeer:(MCPeerID*)peer
 {
-    NSDictionary* data = @{@"msg" : @"searchResult", @"data" : array};
-    NSMutableData* yrdataToSend = [NSMutableData new];
-    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefDataSearchResultMessage, kYRMessageDataSection : array};
     
-    [yrarchiver encodeObject:data forKey:@"infoDataKey"];
-    [yrarchiver finishEncoding];
-    
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
-        
-        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
-            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
-            
-            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
-            
-            NSError *error;
-            
-            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
-            
-            if(error){
-                NSLog(@"%@", [error localizedDescription]);
-            }
-            else
-            {
-                //after the search result are securely sent
-                break;
-            }
-        }
-    }
+    [self sendToPeer:peer withData:packet];
 }
 
 -(void)sendTagListRequest:(NSString*)interviewerName
 {
-    NSDictionary* dic = @{@"msg" : @"tagListRequest", @"data" : interviewerName};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRDebriefTagListRequestMessage, kYRMessageDataSection : interviewerName};
     
-    NSError* error = [self sendToHostWithData:dic];
+    NSError* error = [self sendToHostWithData:packet];
     
     if(error){
         NSLog(@"%@", [error localizedDescription]);
@@ -871,37 +795,13 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
 
 -(void)sendTagList:(NSDictionary*)data toPeer:(MCPeerID*)peer
 {
-    NSMutableData* yrdataToSend = [NSMutableData new];
-    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:yrdataToSend];
-    
-    [yrarchiver encodeObject:data forKey:@"infoDataKey"];
-    [yrarchiver finishEncoding];
-    
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
-        
-        if ([[(MCPeerID*)dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
-            NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
-            
-            NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
-            
-            NSError *error;
-            
-            [(MCSession*)dic[@"session"] sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
-            
-            if(error){
-                NSLog(@"%@", [error localizedDescription]);
-            }
-            else
-            {
-                //
-            }
-        }
-    }
+    [self sendToPeer:peer withData:data];
 }
 
 -(NSError*)tagCandidate:(NSString*)ID withOption:(NSString*)option from:(NSString*)viewer
 {
-    NSDictionary* dic = @{@"msg" : option, @"data" : ID, @"viewer" : viewer};
+    //TODO: combine target candidate and viewer
+    NSDictionary* dic = @{kYRMessageMessageSection : option, kYRMessageDataSection : ID, @"viewer" : viewer};
     
     NSError* error = [self sendToHostWithData:dic];
     
@@ -916,38 +816,14 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
     if(error){
         NSLog(@"%@", [error localizedDescription]);
     }
-    else
-    {
-        //
-    }
 }
 
 -(void)sendACKBack:(MCPeerID*)peerID
 {
-    NSDictionary* dic = @{@"msg" : @"ack", @"code" : [NSString stringWithFormat:@"%@-%d",self.yrPrefix,[self nextCode]], @"source" : [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].peerID};
-    NSMutableData* dataToSend = [NSMutableData new];
+    //TODO: combine code and source to be data
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRAcknowledgeMessage, @"code" : [NSString stringWithFormat:@"%@-%d",self.yrPrefix,[self nextCode]], @"source" : [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].peerID};
     
-    NSLog(@"sending %@ with session number %lu",dic[@"code"],(unsigned long)[[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions count]);
-    
-    NSKeyedArchiver* yrarchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:dataToSend];
-    
-    [yrarchiver encodeObject:dic forKey:@"infoDataKey"];
-    [yrarchiver finishEncoding];
-    
-    NSError *error;
-    
-    MCSession * selectedSession;
-    
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
-        if ([[dic[@"peer"] displayName] isEqualToString:peerID.displayName]) {
-            selectedSession = dic[@"session"];
-        }
-    }
-    
-    [selectedSession sendData:dataToSend toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
-    if(error){
-        NSLog(@"Error %@", [error localizedDescription]);
-    }
+    [self sendToPeer:peerID withData:packet];
 }
 
 -(int) nextCode
@@ -973,7 +849,7 @@ NSString* const kYRDataManagerNeedUpdateTagInfoNotification = @"needUpdateTagInf
         [newDic addEntriesFromDictionary:dataDic];
         
         //change NSDictionary to NSMutableDictionary
-        NSDictionary *dic = @{@"msg" : @"data", @"data" : newDic};
+        NSDictionary *dic = @{kYRMessageMessageSection : kYRDataEntryMessage, kYRMessageDataSection : newDic};
         
         [self sendData:dic];
     }

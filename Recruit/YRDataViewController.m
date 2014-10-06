@@ -197,8 +197,6 @@
 
 -(void)updateTagInformation:(NSNotification*)notification
 {
-    //update flag...
-    [self fetchCandidates];
     [self.infoDataList reloadData];
 }
 

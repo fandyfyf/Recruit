@@ -24,6 +24,36 @@ FOUNDATION_EXPORT NSString* const kYRDataManagerNeedUpdateCodeNotification;
 FOUNDATION_EXPORT NSString* const kYRDataManagerNeedUpdateConnectionListNotification;
 FOUNDATION_EXPORT NSString* const kYRDataManagerNeedPromptNameListNotification;
 
+//message Type
+FOUNDATION_EXPORT NSString* const kYRMessageMessageSection;
+FOUNDATION_EXPORT NSString* const kYRMessageDataSection;
+
+
+FOUNDATION_EXPORT NSString* const kYRDataEntryMessage;
+FOUNDATION_EXPORT NSString* const kYRBackupDataEntryMessage;
+FOUNDATION_EXPORT NSString* const kYRAcknowledgeMessage;
+FOUNDATION_EXPORT NSString* const kYRNameListMessage;
+FOUNDATION_EXPORT NSString* const kYRIdentityConfirmMessage;
+
+//Debriefing Mode
+
+FOUNDATION_EXPORT NSString* const kYRDebriefBroadcastMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefResumeRequestMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefTagListRequestMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefLastDiscussedDataRequestMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefSearchRequestMessage;
+
+FOUNDATION_EXPORT NSString* const kYRDebriefFlagRequestMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefUnflagRequestMessage;
+
+FOUNDATION_EXPORT NSString* const kYRDebriefDataResumeMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefDataTagListMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefDataSearchResultMessage;
+
+
+FOUNDATION_EXPORT NSString* const kYRDebriefInvitationMessage;
+FOUNDATION_EXPORT NSString* const kYRDebriefTerminationMessage;
+
 @interface YRDataManager : NSObject <UIAlertViewDelegate>
 
 
@@ -59,6 +89,8 @@ FOUNDATION_EXPORT NSString* const kYRDataManagerNeedPromptNameListNotification;
 -(void)sendData:(NSDictionary*)data;
 
 -(void)broadCastData:(NSDictionary*)data;
+
+-(void)broadCastData:(NSDictionary *)data toPeer:(MCPeerID*)peer;
 
 -(NSError*)sendDataRequestForFile:(NSString*)fileName;
 
