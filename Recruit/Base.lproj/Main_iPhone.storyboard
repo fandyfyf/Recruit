@@ -1176,7 +1176,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="T6e-VG-JZL">
-                                <rect key="frame" x="20" y="455.99999785423273" width="280" height="40"/>
+                                <rect key="frame" x="20" y="455.99999539698297" width="280" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <color key="tintColor" red="0.46371493530000002" green="0.069119839109999998" blue="0.75237771740000003" alpha="1" colorSpace="calibratedRGB"/>

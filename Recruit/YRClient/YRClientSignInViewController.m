@@ -471,9 +471,15 @@
         for (CandidateEntry* backedUpCandidate in FetchResults)
         {
             //update the taglist with the updated interview username
-            NSMutableArray* newTagList = [NSMutableArray new];
-            [newTagList addObject:self.appDelegate.mcManager.userName];
-            [backedUpCandidate setTagList:[NSArray arrayWithArray:newTagList]];
+            if ([backedUpCandidate tagList] != nil && [[backedUpCandidate tagList] count] != 0) {
+                NSMutableArray* newTagList = [NSMutableArray new];
+                [newTagList addObject:self.appDelegate.mcManager.userName];
+                [backedUpCandidate setTagList:[NSArray arrayWithArray:newTagList]];
+            }
+            else
+            {
+                [backedUpCandidate setTagList:[NSArray new]];
+            }
             
             NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":self.appDelegate.mcManager.userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":[backedUpCandidate tagList]};
             

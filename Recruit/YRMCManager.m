@@ -224,6 +224,17 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
                     NSLog(@"%@ disconnected",[self.connectedDevices objectAtIndex:indexOfPeer][@"confirmedName"]);
                     
                     [self.connectedDevices removeObjectAtIndex:indexOfPeer];
+                    
+                    //remove session
+                    unsigned long indexOfSession = 0;
+                    for (unsigned long i = 0; i < [self.activeSessions count]; i++) {
+                        if ([[(MCPeerID*)[self.activeSessions objectAtIndex:i][@"peer"] displayName] isEqualToString:peerID.displayName]) {
+                            indexOfSession = i;
+                            break;
+                        }
+                    }
+                    NSLog(@"remove session for %@",peerID.displayName);
+                    [self.activeSessions removeObjectAtIndex:indexOfSession];
                 }
             }
             else

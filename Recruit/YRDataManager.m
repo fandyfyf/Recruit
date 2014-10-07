@@ -309,8 +309,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
         }
         else if([message isEqualToString:kYRDebriefLastDiscussedDataRequestMessage] && self.isHost)
         {
-            //TODO: instead of broadcast to all existing clients, send the requested data to this specific user
-            
+            NSLog(@"Host received pull from %@",peerID.displayName);
             [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedStartBroadcastNotification object:peerID];
         }
         else if([message isEqualToString:kYRDebriefFlagRequestMessage] && self.isHost)
@@ -654,7 +653,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
         NSLog(@"%@", [error localizedDescription]);
         
         //save the data in local core data
-        [self queuingLocalCandidate:data[@"data"]];
+        [self queuingLocalCandidate:data[kYRMessageDataSection]];
         
         //send fail, no connection, restart browsing
         if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
@@ -666,11 +665,13 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
 
 -(void)broadCastData:(NSDictionary*)data
 {
+    NSLog(@"Host broadcasting %@",data);
     [self sendToALLClientsWithData:data];
 }
 
 -(void)broadCastData:(NSDictionary *)data toPeer:(MCPeerID*)peer
 {
+    NSLog(@"Host broadcasting to peer %@ %@",peer.displayName,data);
     [self sendToPeer:peer withData:data];
 }
 
