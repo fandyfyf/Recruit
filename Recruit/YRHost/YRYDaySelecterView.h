@@ -23,6 +23,6 @@
 @property (strong, nonatomic) NSArray * yDayList;
 @property (strong, nonatomic) UITextField * tappedTextField;
 @property (strong, nonatomic) NSString* selectedYDate;
-@property (strong, nonatomic) id<YRYDaySelecterViewDelegate> delegate;
+@property (weak, nonatomic) id<YRYDaySelecterViewDelegate> delegate;
 
 @end

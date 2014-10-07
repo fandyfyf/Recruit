@@ -17,21 +17,21 @@
 
 @interface YRHostDetailViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate, UITextViewDelegate, MFMailComposeViewControllerDelegate, UITextFieldDelegate, AutoSuggestTextFieldDelegate, UITableViewDataSource, UITableViewDelegate,UIGestureRecognizerDelegate, UIAlertViewDelegate, YRYDaySelecterViewDelegate>
 
-@property (strong, nonatomic) CandidateEntry *dataSource;
+
+@property (nonatomic) YRAppDelegate* appDelegate;
+
+@property (weak, nonatomic) CandidateEntry *dataSource;
 //next and prev student button
-@property (strong, nonatomic) NSMutableArray *candidateList;
-@property (strong, nonatomic) NSNumber * currentCandidateIndex;
+@property (weak, nonatomic) NSMutableArray *candidateList;
+@property (weak, nonatomic) NSNumber * currentCandidateIndex;
+@property (weak, nonatomic) NSNumber *checkScheduleFlag;
+
+@property (strong, nonatomic) NSMutableArray *formList;
 
 @property (strong, nonatomic) YRYDaySelecterView* yDaySelectorView;
-
-@property (strong, nonatomic) NSNumber *checkScheduleFlag;
-@property (strong, nonatomic) NSMutableArray *formList;
-@property (strong, nonatomic) YRAppDelegate* appDelegate;
 @property (weak, nonatomic) IBOutlet UILabel *yrCodeLabel;
-
 @property (weak, nonatomic) IBOutlet UITextField *yrFirstNameTextField;
 @property (weak, nonatomic) IBOutlet UITextField *yrLastNameTextField;
-
 @property (weak, nonatomic) IBOutlet AutoSuggestTextField *yrEmailTextField;
 @property (weak, nonatomic) IBOutlet UITextField *yrBusinessUnit1;
 @property (weak, nonatomic) IBOutlet UITextField *yrBusinessUnit2;
@@ -39,21 +39,16 @@
 @property (weak, nonatomic) IBOutlet UITextField *yrYDay2;
 @property (weak, nonatomic) IBOutlet UIImageView *checkView;
 @property (weak, nonatomic) IBOutlet UIImageView *checkBoxView;
-
-
 @property (weak, nonatomic) IBOutlet UISegmentedControl *yrPositionSegmentControl;
 @property (weak, nonatomic) IBOutlet UILabel *yrGPALabel;
 @property (weak, nonatomic) IBOutlet UITextField *yrGPATextField;
 @property (weak, nonatomic) IBOutlet UILabel *yrRankLabel;
 @property (weak, nonatomic) IBOutlet UILabel *yrHalfRankLabel;
-
 @property (weak, nonatomic) IBOutlet UITextField *yrPreferenceTextField;
 @property (weak, nonatomic) IBOutlet UILabel *yrTagLabel;
-
 @property (weak, nonatomic) IBOutlet UIButton *yrSnapshotButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrFileNameButton;
 @property (weak, nonatomic) IBOutlet UIButton *yrGoBackButton;
-
 @property (strong, nonatomic) UIScrollView* yrScrollView;
 @property (strong, nonatomic) UIImageView* showingImageView;
 @property (strong, nonatomic) UIButton* yrScrollViewCancelButton;
@@ -63,6 +58,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *YRCommentLabel;
 @property (weak, nonatomic) IBOutlet UITextView *yrCommentTextView;
+
 @property (strong, nonatomic) UIView* scheduleView;
 @property (strong, nonatomic) UITableView* scheduleTable;
 @property (strong, nonatomic) UIView* emailOptionView;
@@ -78,7 +74,6 @@
 @property (strong, nonatomic) UIButton* rankFourButton;
 
 @property (strong, nonatomic) UIPopoverController* popOver;
-
 @property (strong, nonatomic) MFMailComposeViewController* yrMailViewController;
 @property (strong, nonatomic) UIImage* chosenImage;
 

@@ -318,6 +318,12 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)dealloc
+{
+    //never get called, someone is holding strong reference on the detailViewController Object
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (IBAction)LoadNextStudentData:(id)sender {
     if ([self.currentCandidateIndex intValue] + 1 >= [self.candidateList count]) {
         UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Last candidate" message:@"There are no more candidate in the list" delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil, nil];
@@ -1263,7 +1269,8 @@
 
 -(void)broadcast:(NSNotification*)notification
 {
-    NSLog(@"%@",notification.object);
+    //NSLog(@"%@",notification.object);
+    NSLog(@"From %@",self);
     
     CandidateEntry* selected = self.dataSource;
     
