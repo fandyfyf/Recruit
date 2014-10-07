@@ -21,8 +21,6 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
 
 -(BOOL)checkReady;
 -(void)needUpdateCodeNotification:(NSNotification *)notification;
--(void)reconnectNotification:(NSNotification *)notification;
--(void)needEndSessionNotification:(NSNotification *)notification;
 -(void)popUpNameListNotification:(NSNotification*)notification;
 -(void)removeNameListNotification:(NSNotification *)notification;
 -(void)debriefingModeOnNotification:(NSNotification *)notification;
@@ -56,9 +54,6 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(removeNameListNotification:) name:@"removeNameListNotification" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOnNotification:) name:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(debriefingModeOffNotification:) name:kYRDataManagerReceiveDebriefTerminationNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reconnectNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(needEndSessionNotification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
     self.yrcodeLabel.text = [(YRClientSignInViewController*)self.source yrcodeLabel].text;
     
@@ -162,25 +157,6 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
 {
     NSMutableString *code = [[notification userInfo] objectForKey:@"recruitID"];
     [self.yrcodeLabel performSelectorOnMainThread:@selector(setText:) withObject:code waitUntilDone:NO];
-}
-
--(void)reconnectNotification:(NSNotification *)notification
-{
-    //NSLog(@"Name is %@",[[[[self tabBarController] viewControllers] objectAtIndex: 0] valueForKey:@"clientUserName"]);
-//    if ([self.presentingViewController isKindOfClass:[YRClientSignInViewController class]]) {
-//        NSString *clientUserName = [(YRClientSignInViewController *)self.presentingViewController clientUserName];
-//        if (clientUserName) {
-//            [[self.appDelegate mcManager] setupPeerAndSessionWithDisplayName:clientUserName];
-//            MCNearbyServiceBrowser *browser = [[MCNearbyServiceBrowser alloc] initWithPeer:[self.appDelegate mcManager].peerID serviceType:@"files"];
-//            [browser invitePeer:[self.appDelegate mcManager].lastConnectionPeerID toSession:[self.appDelegate mcManager].session withContext:nil timeout:10];
-//        }
-//    }
-}
-
--(void)needEndSessionNotification:(NSNotification *)notification
-{
-    [[self.appDelegate mcManager].session disconnect];
-    [self.appDelegate mcManager].session = nil;
 }
 
 -(void)popUpNameListNotification:(NSNotification*)notification
