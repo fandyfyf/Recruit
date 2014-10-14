@@ -135,16 +135,24 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
     }
     else
     {
-        //wait until GPA is filled out
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please enter GPA!" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-        alert.tag = formAlertTypeSend;
-        [alert show];
+        if (self.yrRankingSegmentControl.selectedSegmentIndex != UISegmentedControlNoSegment) {
+            //wait until GPA is filled out
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please enter GPA!" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            alert.tag = formAlertTypeSend;
+            [alert show];
+        }
+        else
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:@"Please rank candidate!" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            alert.tag = formAlertTypeSend;
+            [alert show];
+        }
     }
 }
 
 -(BOOL)checkReady
 {
-    if ([self.yrGPATextField.text length] != 0) {
+    if ([self.yrGPATextField.text length] != 0 && self.yrRankingSegmentControl.selectedSegmentIndex != UISegmentedControlNoSegment) {
         return YES;
     }
     else
