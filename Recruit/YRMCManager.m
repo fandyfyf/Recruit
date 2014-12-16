@@ -121,7 +121,8 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void(^)(BOOL accept, MCSession *session))invitationHandler
 {
-    //NSLog(@"Invitation received");
+    //if there is a session object existing for the incoming peer
+    //delete the session first
     NSMutableArray* deletedSession = [NSMutableArray new];
     
     for (int i=0; i< [self.activeSessions count] ;i++)
@@ -184,7 +185,8 @@ NSString* const kYRMCManagerDidReceiveDataNotification = @"DidReceiveDataNotific
 
 - (void)browser:(MCNearbyServiceBrowser *)browser lostPeer:(MCPeerID *)peerID
 {
-    //
+    //test purpose
+    NSLog(@"The Invitation is expired... not doing anything");
 }
 
 #pragma mark - MCSessionDelegate

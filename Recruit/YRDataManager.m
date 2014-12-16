@@ -655,6 +655,9 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
         //save the data in local core data
         [self queuingLocalCandidate:data[kYRMessageDataSection]];
         
+        //TODO: after the connection has dropped and the browsing is timed out, the bowsing flag never got switched off. So the client will only initiate the reconnection for only one time and 30 secs. after that, it won't try to reconnect again. It's a problem is need to be fixed.
+        
+        
         //send fail, no connection, restart browsing
         if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
             [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];

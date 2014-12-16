@@ -562,54 +562,61 @@
     else{
         [self.showingImageView setFrame:CGRectMake(0, 0, self.view.frame.size.width, 480)];
     }
-    
-    self.yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-110, 10, 100, 100);
-    }
-    else{
-        self.yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
-        self.yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-55, 50, 50, 50);
-    }
-    //self.yrScrollView.contentSize = image.size;
-    self.yrScrollView.contentSize = self.showingImageView.frame.size;
-    [self.yrScrollView addSubview:self.showingImageView];
-    [self.yrScrollView setDelegate:self];
-    [self.yrScrollView setMaximumZoomScale:4];
-    [self.yrScrollView setMinimumZoomScale:1];
-    
-//    self.grayView = [[UIView alloc] initWithFrame:self.view.frame];
-//    self.grayView.backgroundColor = [UIColor blackColor];
-//    self.grayView.alpha = 0.9;
-//    
-//    [self.view addSubview:self.grayView];
+
     [self.view addSubview:self.yrScrollView];
-    
-    [self.yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
-    [self.yrScrollViewCancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        [[self.yrScrollViewCancelButton layer] setCornerRadius:50];
-        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrScrollViewCancelButton layer] setBorderWidth:5];
-        
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
-    }
-    else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-    {
-        [[self.yrScrollViewCancelButton layer] setCornerRadius:25];
-        [[self.yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
-        [[self.yrScrollViewCancelButton layer] setBorderWidth:3];
-        
-        self.yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
-    }
-    
-    
-    [self.yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
-    
+    [self.yrScrollViewCancelButton removeFromSuperview];
     [self.view addSubview:self.yrScrollViewCancelButton];
+    [self.yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
+}
+
+- (UIScrollView*)yrScrollView
+{
+    if (!_yrScrollView) {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            _yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+        }
+        else{
+            _yrScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 45, self.view.frame.size.width, 480)];
+        }
+        
+        _yrScrollView.contentSize = self.showingImageView.frame.size;
+        [_yrScrollView addSubview:self.showingImageView];
+        [_yrScrollView setDelegate:self];
+        [_yrScrollView setMaximumZoomScale:4];
+        [_yrScrollView setMinimumZoomScale:1];
+    }
+    return _yrScrollView;
+}
+
+
+- (UIButton*)yrScrollViewCancelButton
+{
+    if (!_yrScrollViewCancelButton) {
+        _yrScrollViewCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        
+        [_yrScrollViewCancelButton setTitle:@"Done" forState:UIControlStateNormal];
+        [_yrScrollViewCancelButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            _yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-110, 10, 100, 100);
+            [[_yrScrollViewCancelButton layer] setCornerRadius:50];
+            [[_yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+            [[_yrScrollViewCancelButton layer] setBorderWidth:5];
+            
+            _yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 25];
+        }
+        else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
+        {
+            _yrScrollViewCancelButton.frame = CGRectMake(self.view.frame.size.width-55, 50, 50, 50);
+            [[_yrScrollViewCancelButton layer] setCornerRadius:25];
+            [[_yrScrollViewCancelButton layer] setBorderColor:[[UIColor whiteColor] CGColor]];
+            [[_yrScrollViewCancelButton layer] setBorderWidth:3];
+            
+            _yrScrollViewCancelButton.titleLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size: 15];
+        }
+        [_yrScrollViewCancelButton addTarget:self action:@selector(cancelScrollView) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _yrScrollViewCancelButton;
 }
 
 -(void)searchMode
@@ -644,7 +651,13 @@
 -(void)cancelScrollView
 {
     [self dismissBusy];
-    [self.yrScrollView removeFromSuperview];
+    if ([self.yrScrollViewCancelButton.titleLabel.text isEqualToString:@"Cancel"]) {
+        [self.grayView removeFromSuperview];
+    }
+    else
+    {
+        [self.yrScrollView removeFromSuperview];
+    }
     [self.yrScrollViewCancelButton removeFromSuperview];
     [self.resumeList setUserInteractionEnabled:YES];
 }
@@ -696,6 +709,8 @@
     
     [self.view addSubview:self.grayView];
     [self.view addSubview:self.activityIndicator];
+    [self.view addSubview:self.yrScrollViewCancelButton];
+    [self.yrScrollViewCancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
     [self.activityIndicator startAnimating];
 }
 

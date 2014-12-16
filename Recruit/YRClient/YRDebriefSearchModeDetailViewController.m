@@ -468,7 +468,15 @@
 
 -(void)cancelScrollView
 {
-    [self.yrScrollView removeFromSuperview];
+    if ([self.yrScrollViewCancelButton.titleLabel.text isEqualToString:@"Cancel"]) {
+        [self dismissBusy];
+        [self.grayView removeFromSuperview];
+        
+    }
+    else
+    {
+        [self.yrScrollView removeFromSuperview];
+    }
     [self.yrScrollViewCancelButton removeFromSuperview];
     [self.resumeList setUserInteractionEnabled:YES];
 }
