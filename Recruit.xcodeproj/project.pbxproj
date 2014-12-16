@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D203772E1986E7310000137F /* YREventDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D203772D1986E7310000137F /* YREventDataCell.m */; };
 		D20377311986F8FA0000137F /* Event.m in Sources */ = {isa = PBXBuildFile; fileRef = D20377301986F8FA0000137F /* Event.m */; };
+		D227688619E458E600DA8483 /* file_add.png in Resources */ = {isa = PBXBuildFile; fileRef = D227688519E458E600DA8483 /* file_add.png */; };
 		D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */; };
 		D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414A1959C23C004A31E1 /* YRSchedulingViewController.m */; };
 		D243414E1959D838004A31E1 /* YRTimeCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = D243414D1959D838004A31E1 /* YRTimeCardView.m */; };
@@ -28,6 +29,8 @@
 		D25268B419507DE400EBE43E /* wifi.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268B319507DE400EBE43E /* wifi.png */; };
 		D25268B619507E5300EBE43E /* gear.png in Resources */ = {isa = PBXBuildFile; fileRef = D25268B519507E5300EBE43E /* gear.png */; };
 		D25268B91950826800EBE43E /* YRViewerDataCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D25268B81950826800EBE43E /* YRViewerDataCell.m */; };
+		D256FE171A40D2FC00115F27 /* file_add.png in Resources */ = {isa = PBXBuildFile; fileRef = D256FE161A40D2FC00115F27 /* file_add.png */; };
+		D256FE501A40DB9300115F27 /* UIColor+Util.m in Sources */ = {isa = PBXBuildFile; fileRef = D256FE4F1A40DB9300115F27 /* UIColor+Util.m */; };
 		D25E489D198FCCBD0005A466 /* left.png in Resources */ = {isa = PBXBuildFile; fileRef = D25E489C198FCCBD0005A466 /* left.png */; };
 		D25E489F198FCCCA0005A466 /* right.png in Resources */ = {isa = PBXBuildFile; fileRef = D25E489E198FCCCA0005A466 /* right.png */; };
 		D290360A19A256AF007D354B /* upload1.png in Resources */ = {isa = PBXBuildFile; fileRef = D290360919A256AF007D354B /* upload1.png */; };
@@ -111,6 +114,7 @@
 		D203772D1986E7310000137F /* YREventDataCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YREventDataCell.m; path = ../YREventDataCell.m; sourceTree = "<group>"; };
 		D203772F1986F8FA0000137F /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
 		D20377301986F8FA0000137F /* Event.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Event.m; sourceTree = "<group>"; };
+		D227688519E458E600DA8483 /* file_add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = file_add.png; sourceTree = "<group>"; };
 		D24341461954FFE4004A31E1 /* YRHostTimeCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRHostTimeCardViewController.h; sourceTree = "<group>"; };
 		D24341471954FFE4004A31E1 /* YRHostTimeCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRHostTimeCardViewController.m; sourceTree = "<group>"; };
 		D24341491959C23C004A31E1 /* YRSchedulingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRSchedulingViewController.h; sourceTree = "<group>"; };
@@ -139,6 +143,9 @@
 		D25268B519507E5300EBE43E /* gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gear.png; sourceTree = "<group>"; };
 		D25268B71950826800EBE43E /* YRViewerDataCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRViewerDataCell.h; sourceTree = "<group>"; };
 		D25268B81950826800EBE43E /* YRViewerDataCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRViewerDataCell.m; sourceTree = "<group>"; };
+		D256FE161A40D2FC00115F27 /* file_add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = file_add.png; sourceTree = "<group>"; };
+		D256FE4E1A40DB9300115F27 /* UIColor+Util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Util.h"; sourceTree = "<group>"; };
+		D256FE4F1A40DB9300115F27 /* UIColor+Util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Util.m"; sourceTree = "<group>"; };
 		D25E489C198FCCBD0005A466 /* left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = left.png; sourceTree = "<group>"; };
 		D25E489E198FCCCA0005A466 /* right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = right.png; sourceTree = "<group>"; };
 		D290360919A256AF007D354B /* upload1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = upload1.png; sourceTree = "<group>"; };
@@ -264,6 +271,72 @@
 			name = iPad;
 			sourceTree = "<group>";
 		};
+		D256FE141A40D29500115F27 /* image */ = {
+			isa = PBXGroup;
+			children = (
+				D256FE161A40D2FC00115F27 /* file_add.png */,
+				D251C65E196CA8B8003E86FD /* goldStar.png */,
+				D2B5313A196AF1400019C7D7 /* clock.png */,
+				D2B53140196C994B0019C7D7 /* camera3.png */,
+				D2D1E5761961BE2B0084D8DA /* camera.png */,
+				D2B5313E196B0B410019C7D7 /* Camera2.png */,
+				D251C660196F209A003E86FD /* flag.jpg */,
+				D2B5313C196B0AFE0019C7D7 /* Camera1.png */,
+				D2D1E57419611BC90084D8DA /* Columbia_engineering.jpg */,
+				D2D1E5721960E3370084D8DA /* email.png */,
+				D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */,
+				D25268B519507E5300EBE43E /* gear.png */,
+				D25268B319507DE400EBE43E /* wifi.png */,
+				D25268B119507D8D00EBE43E /* folder.png */,
+				D25268AF19507D7700EBE43E /* document.png */,
+				D251C66E19756B82003E86FD /* yahoo.png */,
+				D251C67019756C61003E86FD /* tag.ico */,
+				D2B8C397197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg */,
+				D2B8C399197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg */,
+				D2B623B7197EAB74006A385B /* upload.png */,
+				D290360919A256AF007D354B /* upload1.png */,
+				D290360B19A258B4007D354B /* upload2.png */,
+				D2B6245C1981617C006A385B /* Recruit_Icon.png */,
+				D2B2CAAC19885B490078C5B3 /* Edit-icon.png */,
+				D25E489C198FCCBD0005A466 /* left.png */,
+				D25E489E198FCCCA0005A466 /* right.png */,
+				D290361A19A65236007D354B /* prevCandidate.png */,
+				D290361B19A65236007D354B /* nextCandidate.png */,
+				D290362419A67C4D007D354B /* checkbox.png */,
+				D290362519A67C4D007D354B /* check.png */,
+				D290362819A69D2F007D354B /* E-mail.png */,
+				D298CE6619A7B6EE00D475DC /* delete.png */,
+				D298CE6819A7B76300D475DC /* file_delete.png */,
+				D227688519E458E600DA8483 /* file_add.png */,
+			);
+			name = image;
+			sourceTree = "<group>";
+		};
+		D256FE151A40D2B100115F27 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
+				D203772F1986F8FA0000137F /* Event.h */,
+				D20377301986F8FA0000137F /* Event.m */,
+				D290362119A6747F007D354B /* CandidateEntry.h */,
+				D290362219A6747F007D354B /* CandidateEntry.m */,
+				D2B80EE0198AE9200058B5DE /* Appointment.h */,
+				D2B80EE1198AE9200058B5DE /* Appointment.m */,
+				D251C66B197484E0003E86FD /* Interviewer.h */,
+				D251C66C197484E0003E86FD /* Interviewer.m */,
+			);
+			name = data;
+			sourceTree = "<group>";
+		};
+		D256FE4D1A40DB4D00115F27 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				D256FE4E1A40DB9300115F27 /* UIColor+Util.h */,
+				D256FE4F1A40DB9300115F27 /* UIColor+Util.m */,
+			);
+			name = Util;
+			sourceTree = "<group>";
+		};
 		D2B6244819805232006A385B /* RecruitingIcon */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,51 +389,13 @@
 		D2F8186019465FE5006E88FD /* Recruit */ = {
 			isa = PBXGroup;
 			children = (
+				D256FE4D1A40DB4D00115F27 /* Util */,
+				D256FE151A40D2B100115F27 /* data */,
+				D256FE141A40D29500115F27 /* image */,
 				D2B6244819805232006A385B /* RecruitingIcon */,
-				D251C65E196CA8B8003E86FD /* goldStar.png */,
-				D2B5313A196AF1400019C7D7 /* clock.png */,
-				D2B53140196C994B0019C7D7 /* camera3.png */,
-				D2D1E5761961BE2B0084D8DA /* camera.png */,
-				D2B5313E196B0B410019C7D7 /* Camera2.png */,
-				D251C660196F209A003E86FD /* flag.jpg */,
-				D2B5313C196B0AFE0019C7D7 /* Camera1.png */,
-				D2D1E57419611BC90084D8DA /* Columbia_engineering.jpg */,
-				D2D1E5721960E3370084D8DA /* email.png */,
-				D2BB41FC195C5E54002ECCC9 /* yahoo-icon.png */,
-				D25268B519507E5300EBE43E /* gear.png */,
-				D25268B319507DE400EBE43E /* wifi.png */,
-				D25268B119507D8D00EBE43E /* folder.png */,
-				D25268AF19507D7700EBE43E /* document.png */,
-				D251C66E19756B82003E86FD /* yahoo.png */,
-				D251C67019756C61003E86FD /* tag.ico */,
-				D2B8C397197DC97200FBBE5F /* corporate_en-US_purple_small_v.jpg */,
-				D2B8C399197DCCDF00FBBE5F /* corporate_en-US_purple_medium_v.jpg */,
-				D2B623B7197EAB74006A385B /* upload.png */,
-				D290360919A256AF007D354B /* upload1.png */,
-				D290360B19A258B4007D354B /* upload2.png */,
-				D2B6245C1981617C006A385B /* Recruit_Icon.png */,
-				D2B2CAAC19885B490078C5B3 /* Edit-icon.png */,
-				D25E489C198FCCBD0005A466 /* left.png */,
-				D25E489E198FCCCA0005A466 /* right.png */,
-				D290361A19A65236007D354B /* prevCandidate.png */,
-				D290361B19A65236007D354B /* nextCandidate.png */,
-				D290362419A67C4D007D354B /* checkbox.png */,
-				D290362519A67C4D007D354B /* check.png */,
-				D290362819A69D2F007D354B /* E-mail.png */,
-				D298CE6619A7B6EE00D475DC /* delete.png */,
-				D298CE6819A7B76300D475DC /* file_delete.png */,
 				D25268A9194F4B4B00EBE43E /* iPad */,
 				D2F818A119478777006E88FD /* YRClient */,
 				D2F818A219478777006E88FD /* YRHost */,
-				D203772F1986F8FA0000137F /* Event.h */,
-				D20377301986F8FA0000137F /* Event.m */,
-				D2F818A319489B5E006E88FD /* Recruit.xcdatamodeld */,
-				D290362119A6747F007D354B /* CandidateEntry.h */,
-				D290362219A6747F007D354B /* CandidateEntry.m */,
-				D2B80EE0198AE9200058B5DE /* Appointment.h */,
-				D2B80EE1198AE9200058B5DE /* Appointment.m */,
-				D251C66B197484E0003E86FD /* Interviewer.h */,
-				D251C66C197484E0003E86FD /* Interviewer.m */,
 				D2F818B11948E691006E88FD /* YRDataManager.h */,
 				D2F818B21948E691006E88FD /* YRDataManager.m */,
 				D2D1E57B19633D4A0084D8DA /* YREmailGenerator.h */,
@@ -561,6 +596,7 @@
 				D25268AB194F5CBC00EBE43E /* Main_iPad.storyboard in Resources */,
 				D2F8186519465FE5006E88FD /* InfoPlist.strings in Resources */,
 				D251C66F19756B82003E86FD /* yahoo.png in Resources */,
+				D227688619E458E600DA8483 /* file_add.png in Resources */,
 				D2B6245219805232006A385B /* 120x120.png in Resources */,
 				D2F8186E19465FE5006E88FD /* Main_iPhone.storyboard in Resources */,
 				D25E489F198FCCCA0005A466 /* right.png in Resources */,
@@ -576,6 +612,7 @@
 				D290361D19A65236007D354B /* nextCandidate.png in Resources */,
 				D2B5313D196B0AFE0019C7D7 /* Camera1.png in Resources */,
 				D2D1E5771961BE2B0084D8DA /* camera.png in Resources */,
+				D256FE171A40D2FC00115F27 /* file_add.png in Resources */,
 				D2B6245519805232006A385B /* 57x57.png in Resources */,
 				D290362719A67C4D007D354B /* check.png in Resources */,
 				D25268B219507D8D00EBE43E /* folder.png in Resources */,
@@ -615,6 +652,7 @@
 				D2A6806E194B83AA0091B768 /* YRHostSettingViewController.m in Sources */,
 				D24341481954FFE4004A31E1 /* YRHostTimeCardViewController.m in Sources */,
 				D251C67719761610003E86FD /* YRDebriefSearchModeViewController.m in Sources */,
+				D256FE501A40DB9300115F27 /* UIColor+Util.m in Sources */,
 				D243414B1959C23C004A31E1 /* YRSchedulingViewController.m in Sources */,
 				D2CB59AF195393D900CAB252 /* YRClientSignInViewController.m in Sources */,
 				D2B80EE5198BDA290058B5DE /* YRDatePickerView.m in Sources */,

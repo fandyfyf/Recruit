@@ -164,7 +164,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
         }
         else if([message isEqualToString:kYRAcknowledgeMessage])
         {
-            [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].lastConnectionPeerID = dic[@"source"];
+            [[YRAppDelegate sharedMCManager] setLastConnectionPeerID:dic[@"source"]];
             NSDictionary *dict = @{@"recruitID": dic[@"code"]};
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateCodeNotification object:nil userInfo:dict];
@@ -182,7 +182,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
             BOOL signIn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"SignedInAlready"] boolValue];
             
             if (signIn) {
-                [self sendIdentityConfirmation:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
+                [self sendIdentityConfirmation:[[YRAppDelegate sharedMCManager] userName]];
                 
                 NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
                 [fetchRequest setEntity:[NSEntityDescription entityForName:@"CandidateEntry" inManagedObjectContext:self.managedObjectContext]];
@@ -191,7 +191,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
                 
                 for (CandidateEntry* backedUpCandidate in FetchResults)
                 {
-                    NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName,@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":[backedUpCandidate tagList]};
+                    NSDictionary* dic = @{@"firstName":backedUpCandidate.firstName,@"lastName":backedUpCandidate.lastName,@"email":backedUpCandidate.emailAddress,@"interviewer":[[YRAppDelegate sharedMCManager] userName],@"code":backedUpCandidate.code,@"status":backedUpCandidate.status,@"pdf":backedUpCandidate.pdf,@"position":backedUpCandidate.position,@"preference":backedUpCandidate.preference,@"date":backedUpCandidate.date,@"note":backedUpCandidate.notes,@"rank":[backedUpCandidate.rank stringValue],@"gpa":[backedUpCandidate.gpa stringValue],@"tagList":[backedUpCandidate tagList]};
                     
                     NSDictionary* packet = @{kYRMessageMessageSection : kYRBackupDataEntryMessage, kYRMessageDataSection:dic};
                     
@@ -230,7 +230,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
             [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerNeedUpdateConnectionListNotification object:nil userInfo:dict];
             
             //===================send to new connected user====================//
-            if ([(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isDebriefing) {
+            if ([YRAppDelegate sharedMCManager].isDebriefing) {
                 [self sendDebriefInvitationToPeer:peerID];
             }
             //=================================================================//
@@ -448,7 +448,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
         {
             //receive debrief termination
             NSLog(@"receiving debrief termination");
-            [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].debriefing = NO;
+            [YRAppDelegate sharedMCManager].debriefing = NO;
             
             UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Debrief Termination" message:@"The host is closing the session" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];
@@ -504,7 +504,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
     [item setPosition:infoData[@"position"]];
     [item setPreference:infoData[@"preference"]];
     [item setDate:infoData[@"date"]];
-    [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName]]];
+    [item setNotes:[(NSString*)infoData[@"note"] stringByAppendingString:[NSString stringWithFormat:@"\n\n#%@#\n\n",[[YRAppDelegate sharedMCManager] userName]]]];
     [item setRank:[NSNumber numberWithFloat:[(NSString*)infoData[@"rank"] floatValue]]];
     [item setGpa:[NSNumber numberWithFloat:[(NSString*)infoData[@"gpa"] floatValue]]];
     [item setBusinessUnit1:@""];
@@ -584,13 +584,13 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
     [yrarchiver encodeObject:data forKey:@"infoDataKey"];
     [yrarchiver finishEncoding];
     
-    NSArray * allPeers = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session.connectedPeers;
+    NSArray * allPeers = [YRAppDelegate sharedMCManager].session.connectedPeers;
     
     //TODO: might also send the request to self, need to check
     
     NSError *error;
     
-    [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].session sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
+    [[YRAppDelegate sharedMCManager].session sendData:yrdataToSend toPeers:allPeers withMode:MCSessionSendDataReliable error:&error];
     return error;
 }
 
@@ -604,7 +604,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
 
     MCSession * selectedSession;
     
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+    for (NSDictionary* dic in [YRAppDelegate sharedMCManager].activeSessions) {
         if ([[dic[@"peer"] displayName] isEqualToString:peer.displayName]) {
             selectedSession = dic[@"session"];
             break;
@@ -626,7 +626,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
     [yrarchiver encodeObject:data forKey:@"infoDataKey"];
     [yrarchiver finishEncoding];
     
-    for (NSDictionary* dic in [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].activeSessions) {
+    for (NSDictionary* dic in [YRAppDelegate sharedMCManager].activeSessions) {
         NSArray * allPeers = [(MCSession*)dic[@"session"] connectedPeers];
         
         NSLog(@"peer count  %lu",(unsigned long)[allPeers count]);
@@ -659,9 +659,9 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
         
         
         //send fail, no connection, restart browsing
-        if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        if (![YRAppDelegate sharedMCManager].isBrowsing) {
+            [[YRAppDelegate sharedMCManager].autoBrowser startBrowsingForPeers];
+            [[YRAppDelegate sharedMCManager] setBrowsing:YES];
         }
     }
 }
@@ -712,7 +712,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
     NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     NSMutableArray* currentList = [NSMutableArray new];
     
-    NSArray* connectedList = [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].connectedDevices;
+    NSArray* connectedList = [YRAppDelegate sharedMCManager].connectedDevices;
     
     for (Interviewer* curr in FetchResults) {
         BOOL check = NO;
@@ -825,7 +825,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
 -(void)sendACKBack:(MCPeerID*)peerID
 {
     //TODO: combine code and source to be data
-    NSDictionary* packet = @{kYRMessageMessageSection : kYRAcknowledgeMessage, @"code" : [NSString stringWithFormat:@"%@-%d",self.yrPrefix,[self nextCode]], @"source" : [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].peerID};
+    NSDictionary* packet = @{kYRMessageMessageSection : kYRAcknowledgeMessage, @"code" : [NSString stringWithFormat:@"%@-%d",self.yrPrefix,[self nextCode]], @"source" : [YRAppDelegate sharedMCManager].peerID};
     
     [self sendToPeer:peerID withData:packet];
 }
@@ -847,7 +847,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
     if (self.debug_counter > 0) {
         self.debug_counter = self.debug_counter - 1;
         //send entry here;
-        NSDictionary *dataDic = @{@"firstName" :[NSString stringWithFormat:@"%@first",rid], @"lastName" : [NSString stringWithFormat:@"%@last",rid], @"email" : [NSString stringWithFormat:@"%@email",rid], @"code" : rid,  @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : @"Mobile - iOS", @"position" : @"Full-Time", @"date" : [NSDate date], @"note" : @"#empty#", @"gpa" : @"3.5", @"rank" : @"3", @"interviewer" : [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName, @"tagList" : [NSArray new]};
+        NSDictionary *dataDic = @{@"firstName" :[NSString stringWithFormat:@"%@first",rid], @"lastName" : [NSString stringWithFormat:@"%@last",rid], @"email" : [NSString stringWithFormat:@"%@email",rid], @"code" : rid,  @"status" : @"pending", @"pdf" : [NSNumber numberWithBool:NO], @"preference" : @"Mobile - iOS", @"position" : @"Full-Time", @"date" : [NSDate date], @"note" : @"#empty#", @"gpa" : @"3.5", @"rank" : @"3", @"interviewer" : [YRAppDelegate sharedMCManager].userName, @"tagList" : [NSArray new]};
         
         NSMutableDictionary *newDic = [NSMutableDictionary new];
         [newDic addEntriesFromDictionary:dataDic];
@@ -865,7 +865,7 @@ NSString* const kYRDebriefTerminationMessage = @"debriefTermination";
 {
     if ([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Accept"]) {
         //accept the debrief mode
-        [(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].debriefing = YES;
+        [YRAppDelegate sharedMCManager].debriefing = YES;
         //bring up new view controller to show broadcast
         [[NSNotificationCenter defaultCenter] postNotificationName:kYRDataManagerReceiveDebriefInitiationNotification object:nil];
     }

@@ -13,6 +13,8 @@
 
 @interface YRDebriefSearchModeViewController ()
 
+@property (nonatomic) YRMCManager* mcManager;
+
 -(void)remoteSearch;
 -(void)receiveResultAndUpdate:(NSNotification*)notification;
 -(void)broadcastMode;
@@ -33,6 +35,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    self.mcManager = [YRAppDelegate sharedMCManager];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveResultAndUpdate:) name:kYRDataManagerReceiveSearchResultNotification object:nil];
     
@@ -164,9 +167,9 @@
     //send search Query
     NSError*error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendSearchQuery:dic];
     if (error) {
-        if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        if (!self.mcManager.isBrowsing) {
+            [self.mcManager.autoBrowser startBrowsingForPeers];
+            [self.mcManager setBrowsing:YES];
         }
     }
     else
@@ -180,7 +183,7 @@
     [self dismissBusy];
     self.searchResult = [notification object];
     
-    self.resultCountLabel.text = [NSString stringWithFormat:@"%d",[self.searchResult count]];
+    self.resultCountLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[self.searchResult count]];
     //reload search result table
     [self.searchResultListTableView reloadData];
 }
@@ -231,7 +234,7 @@
 
 -(NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return [NSString stringWithFormat:@"Search Results - %d",[self.searchResult count]];
+    return [NSString stringWithFormat:@"Search Results - %lu",(unsigned long)[self.searchResult count]];
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -285,7 +288,7 @@
     
     if ([currentData[@"tagList"] count] != 0) {
         for (NSString* name in currentData[@"tagList"]) {
-            if ([name isEqualToString:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName]) {
+            if ([name isEqualToString:self.mcManager.userName]) {
                 cell.flagView.hidden = NO;
                 cell.codeLabel.textColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
                 break;

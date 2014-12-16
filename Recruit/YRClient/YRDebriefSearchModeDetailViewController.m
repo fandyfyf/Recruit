@@ -11,6 +11,8 @@
 
 @interface YRDebriefSearchModeDetailViewController ()
 
+@property (nonatomic) YRMCManager* mcManager;
+
 -(void)loadData;
 
 -(void)cancelScrollView;
@@ -32,6 +34,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.mcManager = [YRAppDelegate sharedMCManager];
+    
 	// Do any additional setup after loading the view.
     self.view = [[UIView alloc] initWithFrame:self.view.frame];
     self.view.backgroundColor = [UIColor whiteColor];
@@ -483,12 +488,12 @@
 
 -(void)tagCandidates
 {
-    NSError* error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] tagCandidate:self.currentDataEntry[@"code"] withOption:self.tagButton.titleLabel.text from:[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].userName];
+    NSError* error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] tagCandidate:self.currentDataEntry[@"code"] withOption:self.tagButton.titleLabel.text from:[YRAppDelegate sharedMCManager].userName];
     
     if (error) {
-        if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        if (!self.mcManager.isBrowsing) {
+            [self.mcManager.autoBrowser startBrowsingForPeers];
+            [self.mcManager setBrowsing:YES];
         }
     }
     else
@@ -573,9 +578,9 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSError* error = [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] dataManager] sendDataRequestForFile:self.currentDataEntry[@"fileNames"][indexPath.row]];
     if (error) {
-        if (![(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].isBrowsing) {
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager].autoBrowser startBrowsingForPeers];
-            [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setBrowsing:YES];
+        if (!self.mcManager.isBrowsing) {
+            [self.mcManager.autoBrowser startBrowsingForPeers];
+            [self.mcManager setBrowsing:YES];
         }
     }
     else

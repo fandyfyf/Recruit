@@ -44,12 +44,12 @@
 
 @implementation YRHostSettingViewController
 {
-    float add_origin_y;
-    float remove_origin_y;
-    float add_form_origin_y;
-    float remove_form_origin_y;
-    float add_event_origin_y;
-    int currentSelected;
+    CGFloat add_origin_y;
+    CGFloat remove_origin_y;
+    CGFloat add_form_origin_y;
+    CGFloat remove_form_origin_y;
+    CGFloat add_event_origin_y;
+    NSInteger currentSelected;
     BOOL modifyModeON;
 }
 
@@ -97,8 +97,8 @@
     
     self.formList = [[[NSUserDefaults standardUserDefaults] objectForKey:kYREmailFormsKey] mutableCopy];
     
-    int interviewCount = [self.interviewerArray count];
-    int eventCount = [self.eventArray count];
+    NSInteger interviewCount = [self.interviewerArray count];
+    NSInteger eventCount = [self.eventArray count];
     
     //set background image fail
     //[self.uploadButton setBackgroundImage:[self colorImage:[UIImage imageNamed:@"upload2.png"] withColor:[UIColor redColor]] forState:UIControlStateNormal];
@@ -1586,8 +1586,8 @@
                 
                 [tableView endUpdates];
                 
-                int interviewCount = [self.interviewerArray count];
-                int eventCount = [self.eventArray count];
+                NSInteger interviewCount = [self.interviewerArray count];
+                NSInteger eventCount = [self.eventArray count];
                 
                 [UIView animateWithDuration:0.3 animations:^{
                     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -1698,7 +1698,7 @@
                 NSArray* FetchResults = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
                 
                 if ([[(Interviewer*)FetchResults[0] appointments] count] != 0) {
-                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat: @"Selected Interviewer has %d interviews set up",[[(Interviewer*)FetchResults[0] appointments] count]] delegate:Nil cancelButtonTitle:@"Oops" otherButtonTitles:nil, nil];
+                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"WARNING" message:[NSString stringWithFormat: @"Selected Interviewer has %lu interviews set up",(unsigned long)[[(Interviewer*)FetchResults[0] appointments] count]] delegate:Nil cancelButtonTitle:@"Oops" otherButtonTitles:nil, nil];
                     [alert show];
                 }
                 else

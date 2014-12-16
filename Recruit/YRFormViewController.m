@@ -301,7 +301,7 @@ typedef NS_ENUM(NSInteger, yRFormAlertType)
 }
 
 - (IBAction)cancelTapped:(id)sender {
-    NSDictionary* temporarybackUp = @{@"gpa" : self.yrGPATextField.text, @"position" : [NSNumber numberWithInt:self.yrPositionSegmentControl.selectedSegmentIndex], @"graduation" : [NSNumber numberWithInt:self.yrGraduationSegCtrl.selectedSegmentIndex], @"preference" : [NSNumber numberWithInt:self.yrPreferenceSegmentControl.selectedSegmentIndex], @"platform" : [NSNumber numberWithInt:self.yrPlatformSegCtrl.selectedSegmentIndex], @"rank" : [NSNumber numberWithInt:self.yrRankingSegmentControl.selectedSegmentIndex], @"note" : self.yrNoteTextView.text};
+    NSDictionary* temporarybackUp = @{@"gpa" : self.yrGPATextField.text, @"position" : [NSNumber numberWithInteger:self.yrPositionSegmentControl.selectedSegmentIndex], @"graduation" : [NSNumber numberWithInteger:self.yrGraduationSegCtrl.selectedSegmentIndex], @"preference" : [NSNumber numberWithInteger:self.yrPreferenceSegmentControl.selectedSegmentIndex], @"platform" : [NSNumber numberWithInteger:self.yrPlatformSegCtrl.selectedSegmentIndex], @"rank" : [NSNumber numberWithInteger:self.yrRankingSegmentControl.selectedSegmentIndex], @"note" : self.yrNoteTextView.text};
     [[NSUserDefaults standardUserDefaults] setObject:temporarybackUp forKey:@"tempBackUp"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     

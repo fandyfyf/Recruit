@@ -14,6 +14,8 @@
 #import "YRMCManager.h"
 #import "Interviewer.h"
 
+#define queuingLabelRadius 15.0
+
 @interface YRClientSignInViewController ()
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
@@ -119,6 +121,9 @@
     
     self.yrEmailTextField.inputAccessoryView = doneToolbar;
     
+    
+    [[self.queuingNumberLabel layer] setCornerRadius:queuingLabelRadius];
+    
 //    //=====test=====/
 //    if (self.debriefingViewController == nil) {
 //        self.debriefingViewController = [YRDebriefViewController new];
@@ -142,7 +147,7 @@
     NSError* error = nil;
     NSArray* FetchResults = [self.appDelegate.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
-    self.queuingNumberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[FetchResults count]];
+    [self updateQueuingIndicator:FetchResults];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -254,8 +259,20 @@
     NSArray* FetchResults = [self.appDelegate.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.queuingNumberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[FetchResults count]];
+        [self updateQueuingIndicator:FetchResults];
     });
+}
+
+- (void)updateQueuingIndicator:(NSArray*)fetchResult
+{
+    if ([fetchResult count] == 0) {
+        self.queuingNumberLabel.hidden = YES;
+    }
+    else
+    {
+        self.queuingNumberLabel.hidden = NO;
+        self.queuingNumberLabel.text = [NSString stringWithFormat:@"%lu",(unsigned long)[fetchResult count]];
+    }
 }
 
 -(void)removeListView

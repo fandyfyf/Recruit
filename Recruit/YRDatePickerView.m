@@ -153,14 +153,14 @@
 
 -(NSString*)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
 {
-    return [NSString stringWithFormat:@"%d",row+1];
+    return [NSString stringWithFormat:@"%ld",row+1];
 }
 
 #pragma mark - UIPickerViewDelegate
 
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-    self.selectedDays = [NSString stringWithFormat:@"%d",row+1];
+    self.selectedDays = [NSString stringWithFormat:@"%ld",row+1];
 }
 
 @end

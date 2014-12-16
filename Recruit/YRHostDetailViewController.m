@@ -41,9 +41,9 @@
 @implementation YRHostDetailViewController
 {
     BOOL spin;
-    int currentSelectedEmailForm;
     BOOL replacingMode;
-    int showingImageIndex;
+    NSInteger currentSelectedEmailForm;
+    NSInteger showingImageIndex;
 }
 
 -(void)loadInfo
@@ -1725,7 +1725,7 @@
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                 NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(self.chosenImage, 0.2)];
                 //save in local resource
-                NSLog(@"%ul",imageData.length);
+                NSLog(@"%lul",(unsigned long)imageData.length);
                 
                 NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
                 NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -1802,7 +1802,7 @@
             NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(self.chosenImage, 0.2)];
             //save in local resource
             
-            NSLog(@"%ul",imageData.length);
+            NSLog(@"%lul",(unsigned long)imageData.length);
             
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
             NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -1912,7 +1912,7 @@
             NSData* imageData = [NSData dataWithData: UIImageJPEGRepresentation(self.chosenImage, 0.2)];
             //save in local resource
             
-            NSLog(@"%ul",imageData.length);
+            NSLog(@"%lul",(unsigned long)imageData.length);
             
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
             NSString *documentsDirectory = [paths objectAtIndex:0];

@@ -8,6 +8,7 @@
 
 #import "YRMainViewController.h"
 #import "YRAppDelegate.h"
+#import "UIColor+Util.h"
 
 #define roleSegCtrlWidth 400
 #define userNameTextWidth 400
@@ -26,7 +27,6 @@
     
 	// Do any additional setup after loading the view, typically from a nib.
     self.yrtextField.delegate = self;
-    UIColor* yahooColor = [UIColor colorWithRed:118.0/255.0 green:18.0/255.0 blue:192.0/255.0 alpha:1.0];
     
     //reset temporary backup
     [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"tempBackUp"];
@@ -35,7 +35,7 @@
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         [[self.yrSignInButton layer] setCornerRadius:60];
         [[self.yrSignInButton layer] setBorderWidth:5];
-        [[self.yrSignInButton layer] setBorderColor:[yahooColor CGColor]];
+        [[self.yrSignInButton layer] setBorderColor:[[UIColor yahooPurple] CGColor]];
         [self.yrsegmentedControl setFrame:CGRectMake(self.view.center.x-roleSegCtrlWidth/2, 380, roleSegCtrlWidth, 50)];
         [self.yrtextField setFrame:CGRectMake(self.view.center.x-userNameTextWidth/2, 280, userNameTextWidth, 50)];
     }
@@ -43,14 +43,13 @@
     {
         [[self.yrSignInButton layer] setCornerRadius:30];
         [[self.yrSignInButton layer] setBorderWidth:2];
-        [[self.yrSignInButton layer] setBorderColor:[yahooColor CGColor]];
+        [[self.yrSignInButton layer] setBorderColor:[[UIColor yahooPurple] CGColor]];
     }
     [self.yrsegmentedControl setSelectedSegmentIndex:1];
     
     //set done button for text input
     UIToolbar* doneToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 50)];
     doneToolbar.items = [NSArray arrayWithObjects:
-                         //                           [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(cancelNumberPad)],
                          [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                          [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithPad)],nil];
     self.yrtextField.inputAccessoryView = doneToolbar;
@@ -76,9 +75,9 @@
     {
         [self setUserName:self.yrtextField.text];
         
-        
-        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setUserName:self.userName];
-        [[(YRAppDelegate*)[[UIApplication sharedApplication] delegate] mcManager] setUserEmail:[self.userName stringByAppendingString:@"@yahoo-inc.com"]];
+        //set up session manager property
+        [[YRAppDelegate sharedMCManager] setUserName:self.userName];
+        [[YRAppDelegate sharedMCManager] setUserEmail:[self.userName stringByAppendingString:@"@yahoo-inc.com"]];
         
         if (self.yrsegmentedControl.selectedSegmentIndex == 0) {
             [self performSegueWithIdentifier:@"MainToHost" sender:self];
